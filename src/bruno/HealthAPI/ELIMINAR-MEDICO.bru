@@ -1,0 +1,16 @@
+meta {
+  name: ELIMINAR-MEDICO
+  type: http
+  seq: 5
+}
+
+delete {
+  url: http://localhost:3000/api/medicos/3
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

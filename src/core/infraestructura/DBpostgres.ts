@@ -4,7 +4,7 @@ import { configuracion } from "../../common/configuracion.js";
 export const pool = new Pool({
   host: configuracion.baseDatos.host,
   user: configuracion.baseDatos.usuario,
-  database: configuracion.baseDatos.nombreDb,
+  database: configuracion.baseDatos.nombreDB,  
   port: configuracion.baseDatos.puerto,
   password: configuracion.baseDatos.contrasena,
 });

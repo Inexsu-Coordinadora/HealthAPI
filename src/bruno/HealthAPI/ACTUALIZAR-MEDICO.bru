@@ -1,0 +1,26 @@
+meta {
+  name: ACTUALIZAR-MEDICO
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:3000/api/medicos/2
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nombreMedico": "Dr. Juan Carlos Pérez",
+    "correoMedico": "jc.perez@hospital.com",
+    "especialidadMedico": "Cardiología Pediátrica"
+  }
+  
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
