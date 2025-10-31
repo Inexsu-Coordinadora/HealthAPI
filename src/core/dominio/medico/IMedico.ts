@@ -1,5 +1,5 @@
 export interface IMedico {
-    idMedico: number | null;
+    idMedico: number;
     nombreMedico: string;
     correoMedico: string;
     especialidadMedico: string;
