@@ -1,12 +1,14 @@
 import Fastify from 'fastify';
 import { configuracion } from '../common/configuracion.js';
 import { medicoRutas } from './rutas/MedicoRutas.js';
+import { pacienteRutas } from './rutas/PacienteRutas.js';
 
 const app = Fastify({ logger: true });
 
 app.register(
   async (appInstance) => {
     await medicoRutas(appInstance);
+    await pacienteRutas(appInstance);
   },
   { prefix: '/api' }
 );

@@ -1,0 +1,20 @@
+meta {
+  name: PACIENTE-POR-ID
+  type: http
+  seq: 9
+}
+
+get {
+  url: http://localhost:3000/api/pacientes/:idPaciente
+  body: none
+  auth: inherit
+}
+
+params:path {
+  idPaciente: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,20 @@
+meta {
+  name: ELIMINAR-PACIENTE
+  type: http
+  seq: 11
+}
+
+delete {
+  url: http://localhost:3000/api/pacientes/:idPaciente
+  body: none
+  auth: inherit
+}
+
+params:path {
+  idPaciente: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

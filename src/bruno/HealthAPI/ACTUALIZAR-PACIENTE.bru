@@ -1,0 +1,30 @@
+meta {
+  name: ACTUALIZAR-PACIENTE
+  type: http
+  seq: 10
+}
+
+put {
+  url: http://localhost:3000/api/pacientes/:idPaciente
+  body: json
+  auth: inherit
+}
+
+params:path {
+  idPaciente: 
+}
+
+body:json {
+  {
+    "nombreMedico": "Dr. Juan Carlos Pérez",
+    "correoMedico": "jc.perez@hospital.com",
+    "especialidadMedico": "Cardiología Pediátrica"
+  }
+  
+  
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
