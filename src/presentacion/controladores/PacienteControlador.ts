@@ -12,6 +12,7 @@ enum Mensajes {
   "200_GET_OK" = "Paciente obtenido exitosamente",
   "200_GET_ALL_OK" = "Lista de pacientes obtenida exitosamente",
   "200_PUT_OK" = "Paciente actualizado exitosamente",
+  "200_DELETE_OK" = "Paciente eliminado exitosamente",
   "404_NOT_FOUND" = "No se encontró un paciente con el ID",
 }
 
@@ -92,5 +93,22 @@ export class PacienteControlador {
       mensaje,
       data: pacienteActualizado,
     });
+  }
+
+  // DELETE /pacientes/:id - Eliminar un paciente
+  async eliminarPaciente(request: FastifyRequest, reply: FastifyReply) {
+    const { id: idPaciente } = validadorEsquemas(
+      esquemaPacientePorId,
+      request.params,
+      reply,
+    );
+
+    const eliminado = await this.pacienteServicio.eliminarPaciente(idPaciente);
+
+    const statusCode = eliminado ? 200 : 404;
+    const mensaje = eliminado
+      ? Mensajes["200_DELETE_OK"]
+      : `${Mensajes["404_NOT_FOUND"]} ${idPaciente}`;
+    return reply.status(statusCode).send({ mensaje });
   }
 }

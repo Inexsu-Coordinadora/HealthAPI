@@ -101,6 +101,20 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
     }
   }
 
+  async eliminarPaciente(idPaciente: number): Promise<boolean> {
+    try {
+      const query =
+        "DELETE FROM Paciente WHERE id_Paciente = $1 RETURNING id_Paciente";
+      const result = await ejecutarConsulta(query, [idPaciente]);
+      return result.rows.length > 0;
+    } catch (error: any) {
+      throw {
+        error: "Error al eliminar el paciente",
+        mensaje: error.message,
+      };
+    }
+  }
+
   // Método auxiliar: Mapear nombres de campos TypeScript a columnas SQL
   private mapearCampoAColumna(campo: string): string {
     const mapeo: Record<string, string> = {

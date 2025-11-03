@@ -8,4 +8,5 @@ export interface IPacienteRepositorio {
     idPaciente: number,
     datosPaciente: IPacienteActualizar,
   ): Promise<IPaciente>;
+  eliminarPaciente(idPaciente: number): Promise<boolean>;
 }

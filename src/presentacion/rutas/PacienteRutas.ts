@@ -23,4 +23,8 @@ export async function pacienteRutas(fastify: FastifyInstance) {
   fastify.put("/pacientes/:id", async (request, reply) => {
     return pacienteControlador.actualizarPaciente(request, reply);
   });
+
+  fastify.delete("/pacientes/:id", async (request, reply) => {
+    return pacienteControlador.eliminarPaciente(request, reply);
+  });
 }

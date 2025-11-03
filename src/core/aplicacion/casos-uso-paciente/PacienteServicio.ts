@@ -47,4 +47,9 @@ export class PacienteServicio {
       datosActualizados,
     );
   }
+
+  // Eliminar un paciente
+  async eliminarPaciente(id: number): Promise<boolean> {
+    return await this.pacienteRepositorio.eliminarPaciente(id);
+  }
 }
