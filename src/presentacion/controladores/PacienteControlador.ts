@@ -1,10 +1,12 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { PacienteServicio } from "../../core/aplicacion/casos-uso-paciente/PacienteServicio.js";
-import { esquemaCrearPaciente } from "../esquemas/PacienteEsquemas.js";
+import { esquemaCrearPaciente, esquemaPacientePorId } from "../esquemas/PacienteEsquemas.js";
 import { validadorEsquemas } from "../esquemas/Validador.js";
 
 enum Mensajes {
+  "200_GET_OK" = "Paciente obtenido exitosamente",
   "200_POST_OK" = "Paciente creado exitosamente",
+  "404_NOT_FOUND" = "No se encontró un paciente con el ID"
 }
 
 export class PacienteControlador {
@@ -25,4 +27,19 @@ export class PacienteControlador {
       data: pacienteCreado,
     });
   }
+
+     // GET /pacientes/:id - Obtener un paciente por ID
+    async obtenerPacientePorId(request: FastifyRequest, reply: FastifyReply) {
+        const { id: idPaciente } = validadorEsquemas(esquemaPacientePorId, request.params, reply);
+
+        const paciente = await this.pacienteServicio.obtenerPacientePorId(idPaciente);
+
+        const statusCode = paciente ? 200 : 404;
+        const mensaje = paciente ? Mensajes["200_GET_OK"] : `${Mensajes["404_NOT_FOUND"]} ${idPaciente}`;
+        return reply.status(statusCode).send({
+            mensaje,
+            data: paciente,
+        });
+    }
+
 }

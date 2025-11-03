@@ -27,6 +27,26 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
       };
     }
   }
+
+      async obtenerPacientePorId(idPaciente: number): Promise<IPaciente | null> {
+        try {
+            const query = "SELECT * FROM Paciente WHERE id_Paciente = $1";
+            const result = await ejecutarConsulta(query, [idPaciente]);
+
+            console.log("🔍 REPOSITORIO - Datos crudos de BD:", JSON.stringify(result.rows, null, 2));
+
+            if (result.rows.length === 0) return null;
+
+            return this.mapearFilaAPaciente(result.rows[0]);
+        } catch (e) {
+            const error = e as Error;
+            throw {
+                error: "Error al obtener el paciente",
+                mensaje: error.message,
+            };
+        }
+    }
+    
   // Método auxiliar: Mapear nombres de campos TypeScript a columnas SQL
   private mapearCampoAColumna(campo: string): string {
     const mapeo: Record<string, string> = {

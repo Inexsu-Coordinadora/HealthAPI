@@ -18,4 +18,8 @@ export class PacienteServicio {
     // Guardar en el repositorio
     return await this.pacienteRepositorio.crearPaciente(nuevoPaciente);
   }
+      // Obtener un paciente por ID
+    async obtenerPacientePorId(id: number): Promise<IPaciente | null> {
+        return await this.pacienteRepositorio.obtenerPacientePorId(id);
+    }
 }

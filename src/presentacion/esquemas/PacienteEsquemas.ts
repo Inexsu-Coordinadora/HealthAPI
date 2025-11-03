@@ -7,6 +7,7 @@ export interface CrearPacienteDTO {
 }
 
 const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const REGEX_STRING_NUMERICO = /^\d+$/;
 
 export const esquemaCrearPaciente = z.object({
   nombrePaciente: z.string(
@@ -18,4 +19,11 @@ export const esquemaCrearPaciente = z.object({
   telefonoPaciente: z
     .string("El teléfono del paciente es obligatorio y debe ser texto")
     .min(7, "El teléfono del paciente debe tener al menos 7 caracteres"),
+});
+
+export const esquemaPacientePorId = z.object({
+    id: z
+        .string()
+        .regex(REGEX_STRING_NUMERICO, "El ID del paciente debe ser un número válido")
+        .transform((val) => Number(val)),
 });
