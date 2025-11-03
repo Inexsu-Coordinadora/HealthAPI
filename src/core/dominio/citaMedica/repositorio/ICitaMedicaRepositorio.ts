@@ -1,7 +1,7 @@
 import type { ICitaMedica } from "../ICitaMedica.js";
 
 export interface ICitaMedicaRepositorio{
-    crear(cita:Omit<ICitaMedica,`id_cita`>): Promise <ICitaMedica>;
+    crear(cita:Omit<ICitaMedica,`idCita`>): Promise <ICitaMedica>;
     obtenerCitaPorId(id:number): Promise <ICitaMedica|null>; 
     listarCitas(): Promise <ICitaMedica[]>; 
     actualizarCita(id:number, cita: Partial<Omit<ICitaMedica,`id_cita`>> ): Promise <ICitaMedica|null>; 

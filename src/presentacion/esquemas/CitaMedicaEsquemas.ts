@@ -16,38 +16,34 @@ export interface ActualizarCitaDTO {
   observaciones?: string;
 }
 
-// ✅ Validar datos para crear una cita
 export function validarCrearCita(datos: any): { valido: boolean; errores: string[] } {
   const errores: string[] = [];
 
-  // Validar idPaciente
+
   if (datos.idPaciente === undefined || typeof datos.idPaciente !== 'number' || isNaN(datos.idPaciente)) {
     errores.push('El idPaciente es obligatorio y debe ser un número válido');
   }
 
-  // Validar idDisponibilidad
+
   if (datos.idDisponibilidad === undefined || typeof datos.idDisponibilidad !== 'number' || isNaN(datos.idDisponibilidad)) {
     errores.push('El idDisponibilidad es obligatorio y debe ser un número válido');
   }
 
-  // Validar fecha
   if (!datos.fecha || isNaN(Date.parse(datos.fecha))) {
     errores.push('La fecha es obligatoria y debe tener un formato de fecha válido');
   }
 
-  // Validar estado
+
   if (!datos.estado || typeof datos.estado !== 'string' || datos.estado.trim() === '') {
     errores.push('El estado es obligatorio y debe ser texto');
   }
 
-  // Validar motivo (opcional)
   if (datos.motivo !== undefined && datos.motivo !== null) {
     if (typeof datos.motivo !== 'string') {
       errores.push('El motivo debe ser texto o nulo');
     }
   }
 
-  // Validar observaciones (opcional)
   if (datos.observaciones !== undefined && typeof datos.observaciones !== 'string') {
     errores.push('Las observaciones deben ser texto');
   }
@@ -58,11 +54,11 @@ export function validarCrearCita(datos: any): { valido: boolean; errores: string
   };
 }
 
-// ✅ Validar datos para actualizar una cita
+
 export function validarActualizarCita(datos: any): { valido: boolean; errores: string[] } {
   const errores: string[] = [];
 
-  // Al menos un campo debe estar presente
+
   if (
     datos.idPaciente === undefined &&
     datos.idDisponibilidad === undefined &&

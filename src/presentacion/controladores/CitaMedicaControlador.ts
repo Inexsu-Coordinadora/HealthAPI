@@ -18,7 +18,7 @@ export class CitaControlador {
       }
 
       const datos = request.body as ICitaMedica;
-      const citaCreada = await this.citaServicio.crearCitaMedica({
+      const citaCreada = await this.citaServicio.CrearCitaMedica({
         idPaciente: datos.idPaciente,
         idDisponibilidad: datos.idDisponibilidad,
         fecha: datos.fecha,
