@@ -15,10 +15,9 @@ export const startServer = async (): Promise<void> => {
       port: configuracion.servidor.puerto,
       host: '0.0.0.0'
     });
-    app.log.info('El servidor está corriendo...');
+    app.log.info('El servidor se esta ejecutando correctamente...');
     
-    
-    console.log('📋 Rutas registradas:');
+
     app.printRoutes();
   } catch (err) {
     app.log.error(`Error al ejecutar el servidor\n ${(err as Error).message}`);
@@ -31,5 +30,5 @@ export const startServer = async (): Promise<void> => {
     };
     
     throw serverError;
-  }
+  };
 };
