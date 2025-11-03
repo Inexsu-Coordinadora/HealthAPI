@@ -36,3 +36,23 @@ export class MedicoServicio {
     // GUARDAR EN EL REPOSITORIO
     return await this.medicoRepositorio.crearMedico(nuevoMedico);
   }
+
+  // OBTENER MEDICO POR ID
+  async obtenerMedicoPorId(id: number): Promise<IMedico> {
+    if (id <= 0) {
+      throw new Error('El ID del médico debe ser un número positivo');
+    }
+
+    const medico = await this.medicoRepositorio.obtenerMedicoPorId(id);
+
+    if (!medico) {
+      throw new Error(`No se encontró un médico con el ID ${id}`);
+    }
+
+    return medico;
+  }
+
+  // OBTENER TODOS LOS MEDICOS EN UNA LISTA
+  async listarMedicos(): Promise<IMedico[]> {
+    return await this.medicoRepositorio.listarMedicos();
+  }
