@@ -22,8 +22,11 @@ export const esquemaCrearPaciente = z.object({
 });
 
 export const esquemaPacientePorId = z.object({
-    id: z
-        .string()
-        .regex(REGEX_STRING_NUMERICO, "El ID del paciente debe ser un número válido")
-        .transform((val) => Number(val)),
+  id: z
+    .string()
+    .regex(
+      REGEX_STRING_NUMERICO,
+      "El ID del paciente debe ser un número válido",
+    )
+    .transform((val) => Number(val)),
 });
