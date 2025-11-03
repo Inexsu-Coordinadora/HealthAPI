@@ -1,5 +1,8 @@
 import type { IPacienteRepositorio } from "../../dominio/paciente/repo/IPacienteRepo.js";
-import type { IPaciente } from "../../dominio/paciente/IPaciente.js";
+import type {
+  IPaciente,
+  IPacienteActualizar,
+} from "../../dominio/paciente/IPaciente.js";
 import { Paciente } from "../../dominio/paciente/Paciente.js";
 
 export class PacienteServicio {
@@ -26,5 +29,22 @@ export class PacienteServicio {
   // Obtener todos los pacientes
   async listarPacientes(): Promise<IPaciente[]> {
     return await this.pacienteRepositorio.listarPacientes();
+  }
+
+  // Actualizar un paciente
+  async actualizarPaciente(
+    id: number,
+    datosActualizados: IPacienteActualizar,
+  ): Promise<IPaciente | null> {
+    // Verificar que el paciente existe
+    const pacienteExistente =
+      await this.pacienteRepositorio.obtenerPacientePorId(id);
+    if (!pacienteExistente) return null;
+
+    // Actualizar en el repositorio
+    return await this.pacienteRepositorio.actualizarPaciente(
+      id,
+      datosActualizados,
+    );
   }
 }

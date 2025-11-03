@@ -3,6 +3,7 @@ import { PacienteServicio } from "../../core/aplicacion/casos-uso-paciente/Pacie
 import {
   esquemaCrearPaciente,
   esquemaPacientePorId,
+  esquemaActualizarPaciente,
 } from "../esquemas/PacienteEsquemas.js";
 import { validadorEsquemas } from "../esquemas/Validador.js";
 
@@ -10,6 +11,7 @@ enum Mensajes {
   "200_POST_OK" = "Paciente creado exitosamente",
   "200_GET_OK" = "Paciente obtenido exitosamente",
   "200_GET_ALL_OK" = "Lista de pacientes obtenida exitosamente",
+  "200_PUT_OK" = "Paciente actualizado exitosamente",
   "404_NOT_FOUND" = "No se encontró un paciente con el ID",
 }
 
@@ -61,6 +63,34 @@ export class PacienteControlador {
       mensaje: Mensajes["200_GET_ALL_OK"],
       data: pacientes,
       total: pacientes.length,
+    });
+  }
+
+  // PUT /pacientes/:id - Actualizar un paciente
+  async actualizarPaciente(request: FastifyRequest, reply: FastifyReply) {
+    const { id: idPaciente } = validadorEsquemas(
+      esquemaPacientePorId,
+      request.params,
+      reply,
+    );
+    const datos = validadorEsquemas(
+      esquemaActualizarPaciente,
+      request.body,
+      reply,
+    );
+
+    const pacienteActualizado = await this.pacienteServicio.actualizarPaciente(
+      idPaciente,
+      datos,
+    );
+
+    const statusCode = pacienteActualizado ? 200 : 404;
+    const mensaje = pacienteActualizado
+      ? Mensajes["200_PUT_OK"]
+      : `${Mensajes["404_NOT_FOUND"]} ${idPaciente}`;
+    return reply.status(statusCode).send({
+      mensaje,
+      data: pacienteActualizado,
     });
   }
 }

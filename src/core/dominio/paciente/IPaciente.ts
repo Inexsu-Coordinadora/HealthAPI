@@ -4,3 +4,9 @@ export interface IPaciente {
   correoPaciente: string;
   telefonoPaciente?: string | null;
 }
+
+export interface IPacienteActualizar {
+  nombrePaciente?: string | undefined;
+  correoPaciente?: string | undefined;
+  telefonoPaciente?: string | undefined;
+}

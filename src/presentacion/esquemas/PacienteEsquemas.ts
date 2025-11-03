@@ -30,3 +30,15 @@ export const esquemaPacientePorId = z.object({
     )
     .transform((val) => Number(val)),
 });
+
+export const esquemaActualizarPaciente = z.object({
+  nombrePaciente: z.string("El nombre del paciente debe ser texto").optional(),
+  correoPaciente: z
+    .string("El correo del paciente debe ser texto")
+    .regex(REGEX_CORREO, "El formato del correo electrónico es inválido")
+    .optional(),
+  telefonoPaciente: z
+    .string("El teléfono del paciente debe ser texto")
+    .min(7, "El teléfono del paciente debe tener al menos 7 caracteres")
+    .optional(),
+});

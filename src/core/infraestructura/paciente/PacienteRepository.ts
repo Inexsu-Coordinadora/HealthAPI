@@ -1,5 +1,8 @@
 import type { IPacienteRepositorio } from "../../dominio/paciente/repo/IPacienteRepo.js";
-import type { IPaciente } from "../../dominio/paciente/IPaciente.js";
+import type {
+  IPaciente,
+  IPacienteActualizar,
+} from "../../dominio/paciente/IPaciente.js";
 import { ejecutarConsulta } from "../DBpostgres.js";
 
 export class PacienteRepositorioPostgres implements IPacienteRepositorio {
@@ -59,6 +62,40 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
     } catch (error: any) {
       throw {
         error: "Error al obtener la lista de pacientes",
+        mensaje: error.message,
+      };
+    }
+  }
+
+  async actualizarPaciente(
+    idPaciente: number,
+    datosPaciente: IPacienteActualizar,
+  ): Promise<IPaciente> {
+    try {
+      const columnas = Object.keys(datosPaciente).map((key) =>
+        this.mapearCampoAColumna(key),
+      );
+      const parametros: Array<string | number | null> =
+        Object.values(datosPaciente);
+      const setClause = columnas
+        .map((col, i) => `${col} = $${i + 1}`)
+        .join(", ");
+      parametros.push(idPaciente);
+
+      const query = `
+                UPDATE Paciente
+                SET ${setClause}
+                WHERE id_Paciente = $${parametros.length}
+                RETURNING *
+            `;
+
+      const result = await ejecutarConsulta(query, parametros);
+
+      return this.mapearFilaAPaciente(result.rows[0]);
+    } catch (e) {
+      const error = e as Error;
+      throw {
+        error: "Error al actualizar el paciente",
         mensaje: error.message,
       };
     }
