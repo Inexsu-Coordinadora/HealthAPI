@@ -97,7 +97,7 @@ export function validarActualizarCita(datos: any): { valido: boolean; errores: s
     if (typeof datos.motivo !== 'string') {
       errores.push('El motivo debe ser texto o nulo');
     }
-  }
+  } 
 
   if (datos.observaciones !== undefined) {
     if (typeof datos.observaciones !== 'string') {
