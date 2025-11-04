@@ -6,10 +6,23 @@ meta {
 
 post {
   url: http://localhost:3000/api/citas
-  body: none
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "idPaciente": 3,
+    "idDisponibilidad": 4,
+    "fecha": "2025-11-05T10:00:00.000Z",
+    "estado": "programada",
+    "motivo": "Consulta de control mensual",
+    "observaciones": "Paciente presenta síntomas leves de gripe"
+  }
+  
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

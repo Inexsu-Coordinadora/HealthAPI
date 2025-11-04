@@ -6,7 +6,7 @@ import type { ICitaMedica } from '../../core/dominio/citaMedica/ICitaMedica.js';
 export class CitaControlador {
   constructor(private readonly citaServicio: CitaMedicaServicio) {}
 
-  // POST /citas - Crear nueva cita
+
   async crearCita(request: FastifyRequest, reply: FastifyReply) {
     try {
       const validacion = validarCrearCita(request.body);
@@ -39,7 +39,7 @@ export class CitaControlador {
     }
   }
 
-  // GET /citas - Listar todas las citas
+
   async listarCitas(request: FastifyRequest, reply: FastifyReply) {
     try {
       const citas = await this.citaServicio.listarCitas();
@@ -57,7 +57,7 @@ export class CitaControlador {
     }
   }
 
-  // GET /citas/:id - Obtener cita por ID
+
   async obtenerCitaPorId(request: FastifyRequest, reply: FastifyReply) {
     try {
       const { id } = request.params as { id: string };
@@ -91,7 +91,7 @@ export class CitaControlador {
     }
   }
 
-  // PUT /citas/:id - Actualizar una cita
+
   async actualizarCita(request: FastifyRequest, reply: FastifyReply) {
     try {
       const { id } = request.params as { id: string };
@@ -134,7 +134,7 @@ export class CitaControlador {
     }
   }
 
-  // DELETE /citas/:id - Eliminar una cita
+
   async eliminarCita(request: FastifyRequest, reply: FastifyReply) {
     try {
       const { id } = request.params as { id: string };
