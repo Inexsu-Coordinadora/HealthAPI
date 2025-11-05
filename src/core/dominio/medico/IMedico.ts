@@ -3,4 +3,4 @@ export interface IMedico {
     nombreMedico: string;
     correoMedico: string;
     especialidadMedico: string;
-};   
+}
