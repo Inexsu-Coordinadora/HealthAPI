@@ -12,10 +12,11 @@ git clone git@github.com:Inexsu-Coordinadora/HealthAPI.git
 
 ### 2. Instalar Dependencias
 ```bash
-npm i
+npm i -g pnpm
+pnpm i
 ```
 
-Este comando instalará todas las dependencias necesarias
+Estos comandos instalará todas las dependencias necesarias
 
 ### 3. Verificar Instalación
 ```bash
@@ -24,4 +25,9 @@ npm run type-check
 
 Si no hay errores, la instalación fue exitosa ✅
 
----
+### 4. Ejecutar el servidor para iniciar el funcionamiento del código.
+```bash
+pnpm run dev
+```
+
+La consola debe mostrar un mensaje que dice: "El servidor se esta ejecutando correctamente...", si este aparece, la ejecución fue exitosa.
