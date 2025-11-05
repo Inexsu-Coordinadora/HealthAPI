@@ -31,3 +31,18 @@ pnpm run dev
 ```
 
 La consola debe mostrar un mensaje que dice: "El servidor se esta ejecutando correctamente...", si este aparece, la ejecución fue exitosa.
+
+
+## 5. 📘 Documentación
+
+Toda la información técnica y funcional del módulo se encuentra en el siguiente documento:
+
+📄 [Ver DOCUMENTACIÓN HEALTHAPI (PDF)](./docs/DOCUMENTACION%20HEALTHAPI.pdf)
+
+## 6. Video Demostrativo
+
+Se puede ver la demostración del funcionamiento en BRUNO de todas las entidades, tales como, Médico, Paciente y Cita médica, dar click en el siguiente link para verlo:
+
+https://youtu.be/cAphvJFwm6w
+
+
