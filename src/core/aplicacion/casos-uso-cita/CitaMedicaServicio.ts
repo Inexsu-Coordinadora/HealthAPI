@@ -1,4 +1,5 @@
 import type { ICitaMedica } from "../../dominio/citaMedica/ICitaMedica.js";
+import type { ICitaMedicaConDetalles } from "../../dominio/citaMedica/ICitaMedicaConDetalles.js";
 import { CitaMedica } from "../../dominio/citaMedica/CitaMedica.js";
 import type { ICitaMedicaRepositorio } from "../../dominio/citaMedica/repositorio/ICitaMedicaRepositorio.js";
 
@@ -99,4 +100,16 @@ export class CitaMedicaServicio {
 
         return await this.citaMedicaRepositorio.eliminarCita(id);
     }
-}
+
+    
+async obtenerCitasPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]> {
+    
+    if (idPaciente <= 0) {
+        throw new Error("El ID del paciente debe ser un número positivo");
+    }
+
+    const citas = await this.citaMedicaRepositorio.obtenerCitasConDetallesPorPaciente(idPaciente);
+
+    return citas;
+};
+};
