@@ -1,6 +1,7 @@
 import type { ICitaMedicaRepositorio } from "../../dominio/citaMedica/repositorio/ICitaMedicaRepositorio.js";
 import type { ICitaMedica } from "../../dominio/citaMedica/ICitaMedica.js";
 import { ejecutarConsulta } from "../DBpostgres.js";
+import type { ICitaMedicaConDetalles } from "../../dominio/citaMedica/ICitaMedicaConDetalles.js";
 
 export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
     // 1. Crear una nueva cita médica
@@ -125,4 +126,47 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
             observaciones: row.observaciones,
         };
     }
+
+    async obtenerCitasConDetallesPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]> {
+    const query = `
+        SELECT 
+            cm.id_cita,
+            cm.fecha,
+            cm.estado,
+            cm.motivo,
+            cm.observaciones,
+            p.id_paciente,
+            p.nombre as nombre_paciente,
+            p.correo as correo_paciente,
+            m.id_medico,
+            m.nombre as nombre_medico,
+            m.especialidad as especialidad_medico
+        FROM cita_medica cm
+        INNER JOIN paciente p ON cm.id_paciente = p.id_paciente
+        INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
+        INNER JOIN medico m ON d.id_medico = m.id_medico
+        WHERE cm.id_paciente = $1
+        ORDER BY cm.fecha DESC
+    `;
+
+    const result = await ejecutarConsulta(query, [idPaciente]);
+    
+    return result.rows.map((row) => ({
+        idCita: row.id_cita,
+        fecha: new Date(row.fecha),
+        estado: row.estado,
+        motivo: row.motivo,
+        observaciones: row.observaciones,
+        paciente: {
+            idPaciente: row.id_paciente,
+            nombrePaciente: row.nombre_paciente,
+            correoPaciente: row.correo_paciente,
+        },
+        medico: {
+            idMedico: row.id_medico,
+            nombreMedico: row.nombre_medico,
+            especialidadMedico: row.especialidad_medico,
+        },
+    }));
+}
 }
