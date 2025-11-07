@@ -1,0 +1,24 @@
+meta {
+  name: CREAR-MEDICO
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/api/medicos
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nombreMedico": "Dr. Jose Herrera",
+    "correoMedico": "jose.h@hospital.com",
+    "especialidadMedico": "Cirujano"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
