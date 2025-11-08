@@ -2,9 +2,13 @@ import type { ICitaMedica } from "../../dominio/citaMedica/ICitaMedica.js";
 import type { ICitaMedicaConDetalles } from "../../dominio/citaMedica/ICitaMedicaConDetalles.js";
 import { CitaMedica } from "../../dominio/citaMedica/CitaMedica.js";
 import type { ICitaMedicaRepositorio } from "../../dominio/citaMedica/repositorio/ICitaMedicaRepositorio.js";
+import type { IPacienteRepositorio } from "../../dominio/paciente/repo/IPacienteRepo.js"; 
 
 export class CitaMedicaServicio {
-    constructor(private citaMedicaRepositorio: ICitaMedicaRepositorio) {}
+    constructor(
+        private citaMedicaRepositorio: ICitaMedicaRepositorio,
+        private pacienteRepositorio: IPacienteRepositorio  
+    ) {}
 
     async CrearCitaMedica(datos: {
         idPaciente: number;
@@ -102,14 +106,22 @@ export class CitaMedicaServicio {
     }
 
     
-async obtenerCitasPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]> {
+    async obtenerCitasPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]> {
     
-    if (idPaciente <= 0) {
-        throw new Error("El ID del paciente debe ser un número positivo");
-    }
+        if (idPaciente <= 0) {
+            throw new Error("El ID del paciente debe ser un número positivo");
+        }
 
-    const citas = await this.citaMedicaRepositorio.obtenerCitasConDetallesPorPaciente(idPaciente);
+    
+        const paciente = await this.pacienteRepositorio.obtenerPacientePorId(idPaciente);
+        if (!paciente) {
+            throw new Error(`No se encontró un paciente con el ID ${idPaciente}`);
+        }
 
-    return citas;
-};
+    
+        const citas = await this.citaMedicaRepositorio.obtenerCitasConDetallesPorPaciente(idPaciente);
+
+    
+        return citas;
+    };
 };

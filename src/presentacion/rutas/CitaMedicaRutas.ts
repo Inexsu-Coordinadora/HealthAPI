@@ -2,13 +2,16 @@ import type { FastifyInstance } from "fastify";
 import { CitaControlador } from "../controladores/CitaMedicaControlador.js";
 import { CitaMedicaServicio } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
 import { CitaMedicaRepositorioPostgres } from "../../core/infraestructura/cita/CitaMedicaRepository.js";
+import { PacienteRepositorioPostgres } from "../../core/infraestructura/paciente/PacienteRepository.js";
 
 
 
 export async function citaRutas(fastify: FastifyInstance) {
     const citaRepositorio = new CitaMedicaRepositorioPostgres();
-    const citaServicio = new CitaMedicaServicio(citaRepositorio);
+    const pacienteRepositorio = new PacienteRepositorioPostgres();
+    const citaServicio = new CitaMedicaServicio(citaRepositorio, pacienteRepositorio);
     const citaControlador = new CitaControlador(citaServicio);
+    
 
     fastify.post("/citas", async (request, reply) => {
         return citaControlador.crearCita(request, reply);

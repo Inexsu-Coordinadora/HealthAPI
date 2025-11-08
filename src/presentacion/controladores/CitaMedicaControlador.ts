@@ -169,7 +169,6 @@ async consultarCitasPorPaciente(request: FastifyRequest, reply: FastifyReply) {
         const { idPaciente } = request.params as { idPaciente: string };
         const id = parseInt(idPaciente, 10);
 
-        
         if (isNaN(id)) {
             return reply.status(400).send({
                 error: "ID inválido",
@@ -177,10 +176,8 @@ async consultarCitasPorPaciente(request: FastifyRequest, reply: FastifyReply) {
             });
         }
 
-        
         const citas = await this.citaServicio.obtenerCitasPorPaciente(id);
 
-        
         if (citas.length === 0) {
             return reply.status(200).send({
                 mensaje: "El paciente no tiene citas registradas",
@@ -189,14 +186,12 @@ async consultarCitasPorPaciente(request: FastifyRequest, reply: FastifyReply) {
             });
         }
 
-        
         return reply.status(200).send({
             mensaje: "Citas del paciente obtenidas exitosamente",
             data: citas,
             total: citas.length,
         });
     } catch (error: any) {
-        
         if (error.message.includes("debe ser un número positivo")) {
             return reply.status(400).send({
                 error: "ID inválido",
@@ -204,7 +199,7 @@ async consultarCitasPorPaciente(request: FastifyRequest, reply: FastifyReply) {
             });
         }
 
-        
+        // ✨ Error: Paciente no encontrado
         if (error.message.includes("No se encontró")) {
             return reply.status(404).send({
                 error: "Paciente no encontrado",
@@ -212,7 +207,6 @@ async consultarCitasPorPaciente(request: FastifyRequest, reply: FastifyReply) {
             });
         }
 
-        
         return reply.status(500).send({
             error: "Error al obtener las citas del paciente",
             mensaje: error.message,
