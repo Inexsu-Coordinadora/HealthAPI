@@ -3,18 +3,17 @@ import type { IDisponibilidad } from "../../dominio/disponibilidad/IDisponibilid
 import { ejecutarConsulta } from "../DBpostgres.js";
 
 export class DisponibilidadRepositorioPostgres implements IDisponibilidadRepositorio {
-    // CREAR UNA NUEVA DISPONIBILIDAD
+    
     async crearDisponibilidad(datosDisponibilidad: IDisponibilidad): Promise<IDisponibilidad> {
         const { idDisponibilidad, ...datosParaInsertar } = datosDisponibilidad;
 
-        const columnas = Object.keys(datosParaInsertar)
-            .filter((key) => datosParaInsertar[key as keyof typeof datosParaInsertar] !== undefined)
-            .map((key) => this.mapearCampoAColumna(key));
-
-        const parametros: Array<string | number | null> = Object.entries(datosParaInsertar)
+        
+        const datosLimpios = Object.entries(datosParaInsertar)
             .filter(([_, value]) => value !== undefined)
-            .map(([_, value]) => value);
+            .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
 
+        const columnas = Object.keys(datosLimpios).map((key) => this.mapearCampoAColumna(key));
+        const parametros: Array<string | number | null> = Object.values(datosLimpios);
         const placeholders = columnas.map((_, i) => `$${i + 1}`).join(", ");
 
         const query = `
@@ -24,8 +23,8 @@ export class DisponibilidadRepositorioPostgres implements IDisponibilidadReposit
         `;
 
         const respuesta = await ejecutarConsulta(query, parametros);
-        return this.mapearFilaADisponibilidad(respuesta.rows[0]);
-    }
+    return this.mapearFilaADisponibilidad(respuesta.rows[0]);
+}
 
     // OBTENER DISPONIBILIDAD POR ID
     async obtenerDisponibilidadPorId(idDisponibilidad: number): Promise<IDisponibilidad | null> {

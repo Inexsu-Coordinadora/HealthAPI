@@ -77,23 +77,24 @@ export class ConsultorioRepositorioPostgres implements IConsultorioRepositorio {
     }
 
     
-    private mapearCampoAColumna(campo: string): string {
-        const mapeo: Record<string, string> = {
-            idConsultorio: "id_consultorio",
-            nombreConsultorio: "nombre",
-            ubicacionConsultorio: "ubicacion",
-            capacidadConsultorio: "capacidad",
-        };
-        return mapeo[campo] || campo.toLowerCase();
-    }
+private mapearCampoAColumna(campo: string): string {
+    const mapeo: Record<string, string> = {
+        idConsultorio: "id_consultorio",
+        nombreConsultorio: "nombre_consultorio",        
+        ubicacionConsultorio: "ubicacion_consultorio", 
+        capacidadConsultorio: "capacidad_consultorio", 
+    };
+    return mapeo[campo] || campo.toLowerCase();
+}
 
     
-    private mapearFilaAConsultorio(row: any): IConsultorio {
-        return {
-            idConsultorio: row.id_consultorio,
-            nombreConsultorio: row.nombre,
-            ubicacionConsultorio: row.ubicacion,
-            capacidadConsultorio: row.capacidad,
-        };
-    }
+    
+private mapearFilaAConsultorio(row: any): IConsultorio {
+    return {
+        idConsultorio: row.id_consultorio,
+        nombreConsultorio: row.nombre_consultorio,        
+        ubicacionConsultorio: row.ubicacion_consultorio,  
+        capacidadConsultorio: row.capacidad_consultorio,  
+    };
+}
 }
