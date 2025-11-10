@@ -100,6 +100,22 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         return result.rows.map((row) => this.mapearFilaACitaMedica(row));
     }
 
+    async verificarCitasSuperpuestasMedico(idDisponibilidad: number, fecha: Date): Promise<boolean> {
+        const query = `
+            SELECT COUNT(*) as count
+            FROM cita_medica cm
+            INNER JOIN disponibilidad d1 ON cm.id_disponibilidad = d1.id_disponibilidad
+            INNER JOIN disponibilidad d2 ON d1.id_medico = d2.id_medico
+            WHERE d2.id_disponibilidad = $1
+            AND cm.fecha BETWEEN $2::timestamp - interval '1 hour' 
+                            AND $2::timestamp + interval '1 hour'
+            AND cm.estado != 'cancelada'
+        `;
+    
+        const result = await ejecutarConsulta(query, [idDisponibilidad, fecha]);
+        return parseInt(result.rows[0].count) > 0;
+    }
+
     // Método auxiliar: Mapear nombres de campos TypeScript a columnas SQL
     private mapearCampoAColumna(campo: string): string {
         const mapeo: Record<string, string> = {

@@ -22,6 +22,15 @@ export class CitaMedicaServicio {
             throw new Error("Estado de cita inválido");
         }
 
+        const medicoOcupado = await this.citaMedicaRepositorio.verificarCitasSuperpuestasMedico(
+            datos.idDisponibilidad,
+            datos.fecha
+            );
+    
+            if (medicoOcupado) {
+                throw new Error(`El médico ya tiene una cita programada en ese horario`);
+            }
+
         const nuevaCita: Omit<ICitaMedica, "idCita"> = {
             idPaciente: datos.idPaciente,
             idDisponibilidad: datos.idDisponibilidad,
@@ -32,6 +41,8 @@ export class CitaMedicaServicio {
         };
 
         return await this.citaMedicaRepositorio.crear(nuevaCita);
+
+        
     }
 
     async obtenerCitaMedicaPorId(id: number): Promise<ICitaMedica> {
