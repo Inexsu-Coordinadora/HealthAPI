@@ -20,6 +20,11 @@ export class MedicoServicio {
             throw new Error("La especialidad del médico es obligatoria");
         }
 
+        const medicoExistente = await this.medicoRepositorio.obtenerPorCorreo(datos.correoMedico);
+            if (medicoExistente) {
+        throw new Error(`Ya existe un médico con el correo ${datos.correoMedico}`);
+        }
+
         // INSTANCIAR MÉDICO
         const nuevoMedico = Medico.crear(datos.nombreMedico, datos.correoMedico, datos.especialidadMedico);
 
