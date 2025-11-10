@@ -40,9 +40,16 @@ export class CitaMedicaServicio {
             observaciones: datos.observaciones,
         };
 
-        return await this.citaMedicaRepositorio.crear(nuevaCita);
+        const consultorioOcupado = await this.citaMedicaRepositorio.verificarCitasSuperpuestasConsultorio(
+            datos.idDisponibilidad,
+            datos.fecha
+        );
+    
+        if (consultorioOcupado) {
+            throw new Error(`El consultorio ya está ocupado en ese horario`);
+        }
 
-        
+        return await this.citaMedicaRepositorio.crear(nuevaCita);
     }
 
     async obtenerCitaMedicaPorId(id: number): Promise<ICitaMedica> {

@@ -116,6 +116,24 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         return parseInt(result.rows[0].count) > 0;
     }
 
+
+    async verificarCitasSuperpuestasConsultorio(idDisponibilidad: number, fecha: Date): Promise<boolean> {
+        const query = `
+            SELECT COUNT(*) as count
+            FROM cita_medica cm
+            INNER JOIN disponibilidad d1 ON cm.id_disponibilidad = d1.id_disponibilidad
+            INNER JOIN disponibilidad d2 ON d1.id_consultorio = d2.id_consultorio
+            WHERE d2.id_disponibilidad = $1
+            AND d2.id_consultorio IS NOT NULL
+            AND cm.fecha BETWEEN $2::timestamp - interval '1 hour' 
+                            AND $2::timestamp + interval '1 hour'
+            AND cm.estado != 'cancelada'
+        `;
+    
+        const result = await ejecutarConsulta(query, [idDisponibilidad, fecha]);
+        return parseInt(result.rows[0].count) > 0;
+    }
+
     // Método auxiliar: Mapear nombres de campos TypeScript a columnas SQL
     private mapearCampoAColumna(campo: string): string {
         const mapeo: Record<string, string> = {

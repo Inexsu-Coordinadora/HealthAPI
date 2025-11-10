@@ -12,4 +12,5 @@ export interface ICitaMedicaRepositorio {
     obtenerPorEstado(estado: string): Promise<ICitaMedica[]>;
     obtenerCitasConDetallesPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]>;
     verificarCitasSuperpuestasMedico(idDisponibilidad: number, fecha: Date): Promise<boolean>;
+    verificarCitasSuperpuestasConsultorio(idDisponibilidad: number, fecha: Date): Promise<boolean>;
 }
