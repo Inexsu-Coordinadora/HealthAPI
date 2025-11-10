@@ -9,6 +9,11 @@ export class PacienteServicio {
         // Crear instancia de Paciente
         const nuevoPaciente = Paciente.crear(datos.nombrePaciente, datos.correoPaciente, datos.telefonoPaciente || "");
 
+        const pacienteExistente = await this.pacienteRepositorio.obtenerPorCorreo(datos.correoPaciente);
+            if (pacienteExistente) {
+        throw new Error(`Ya existe un paciente con el correo ${datos.correoPaciente}`);
+    }
+
         return await this.pacienteRepositorio.crearPaciente(nuevoPaciente);
     }
     // Obtener un paciente por ID

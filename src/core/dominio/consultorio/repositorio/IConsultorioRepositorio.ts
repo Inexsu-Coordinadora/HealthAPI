@@ -6,4 +6,5 @@ export interface IConsultorioRepositorio {
     listarConsultorios(): Promise<IConsultorio[]>;
     actualizarConsultorio(idConsultorio: number, datosConsultorio: Partial<IConsultorio>): Promise<IConsultorio>;
     eliminarConsultorio(idConsultorio: number): Promise<boolean>;
+    obtenerPorNombre(nombre: string): Promise<IConsultorio | null>;
 }
