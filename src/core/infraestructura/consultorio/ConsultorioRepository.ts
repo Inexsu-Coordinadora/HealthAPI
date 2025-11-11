@@ -30,7 +30,7 @@ export class ConsultorioRepositorioPostgres implements IConsultorioRepositorio {
         idConsultorio: number
     ): Promise<IConsultorio | null> {
         const query =
-            "SELECT id_consultorio, nombre, ubicacion, capacidad FROM consultorio WHERE id_consultorio = $1";
+            "SELECT id_consultorio, nombre_consultorio, ubicacion_consultorio, capacidad_consultorio FROM consultorio WHERE id_consultorio = $1";
         const result = await ejecutarConsulta(query, [idConsultorio]);
 
         if (result.rows.length === 0) {
@@ -42,7 +42,7 @@ export class ConsultorioRepositorioPostgres implements IConsultorioRepositorio {
 
     async listarConsultorios(): Promise<IConsultorio[]> {
         const query =
-            "SELECT id_consultorio, nombre, ubicacion, capacidad FROM consultorio ORDER BY id_consultorio ASC";
+            "SELECT id_consultorio, nombre_consultorio, ubicacion_consultorio, capacidad_consultorio FROM consultorio ORDER BY id_consultorio ASC";
         const result = await ejecutarConsulta(query, []);
         return result.rows.map((row) => this.mapearFilaAConsultorio(row));
     }
@@ -72,7 +72,7 @@ export class ConsultorioRepositorioPostgres implements IConsultorioRepositorio {
             UPDATE consultorio
             SET ${setClause}
             WHERE id_consultorio = $${parametros.length}
-            RETURNING id_consultorio, nombre, ubicacion, capacidad
+            RETURNING id_consultorio, nombre_consultorio, ubicacion_consultorio, capacidad_consultorio
         `;
 
         const result = await ejecutarConsulta(query, parametros);
