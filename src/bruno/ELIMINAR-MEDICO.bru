@@ -1,10 +1,10 @@
 meta {
   name: ELIMINAR-MEDICO
   type: http
-  seq: 5
+  seq: 11
 }
 
-get {
+delete {
   url: http://localhost:3000/api/medicos/7
   body: none
   auth: inherit
@@ -12,4 +12,5 @@ get {
 
 settings {
   encodeUrl: true
+  timeout: 0
 }
