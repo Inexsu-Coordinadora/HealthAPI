@@ -31,6 +31,15 @@ export class CitaMedicaServicio {
                 throw new Error(`El médico ya tiene una cita programada en ese horario`);
             }
 
+            const pacienteTieneCita = await this.citaMedicaRepositorio.verificarCitasSuperpuestasPaciente(
+                datos.idPaciente,
+                datos.fecha
+            );
+            
+            if (pacienteTieneCita) {
+                throw new Error("El paciente ya tiene una cita programada en ese horario");
+            }
+
         const nuevaCita: Omit<ICitaMedica, "idCita"> = {
             idPaciente: datos.idPaciente,
             idDisponibilidad: datos.idDisponibilidad,

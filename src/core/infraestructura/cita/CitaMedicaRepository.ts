@@ -148,6 +148,20 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         return mapeo[campo] || campo.toLowerCase();
     }
 
+    async verificarCitasSuperpuestasPaciente(idPaciente: number, fecha: Date): Promise<boolean> {
+        const query = `
+            SELECT COUNT(*) as count
+            FROM cita_medica
+            WHERE id_paciente = $1
+            AND fecha BETWEEN $2::timestamp - interval '1 hour' 
+                        AND $2::timestamp + interval '1 hour'
+            AND estado != 'cancelada'
+        `;
+        
+        const result = await ejecutarConsulta(query, [idPaciente, fecha]);
+        return parseInt(result.rows[0].count) > 0;
+    }
+
     // Método auxiliar: Mapear fila de BD a objeto ICitaMedica
     private mapearFilaACitaMedica(row: any): ICitaMedica {
         return {
