@@ -8,7 +8,8 @@ export class DisponibilidadRepositorioPostgres
     async crearDisponibilidad(
         datosDisponibilidad: IDisponibilidad
     ): Promise<IDisponibilidad> {
-        const { idDisponibilidad, ...datosParaInsertar } = datosDisponibilidad;
+        const { idDisponibilidad: _idDisponibilidad, ...datosParaInsertar } =
+            datosDisponibilidad;
 
         const datosLimpios = Object.entries(datosParaInsertar)
             .filter(([_, value]) => value !== undefined)

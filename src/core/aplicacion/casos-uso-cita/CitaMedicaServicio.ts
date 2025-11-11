@@ -34,7 +34,7 @@ export class CitaMedicaServicio {
     ): Promise<ICitaMedica | null> {
         const citaExistente =
             await this.citaMedicaRepositorio.obtenerCitaPorId(id);
-        if (!citaExistente) return null;
+        if (!citaExistente) {return null;}
 
         return await this.citaMedicaRepositorio.actualizarCita(
             id,

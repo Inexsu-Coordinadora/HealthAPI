@@ -6,7 +6,8 @@ export class ConsultorioRepositorioPostgres implements IConsultorioRepositorio {
     async crearConsultorio(
         datosConsultorio: IConsultorio
     ): Promise<IConsultorio> {
-        const { idConsultorio, ...datosParaInsertar } = datosConsultorio;
+        const { idConsultorio: _idConsultorio, ...datosParaInsertar } =
+            datosConsultorio;
 
         const columnas = Object.keys(datosParaInsertar).map((key) =>
             this.mapearCampoAColumna(key)

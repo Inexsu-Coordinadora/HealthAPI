@@ -118,7 +118,7 @@ export const crearDisponibilidadConValidacionRepositorios = (
         )
         .refine(
             async (data) => {
-                if (!data.idConsultorio) return true;
+                if (!data.idConsultorio) {return true;}
                 const consultorioExiste =
                     await consultorioRepo.obtenerConsultorioPorId(
                         data.idConsultorio

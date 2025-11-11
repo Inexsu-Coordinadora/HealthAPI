@@ -73,7 +73,7 @@ export class DisponibilidadServicio {
     ): Promise<IDisponibilidad | null> {
         const disponibilidadExistente =
             await this.disponibilidadRepositorio.obtenerDisponibilidadPorId(id);
-        if (!disponibilidadExistente) return null;
+        if (!disponibilidadExistente) {return null;}
 
         return await this.disponibilidadRepositorio.actualizarDisponibilidad(
             id,

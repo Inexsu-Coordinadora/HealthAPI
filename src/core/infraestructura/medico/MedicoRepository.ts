@@ -5,7 +5,7 @@ import { ejecutarConsulta } from "../DBpostgres.js";
 export class MedicoRepositorioPostgres implements IMedicoRepositorio {
     // CREAR UN NUEVO MÉDICO
     async crearMedico(datosMedico: IMedico): Promise<IMedico> {
-        const { idMedico, ...datosParaInsertar } = datosMedico;
+        const { idMedico: _idMedico, ...datosParaInsertar } = datosMedico;
 
         const columnas = Object.keys(datosParaInsertar).map((key) =>
             this.mapearCampoAColumna(key)

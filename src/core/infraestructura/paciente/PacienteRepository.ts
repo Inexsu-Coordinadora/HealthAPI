@@ -37,7 +37,7 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
                 "SELECT id_paciente, nombre, correo, telefono FROM Paciente WHERE id_Paciente = $1";
             const result = await ejecutarConsulta(query, [idPaciente]);
 
-            if (result.rows.length === 0) return null;
+            if (result.rows.length === 0) {return null;}
 
             return this.mapearFilaAPaciente(result.rows[0]);
         } catch (e) {

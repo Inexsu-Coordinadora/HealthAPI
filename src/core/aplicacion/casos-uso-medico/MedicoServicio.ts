@@ -29,7 +29,7 @@ export class MedicoServicio {
     ): Promise<IMedico | null> {
         const medicoExistente =
             await this.medicoRepositorio.obtenerMedicoPorId(id);
-        if (!medicoExistente) return null;
+        if (!medicoExistente) {return null;}
 
         return await this.medicoRepositorio.actualizarMedico(
             id,

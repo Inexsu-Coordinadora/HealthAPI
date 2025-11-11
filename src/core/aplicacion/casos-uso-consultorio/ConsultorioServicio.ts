@@ -35,7 +35,7 @@ export class ConsultorioServicio {
     ): Promise<IConsultorio | null> {
         const consultorioExistente =
             await this.consultorioRepositorio.obtenerConsultorioPorId(id);
-        if (!consultorioExistente) return null;
+        if (!consultorioExistente) {return null;}
 
         return await this.consultorioRepositorio.actualizarConsultorio(
             id,

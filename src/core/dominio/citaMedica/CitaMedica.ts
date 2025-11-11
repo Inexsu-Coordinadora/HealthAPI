@@ -1,4 +1,4 @@
-import type { ICitaMedica } from "./ICitaMedica.ts";
+import type { ICitaMedica } from "./ICitaMedica.js";
 
 export class CitaMedica implements ICitaMedica {
     idCita: number | null;
