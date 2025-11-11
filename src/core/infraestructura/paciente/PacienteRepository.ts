@@ -33,7 +33,8 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
 
     async obtenerPacientePorId(idPaciente: number): Promise<IPaciente | null> {
         try {
-            const query = "SELECT * FROM Paciente WHERE id_Paciente = $1";
+            const query =
+                "SELECT id_paciente, nombre, correo, telefono FROM Paciente WHERE id_Paciente = $1";
             const result = await ejecutarConsulta(query, [idPaciente]);
 
             if (result.rows.length === 0) return null;
@@ -50,7 +51,8 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
 
     async listarPacientes(): Promise<IPaciente[]> {
         try {
-            const query = "SELECT * FROM paciente ORDER BY id_paciente ASC";
+            const query =
+                "SELECT id_paciente, nombre, correo, telefono FROM paciente ORDER BY id_paciente ASC";
             const result = await ejecutarConsulta(query, []);
             const pacientes = result.rows.map((row) =>
                 this.mapearFilaAPaciente(row)

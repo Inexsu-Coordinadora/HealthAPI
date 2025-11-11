@@ -36,7 +36,7 @@ export class DisponibilidadRepositorioPostgres
         idDisponibilidad: number
     ): Promise<IDisponibilidad | null> {
         const query =
-            "SELECT * FROM disponibilidad WHERE id_disponibilidad = $1";
+            "SELECT id_disponibilidad, id_medico, id_consultorio, dia_semana, hora_inicio, hora_fin FROM disponibilidad WHERE id_disponibilidad = $1";
         const result = await ejecutarConsulta(query, [idDisponibilidad]);
 
         if (result.rows.length === 0) {
@@ -49,7 +49,7 @@ export class DisponibilidadRepositorioPostgres
     // LISTAR TODAS LAS DISPONIBILIDADES
     async listarDisponibilidades(): Promise<IDisponibilidad[]> {
         const query =
-            "SELECT * FROM disponibilidad ORDER BY id_disponibilidad ASC";
+            "SELECT id_disponibilidad, id_medico, id_consultorio, dia_semana, hora_inicio, hora_fin FROM disponibilidad ORDER BY id_disponibilidad ASC";
         const result = await ejecutarConsulta(query, []);
         return result.rows.map((row) => this.mapearFilaADisponibilidad(row));
     }
@@ -59,7 +59,7 @@ export class DisponibilidadRepositorioPostgres
         idMedico: number
     ): Promise<IDisponibilidad[]> {
         const query =
-            "SELECT * FROM disponibilidad WHERE id_medico = $1 ORDER BY dia_semana, hora_inicio";
+            "SELECT id_disponibilidad, id_medico, id_consultorio, dia_semana, hora_inicio, hora_fin FROM disponibilidad WHERE id_medico = $1 ORDER BY dia_semana, hora_inicio";
         const result = await ejecutarConsulta(query, [idMedico]);
         return result.rows.map((row) => this.mapearFilaADisponibilidad(row));
     }
@@ -69,7 +69,7 @@ export class DisponibilidadRepositorioPostgres
         idConsultorio: number
     ): Promise<IDisponibilidad[]> {
         const query =
-            "SELECT * FROM disponibilidad WHERE id_consultorio = $1 ORDER BY dia_semana, hora_inicio";
+            "SELECT id_disponibilidad, id_medico, id_consultorio, dia_semana, hora_inicio, hora_fin FROM disponibilidad WHERE id_consultorio = $1 ORDER BY dia_semana, hora_inicio";
         const result = await ejecutarConsulta(query, [idConsultorio]);
         return result.rows.map((row) => this.mapearFilaADisponibilidad(row));
     }
@@ -110,7 +110,7 @@ export class DisponibilidadRepositorioPostgres
             UPDATE disponibilidad
             SET ${setClause}
             WHERE id_disponibilidad = $${parametros.length}
-            RETURNING *
+            RETURNING id_disponibilidad, id_medico, id_consultorio, dia_semana, hora_inicio, hora_fin
         `;
 
         const result = await ejecutarConsulta(query, parametros);
