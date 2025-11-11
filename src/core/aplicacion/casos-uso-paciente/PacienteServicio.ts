@@ -1,4 +1,4 @@
-import type { IPacienteRepositorio } from "../../dominio/paciente/repositorio/IPacienteRepo.js";
+import type { IPacienteRepositorio } from "../../dominio/paciente/repositorio/IPacienteRepositorio.js";
 import type {
     IPaciente,
     IPacienteActualizar,
