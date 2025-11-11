@@ -51,6 +51,25 @@ export class CitaControlador {
                 });
             }
 
+            // Error de disponibilidad no encontrada
+            if (error.message.includes("No se encontró una disponibilidad")) {
+                return reply.status(404).send({
+                    error: "Disponibilidad no encontrada",
+                    mensaje: error.message,
+                });
+            }
+
+            // Error de validación de fecha con disponibilidad
+            if (
+                error.message.includes("no coincide") ||
+                error.message.includes("no está dentro del rango")
+            ) {
+                return reply.status(400).send({
+                    error: "Fecha inválida",
+                    mensaje: error.message,
+                });
+            }
+
             // Error de duplicado desde el servicio
             if (error.message.includes("Ya existe")) {
                 return reply.status(409).send({
