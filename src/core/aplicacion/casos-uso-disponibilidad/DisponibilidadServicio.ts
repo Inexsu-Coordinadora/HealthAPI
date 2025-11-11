@@ -1,8 +1,6 @@
 import type { IDisponibilidadRepositorio } from "../../dominio/disponibilidad/repositorio/IDisponibilidadRepositorio.js";
 import type { IDisponibilidad } from "../../dominio/disponibilidad/IDisponibilidad.js";
 import { Disponibilidad } from "../../dominio/disponibilidad/Disponibilidad.js";
-import type { IMedicoRepositorio } from "../../dominio/medico/repositorio/IMedicoRepositorio.js";
-import type { IConsultorioRepositorio } from "../../dominio/consultorio/repositorio/IConsultorioRepositorio.js";
 
 export class DisponibilidadServicio {
     constructor(

@@ -3,7 +3,6 @@ import * as z from "zod";
 import { DisponibilidadServicio } from "../../core/aplicacion/casos-uso-disponibilidad/DisponibilidadServicio.js";
 import type { IDisponibilidad } from "../../core/dominio/disponibilidad/IDisponibilidad.js";
 import {
-    esquemaCrearDisponibilidad,
     esquemaDisponibilidadPorId,
     esquemaActualizarDisponibilidad,
     crearDisponibilidadConValidacionRepositorios,
@@ -98,7 +97,7 @@ export class DisponibilidadControlador {
         }
     }
 
-    async listarDisponibilidades(request: FastifyRequest, reply: FastifyReply) {
+    async listarDisponibilidades(reply: FastifyReply) {
         const disponibilidades =
             await this.disponibilidadServicio.listarDisponibilidades();
 

@@ -35,7 +35,7 @@ export class MedicoControlador {
         });
     }
 
-    async listarMedicos(request: FastifyRequest, reply: FastifyReply) {
+    async listarMedicos(reply: FastifyReply) {
         const medicos = await this.medicoServicio.listarMedicos();
 
         return reply.status(200).send({

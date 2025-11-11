@@ -42,7 +42,7 @@ export class PacienteControlador {
     }
 
     // GET /pacientes - Obtener todos los pacientes
-    async listarPacientes(request: FastifyRequest, reply: FastifyReply) {
+    async listarPacientes(reply: FastifyReply) {
         const pacientes = await this.pacienteServicio.listarPacientes();
 
         return reply.status(200).send({

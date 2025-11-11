@@ -39,7 +39,7 @@ export class ConsultorioControlador {
         });
     }
 
-    async listarConsultorios(request: FastifyRequest, reply: FastifyReply) {
+    async listarConsultorios(reply: FastifyReply) {
         const consultorios =
             await this.consultorioServicio.listarConsultorios();
 

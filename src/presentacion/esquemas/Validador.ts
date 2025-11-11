@@ -1,5 +1,5 @@
 import * as z from "zod";
-import type { FastifyReply, FastifyRequest, RequestBodyDefault } from "fastify";
+import type { FastifyReply, RequestBodyDefault } from "fastify";
 
 export function validadorEsquemas<T>(esquema: z.ZodSchema<T>, datos: RequestBodyDefault, reply: FastifyReply): T {
     try {

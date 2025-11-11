@@ -1,5 +1,5 @@
 import * as z from "zod";
-import type { IPacienteRepositorio } from "../../core/dominio/paciente/repo/IPacienteRepo.js";
+import type { IPacienteRepositorio } from "../../core/dominio/paciente/repositorio/IPacienteRepo.js";
 import type { IDisponibilidadRepositorio } from "../../core/dominio/disponibilidad/repositorio/IDisponibilidadRepositorio.js";
 import { CitaMedica } from "../../core/dominio/citaMedica/CitaMedica.js";
 
