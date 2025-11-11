@@ -1,78 +1,47 @@
+import * as z from "zod";
+
 export interface CrearMedicoDTO {
     nombreMedico: string;
     correoMedico: string;
     especialidadMedico: string;
 }
 
-export interface ActualizarMedicoDTO {
-    nombreMedico?: string;
-    correoMedico?: string;
-    especialidadMedico?: string;
-}
+const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const REGEX_STRING_NUMERICO = /^\d+$/;
 
-export function validarCrearMedico(datos: any): { valido: boolean; errores: string[] } {
-    const errores: string[] = [];
+export const esquemaCrearMedico = z.object({
+    nombreMedico: z
+        .string("El nombre del médico es obligatorio y debe ser texto")
+        .min(1, "El nombre del médico no puede estar vacío"),
+    correoMedico: z
+        .string("El correo del médico es obligatorio y debe ser texto")
+        .regex(REGEX_CORREO, "El formato del correo electrónico es inválido"),
+    especialidadMedico: z
+        .string("La especialidad del médico es obligatoria y debe ser texto")
+        .min(1, "La especialidad del médico no puede estar vacía"),
+});
 
-    if (!datos.nombreMedico || typeof datos.nombreMedico !== "string" || datos.nombreMedico.trim() === "") {
-        errores.push("El nombre del médico es obligatorio y debe ser texto");
-    }
+export const esquemaMedicoPorId = z.object({
+    id: z
+        .string()
+        .regex(
+            REGEX_STRING_NUMERICO,
+            "El ID del médico debe ser un número válido"
+        )
+        .transform((val) => Number(val)),
+});
 
-    if (!datos.correoMedico || typeof datos.correoMedico !== "string" || datos.correoMedico.trim() === "") {
-        errores.push("El correo del médico es obligatorio y debe ser texto");
-    } else {
-        const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!regexCorreo.test(datos.correoMedico)) {
-            errores.push("El formato del correo electrónico es inválido");
-        }
-    }
-
-    if (
-        !datos.especialidadMedico ||
-        typeof datos.especialidadMedico !== "string" ||
-        datos.especialidadMedico.trim() === ""
-    ) {
-        errores.push("La especialidad del médico es obligatoria y debe ser texto");
-    }
-
-    return {
-        valido: errores.length === 0,
-        errores,
-    };
-}
-
-export function validarActualizarMedico(datos: any): { valido: boolean; errores: string[] } {
-    const errores: string[] = [];
-
-    if (!datos.nombreMedico && !datos.correoMedico && !datos.especialidadMedico) {
-        errores.push("Debe proporcionar al menos un campo para actualizar");
-        return { valido: false, errores };
-    }
-
-    if (datos.nombreMedico !== undefined) {
-        if (typeof datos.nombreMedico !== "string" || datos.nombreMedico.trim() === "") {
-            errores.push("El nombre del médico debe ser texto y no puede estar vacío");
-        }
-    }
-
-    if (datos.correoMedico !== undefined) {
-        if (typeof datos.correoMedico !== "string" || datos.correoMedico.trim() === "") {
-            errores.push("El correo del médico debe ser texto y no puede estar vacío");
-        } else {
-            const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!regexCorreo.test(datos.correoMedico)) {
-                errores.push("El formato del correo electrónico es inválido");
-            }
-        }
-    }
-
-    if (datos.especialidadMedico !== undefined) {
-        if (typeof datos.especialidadMedico !== "string" || datos.especialidadMedico.trim() === "") {
-            errores.push("La especialidad del médico debe ser texto y no puede estar vacía");
-        }
-    }
-
-    return {
-        valido: errores.length === 0,
-        errores,
-    };
-}
+export const esquemaActualizarMedico = z.object({
+    nombreMedico: z
+        .string("El nombre del médico debe ser texto")
+        .min(1, "El nombre del médico no puede estar vacío")
+        .optional(),
+    correoMedico: z
+        .string("El correo del médico debe ser texto")
+        .regex(REGEX_CORREO, "El formato del correo electrónico es inválido")
+        .optional(),
+    especialidadMedico: z
+        .string("La especialidad del médico debe ser texto")
+        .min(1, "La especialidad del médico no puede estar vacía")
+        .optional(),
+});
