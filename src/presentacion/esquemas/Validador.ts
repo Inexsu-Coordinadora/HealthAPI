@@ -1,7 +1,11 @@
 import * as z from "zod";
 import type { FastifyReply, RequestBodyDefault } from "fastify";
 
-export function validadorEsquemas<T>(esquema: z.ZodSchema<T>, datos: RequestBodyDefault, reply: FastifyReply): T {
+export function validadorEsquemas<T>(
+    esquema: z.ZodSchema<T>,
+    datos: RequestBodyDefault,
+    reply: FastifyReply
+): T {
     try {
         return esquema.parse(datos);
     } catch (e) {
