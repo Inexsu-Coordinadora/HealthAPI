@@ -17,7 +17,7 @@ export async function medicoRutas(fastify: FastifyInstance) {
     });
 
     fastify.get("/medicos", async (request, reply) => {
-        return medicoControlador.listarMedicos(request, reply);
+        return medicoControlador.listarMedicos(reply);
     });
 
     fastify.put("/medicos/:id", async (request, reply) => {

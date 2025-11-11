@@ -19,7 +19,7 @@ export async function consultorioRutas(fastify: FastifyInstance) {
     });
 
     fastify.get("/consultorios", async (request, reply) => {
-        return consultorioControlador.listarConsultorios(request, reply);
+        return consultorioControlador.listarConsultorios(reply);
     });
 
     fastify.put("/consultorios/:id", async (request, reply) => {

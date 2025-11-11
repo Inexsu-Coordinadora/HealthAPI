@@ -24,7 +24,7 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
     });
 
     fastify.get("/disponibilidades", async (request, reply) => {
-        return disponibilidadControlador.listarDisponibilidades(request, reply);
+        return disponibilidadControlador.listarDisponibilidades(reply);
     });
 
     fastify.put("/disponibilidades/:id", async (request, reply) => {

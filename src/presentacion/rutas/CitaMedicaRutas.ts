@@ -16,7 +16,7 @@ export async function citaRutas(fastify: FastifyInstance) {
     });
 
     fastify.get("/citas", async (request, reply) => {
-        return citaControlador.listarCitas(request, reply);
+        return citaControlador.listarCitas(reply);
     });
 
     fastify.put("/citas/:id", async (request, reply) => {
