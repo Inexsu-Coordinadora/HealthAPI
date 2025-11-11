@@ -1,12 +1,18 @@
 import type { IPacienteRepositorio } from "../../dominio/paciente/repo/IPacienteRepo.js";
-import type { IPaciente, IPacienteActualizar } from "../../dominio/paciente/IPaciente.js";
+import type {
+    IPaciente,
+    IPacienteActualizar,
+} from "../../dominio/paciente/IPaciente.js";
 import { ejecutarConsulta } from "../DBpostgres.js";
 
 export class PacienteRepositorioPostgres implements IPacienteRepositorio {
     async crearPaciente(datosPaciente: IPaciente): Promise<IPaciente> {
         try {
-            const columnas = Object.keys(datosPaciente).map((key) => this.mapearCampoAColumna(key));
-            const parametros: Array<string | number | null> = Object.values(datosPaciente);
+            const columnas = Object.keys(datosPaciente).map((key) =>
+                this.mapearCampoAColumna(key)
+            );
+            const parametros: Array<string | number | null> =
+                Object.values(datosPaciente);
             const placeholders = columnas.map((_, i) => `$${i + 1}`).join(", ");
 
             const query = `
@@ -30,8 +36,6 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
             const query = "SELECT * FROM Paciente WHERE id_Paciente = $1";
             const result = await ejecutarConsulta(query, [idPaciente]);
 
-            console.log("🔍 REPOSITORIO - Datos crudos de BD:", JSON.stringify(result.rows, null, 2));
-
             if (result.rows.length === 0) return null;
 
             return this.mapearFilaAPaciente(result.rows[0]);
@@ -48,7 +52,9 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
         try {
             const query = "SELECT * FROM paciente ORDER BY id_paciente ASC";
             const result = await ejecutarConsulta(query, []);
-            const pacientes = result.rows.map((row) => this.mapearFilaAPaciente(row));
+            const pacientes = result.rows.map((row) =>
+                this.mapearFilaAPaciente(row)
+            );
             return pacientes;
         } catch (error: any) {
             throw {
@@ -58,11 +64,19 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
         }
     }
 
-    async actualizarPaciente(idPaciente: number, datosPaciente: IPacienteActualizar): Promise<IPaciente> {
+    async actualizarPaciente(
+        idPaciente: number,
+        datosPaciente: IPacienteActualizar
+    ): Promise<IPaciente> {
         try {
-            const columnas = Object.keys(datosPaciente).map((key) => this.mapearCampoAColumna(key));
-            const parametros: Array<string | number | null> = Object.values(datosPaciente);
-            const setClause = columnas.map((col, i) => `${col} = $${i + 1}`).join(", ");
+            const columnas = Object.keys(datosPaciente).map((key) =>
+                this.mapearCampoAColumna(key)
+            );
+            const parametros: Array<string | number | null> =
+                Object.values(datosPaciente);
+            const setClause = columnas
+                .map((col, i) => `${col} = $${i + 1}`)
+                .join(", ");
             parametros.push(idPaciente);
 
             const query = `
@@ -86,7 +100,8 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
 
     async eliminarPaciente(idPaciente: number): Promise<boolean> {
         try {
-            const query = "DELETE FROM Paciente WHERE id_Paciente = $1 RETURNING id_Paciente";
+            const query =
+                "DELETE FROM Paciente WHERE id_Paciente = $1 RETURNING id_Paciente";
             const result = await ejecutarConsulta(query, [idPaciente]);
             return result.rows.length > 0;
         } catch (error: any) {
