@@ -51,14 +51,14 @@ export class DisponibilidadControlador {
                 data: disponibilidadCreada,
             });
         } catch (error: any) {
-            if (error.name === "ZodError") {
+            if (error instanceof z.ZodError) {
                 // Detectar si es error de recurso inexistente (404)
-                const errorMedicoInexistente = error.errors.find(
+                const errorMedicoInexistente = error.issues.find(
                     (e: z.ZodIssue) =>
                         e.path.includes("idMedico") &&
                         e.message.includes("No se encontró")
                 );
-                const errorConsultorioInexistente = error.errors.find(
+                const errorConsultorioInexistente = error.issues.find(
                     (e: z.ZodIssue) =>
                         e.path.includes("idConsultorio") &&
                         e.message.includes("No se encontró")
@@ -67,7 +67,7 @@ export class DisponibilidadControlador {
                 if (errorMedicoInexistente || errorConsultorioInexistente) {
                     return reply.status(404).send({
                         error: "Recurso inexistente",
-                        mensaje: error.errors
+                        mensaje: error.issues
                             .map((e: z.ZodIssue) => e.message)
                             .join(". "),
                     });
@@ -75,7 +75,7 @@ export class DisponibilidadControlador {
 
                 return reply.status(400).send({
                     error: "Datos inválidos",
-                    mensaje: error.errors
+                    mensaje: error.issues
                         .map((e: z.ZodIssue) => e.message)
                         .join(". "),
                 });
