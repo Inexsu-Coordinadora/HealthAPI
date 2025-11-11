@@ -1,23 +1,17 @@
 meta {
-  name: ACTUALIZAR-PACIENTE
+  name: OBTENER-PACIENTE-POR-ID
   type: http
-  seq: 5
+  seq: 2
 }
 
-put {
+get {
   url: http://localhost:3000/api/pacientes/:id
-  body: json
+  body: none
   auth: inherit
 }
 
 params:path {
-  id: 6
-}
-
-body:json {
-  {
-    "telefonoPaciente": "1831838"
-  }
+  id: 1
 }
 
 settings {

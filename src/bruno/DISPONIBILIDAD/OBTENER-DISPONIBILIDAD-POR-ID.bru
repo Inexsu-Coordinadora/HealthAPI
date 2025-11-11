@@ -1,39 +1,32 @@
 meta {
-  name: ACTUALIZAR-DISPONIBILIDAD
+  name: OBTENER-DISPONIBILIDAD-POR-ID
   type: http
-  seq: 27
+  seq: 2
 }
 
-put {
+get {
   url: http://localhost:3000/api/disponibilidades/1
-  body: json
+  body: none
   auth: none
 }
 
-body:json {
-  {
-    "horaInicio": "09:00:00",
-    "horaFin": "13:00:00"
-  }
-}
-
 docs {
-  # Actualizar Disponibilidad
+  # Obtener Disponibilidad por ID
   
   ## Descripción
-  Actualiza los datos de una disponibilidad existente. Se pueden actualizar campos parciales.
+  Obtiene los datos de una disponibilidad específica por su ID.
   
   ## Respuesta esperada: 200
   ```json
   {
-    "mensaje": "Disponibilidad actualizada exitosamente",
+    "mensaje": "Disponibilidad obtenida exitosamente",
     "data": {
       "idDisponibilidad": 1,
       "idMedico": 1,
       "idConsultorio": 1,
       "diaSemana": "lunes",
-      "horaInicio": "09:00:00",
-      "horaFin": "13:00:00"
+      "horaInicio": "08:00:00",
+      "horaFin": "12:00:00"
     }
   }
   ```
