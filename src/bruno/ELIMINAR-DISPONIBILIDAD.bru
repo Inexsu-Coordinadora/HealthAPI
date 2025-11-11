@@ -1,0 +1,33 @@
+meta {
+  name: ELIMINAR-DISPONIBILIDAD
+  type: http
+  seq: 16
+}
+
+delete {
+  url: http://localhost:3000/api/disponibilidades/1
+  body: none
+  auth: none
+}
+
+docs {
+  # Eliminar Disponibilidad
+  
+  ## Descripción
+  Elimina una disponibilidad del sistema por su ID.
+  
+  ## Respuesta esperada: 200
+  ```json
+  {
+    "mensaje": "Disponibilidad eliminada exitosamente"
+  }
+  ```
+  
+  ## Caso de error: ID inexistente → 404
+  ```json
+  {
+    "error": "Disponibilidad no encontrada",
+    "mensaje": "No se encontró una disponibilidad con el ID 999"
+  }
+  ```
+}

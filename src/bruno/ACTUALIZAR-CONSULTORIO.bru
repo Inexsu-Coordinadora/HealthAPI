@@ -1,0 +1,46 @@
+meta {
+  name: ACTUALIZAR-CONSULTORIO
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:3000/api/consultorios/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombreConsultorio": "Consultorio A - Actualizado",
+    "capacidadConsultorio": 20
+  }
+}
+
+docs {
+  # Actualizar Consultorio
+  
+  ## Descripción
+  Actualiza los datos de un consultorio existente. Se pueden actualizar campos parciales.
+  
+  ## Respuesta esperada: 200
+  ```json
+  {
+    "mensaje": "Consultorio actualizado exitosamente",
+    "data": {
+      "idConsultorio": 1,
+      "nombreConsultorio": "Consultorio A - Actualizado",
+      "ubicacionConsultorio": "Piso 3 - Sala 301",
+      "capacidadConsultorio": 20
+    }
+  }
+  ```
+  
+  ## Caso de error: ID inexistente → 404
+  ```json
+  {
+    "error": "Consultorio no encontrado",
+    "mensaje": "No se encontró un consultorio con el ID 999"
+  }
+  ```
+}

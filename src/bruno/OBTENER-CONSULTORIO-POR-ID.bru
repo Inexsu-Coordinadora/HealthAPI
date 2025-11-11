@@ -1,0 +1,39 @@
+meta {
+  name: OBTENER-CONSULTORIO-POR-ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:3000/api/consultorios/1
+  body: none
+  auth: none
+}
+
+docs {
+  # Obtener Consultorio por ID
+  
+  ## Descripción
+  Obtiene los datos de un consultorio específico por su ID.
+  
+  ## Respuesta esperada: 200
+  ```json
+  {
+    "mensaje": "Consultorio obtenido exitosamente",
+    "data": {
+      "idConsultorio": 1,
+      "nombreConsultorio": "Consultorio A",
+      "ubicacionConsultorio": "Piso 3 - Sala 301",
+      "capacidadConsultorio": 15
+    }
+  }
+  ```
+  
+  ## Caso de error: ID inexistente → 404
+  ```json
+  {
+    "error": "Consultorio no encontrado",
+    "mensaje": "No se encontró un consultorio con el ID 999"
+  }
+  ```
+}

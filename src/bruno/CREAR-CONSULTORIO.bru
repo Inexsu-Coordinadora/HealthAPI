@@ -1,0 +1,43 @@
+meta {
+  name: CREAR-CONSULTORIO
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/api/consultorios
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombreConsultorio": "Consultorio C",
+    "ubicacionConsultorio": "Piso 3 - Sala 303",
+    "capacidadConsultorio": 10
+  }
+}
+
+docs {
+  # Crear Consultorio - Caso Exitoso
+  
+  ## Descripción
+  Crea un nuevo consultorio con todos los campos completos.
+  
+  ## Respuesta esperada: 201
+  ```json
+  {
+    "mensaje": "Consultorio creado exitosamente",
+    "data": {
+      "idConsultorio": 1,
+      "nombreConsultorio": "Consultorio A",
+      "ubicacionConsultorio": "Piso 3 - Sala 301",
+      "capacidadConsultorio": 15
+    }
+  }
+  ```
+  
+  ## Casos de error a probar:
+  - Nombre vacío → 400
+  - Capacidad negativa → 400
+}

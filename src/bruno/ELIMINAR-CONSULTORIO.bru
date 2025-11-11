@@ -1,0 +1,33 @@
+meta {
+  name: ELIMINAR-CONSULTORIO
+  type: http
+  seq: 5
+}
+
+delete {
+  url: http://localhost:3000/api/consultorios/1
+  body: none
+  auth: none
+}
+
+docs {
+  # Eliminar Consultorio
+  
+  ## Descripción
+  Elimina un consultorio del sistema por su ID.
+  
+  ## Respuesta esperada: 200
+  ```json
+  {
+    "mensaje": "Consultorio eliminado exitosamente"
+  }
+  ```
+  
+  ## Caso de error: ID inexistente → 404
+  ```json
+  {
+    "error": "Consultorio no encontrado",
+    "mensaje": "No se encontró un consultorio con el ID 999"
+  }
+  ```
+}

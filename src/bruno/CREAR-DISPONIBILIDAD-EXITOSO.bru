@@ -1,0 +1,50 @@
+meta {
+  name: CREAR-DISPONIBILIDAD (Caso Exitoso)
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:3000/api/disponibilidades
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "idMedico": 4,
+    "idConsultorio": 10,
+    "diaSemana": "martes",
+    "horaInicio": "08:30:00",
+    "horaFin": "9:00:00"
+  }
+}
+
+docs {
+  # Crear Disponibilidad - Caso Exitoso
+  
+  ## Descripción
+  Asigna un médico a un consultorio con disponibilidad horaria específica.
+  
+  ## Respuesta esperada: 201
+  ```json
+  {
+    "mensaje": "Disponibilidad creada exitosamente",
+    "data": {
+      "idDisponibilidad": 1,
+      "idMedico": 1,
+      "idConsultorio": 1,
+      "diaSemana": "lunes",
+      "horaInicio": "08:00:00",
+      "horaFin": "12:00:00"
+    }
+  }
+  ```
+  
+  ## Validaciones implementadas:
+  ✅ Médico y consultorio deben existir
+  ✅ No puede haber asignaciones duplicadas
+  ✅ Formato de hora válido (HH:MM:SS)
+  ✅ horaFin > horaInicio
+  ✅ Día de semana válido
+}
