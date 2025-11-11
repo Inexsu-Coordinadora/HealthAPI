@@ -90,6 +90,10 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
 
             const result = await ejecutarConsulta(query, parametros);
 
+            if (result.rows.length === 0) {
+                throw new Error(`Paciente con ID ${idPaciente} no encontrado`);
+            }
+
             return this.mapearFilaAPaciente(result.rows[0]);
         } catch (e) {
             const error = e as Error;

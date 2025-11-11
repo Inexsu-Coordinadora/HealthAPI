@@ -35,12 +35,6 @@ export class PacienteServicio {
         id: number,
         datosActualizados: IPacienteActualizar
     ): Promise<IPaciente | null> {
-        // Verificar que el paciente existe
-        const pacienteExistente =
-            await this.pacienteRepositorio.obtenerPacientePorId(id);
-        if (!pacienteExistente) return null;
-
-        // Actualizar en el repositorio
         return await this.pacienteRepositorio.actualizarPaciente(
             id,
             datosActualizados
