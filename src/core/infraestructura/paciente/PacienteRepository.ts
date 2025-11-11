@@ -8,11 +8,14 @@ import { ejecutarConsulta } from "../DBpostgres.js";
 export class PacienteRepositorioPostgres implements IPacienteRepositorio {
     async crearPaciente(datosPaciente: IPaciente): Promise<IPaciente> {
         try {
-            const columnas = Object.keys(datosPaciente).map((key) =>
+            const { idPaciente: _idPaciente, ...datosParaInsertar } =
+                datosPaciente;
+
+            const columnas = Object.keys(datosParaInsertar).map((key) =>
                 this.mapearCampoAColumna(key)
             );
             const parametros: Array<string | number | null> =
-                Object.values(datosPaciente);
+                Object.values(datosParaInsertar);
             const placeholders = columnas.map((_, i) => `$${i + 1}`).join(", ");
 
             const query = `
@@ -37,7 +40,9 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
                 "SELECT id_paciente, nombre, correo, telefono FROM Paciente WHERE id_Paciente = $1";
             const result = await ejecutarConsulta(query, [idPaciente]);
 
-            if (result.rows.length === 0) {return null;}
+            if (result.rows.length === 0) {
+                return null;
+            }
 
             return this.mapearFilaAPaciente(result.rows[0]);
         } catch (e) {

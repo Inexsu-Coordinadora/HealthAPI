@@ -5,11 +5,15 @@ import { ejecutarConsulta } from "../DBpostgres.js";
 export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
     // 1. Crear una nueva cita médica
     async crear(datosCita: Omit<ICitaMedica, "idCita">): Promise<ICitaMedica> {
-        const columnas = Object.keys(datosCita).map((key) =>
+        // Asegurar que idCita no se incluya aunque venga en el objeto
+        const { idCita: _idCita, ...datosParaInsertar } =
+            datosCita as ICitaMedica;
+
+        const columnas = Object.keys(datosParaInsertar).map((key) =>
             this.mapearCampoAColumna(key)
         );
         const parametros: Array<string | number | Date | null> =
-            Object.values(datosCita);
+            Object.values(datosParaInsertar);
         const placeholders = columnas.map((_, i) => `$${i + 1}`).join(", ");
 
         const query = `
