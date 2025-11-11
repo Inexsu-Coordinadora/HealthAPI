@@ -11,12 +11,12 @@ export async function citaRutas(fastify: FastifyInstance) {
         return citaControlador.crearCita(request, reply);
     });
 
-    fastify.get("/citas", async (request, reply) => {
-        return citaControlador.listarCitas(request, reply);
-    });
-
     fastify.get("/citas/:id", async (request, reply) => {
         return citaControlador.obtenerCitaPorId(request, reply);
+    });
+
+    fastify.get("/citas", async (request, reply) => {
+        return citaControlador.listarCitas(request, reply);
     });
 
     fastify.put("/citas/:id", async (request, reply) => {

@@ -12,12 +12,12 @@ export async function medicoRutas(fastify: FastifyInstance) {
         return medicoControlador.crearMedico(request, reply);
     });
 
-    fastify.get("/medicos", async (request, reply) => {
-        return medicoControlador.listarMedicos(request, reply);
-    });
-
     fastify.get("/medicos/:id", async (request, reply) => {
         return medicoControlador.obtenerMedicoPorId(request, reply);
+    });
+
+    fastify.get("/medicos", async (request, reply) => {
+        return medicoControlador.listarMedicos(request, reply);
     });
 
     fastify.put("/medicos/:id", async (request, reply) => {
