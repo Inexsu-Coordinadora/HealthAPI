@@ -3,7 +3,6 @@ import * as z from "zod";
 import { CitaMedicaServicio } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
 import type { ICitaMedica } from "../../core/dominio/citaMedica/ICitaMedica.js";
 import {
-    esquemaCrearCita,
     esquemaCitaPorId,
     esquemaActualizarCita,
     crearCitaConValidacionRepositorios,
@@ -49,7 +48,7 @@ export class CitaControlador {
             if (error.name === "ZodError") {
                 return reply.status(400).send({
                     error: "Datos inválidos",
-                    detalles: error.errors.map((e: z.ZodIssue) => e.message),
+                    detalles: error.issues.map((e: any) => e.message),
                 });
             }
 
@@ -68,7 +67,7 @@ export class CitaControlador {
         }
     }
 
-    async listarCitas(request: FastifyRequest, reply: FastifyReply) {
+    async listarCitas(reply: FastifyReply) {
         const citas = await this.citaServicio.listarCitas();
 
         return reply.status(200).send({
