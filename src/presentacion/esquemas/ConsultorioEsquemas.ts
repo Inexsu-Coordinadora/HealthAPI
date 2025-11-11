@@ -14,13 +14,11 @@ export const esquemaCrearConsultorio = z.object({
         .min(1, "El nombre del consultorio no puede estar vacío"),
     ubicacionConsultorio: z
         .string("La ubicación del consultorio debe ser texto")
-        .nullable()
-        .optional(),
+        .nullish(),
     capacidadConsultorio: z
         .number("La capacidad debe ser un número")
         .positive("La capacidad debe ser un número positivo")
-        .nullable()
-        .optional(),
+        .nullish(),
 });
 
 export const esquemaConsultorioPorId = z.object({
@@ -40,11 +38,9 @@ export const esquemaActualizarConsultorio = z.object({
         .optional(),
     ubicacionConsultorio: z
         .string("La ubicación del consultorio debe ser texto")
-        .nullable()
-        .optional(),
+        .nullish(),
     capacidadConsultorio: z
         .number("La capacidad debe ser un número")
         .positive("La capacidad debe ser un número positivo")
-        .nullable()
-        .optional(),
+        .nullish(),
 });

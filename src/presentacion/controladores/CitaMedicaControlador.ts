@@ -1,4 +1,5 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
+import * as z from "zod";
 import { CitaMedicaServicio } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
 import type { ICitaMedica } from "../../core/dominio/citaMedica/ICitaMedica.js";
 import {
@@ -48,7 +49,7 @@ export class CitaControlador {
             if (error.name === "ZodError") {
                 return reply.status(400).send({
                     error: "Datos inválidos",
-                    detalles: error.errors.map((e: any) => e.message),
+                    detalles: error.errors.map((e: z.ZodIssue) => e.message),
                 });
             }
 
@@ -110,7 +111,7 @@ export class CitaControlador {
 
         const citaActualizada = await this.citaServicio.actualizarCita(
             idCita,
-            datos as any
+            datos as Partial<ICitaMedica>
         );
 
         const statusCode = citaActualizada ? 200 : 404;

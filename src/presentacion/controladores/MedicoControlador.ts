@@ -1,5 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { MedicoServicio } from "../../core/aplicacion/casos-uso-medico/MedicoServicio.js";
+import type { IMedico } from "../../core/dominio/medico/IMedico.js";
 import {
     esquemaCrearMedico,
     esquemaMedicoPorId,
@@ -77,7 +78,7 @@ export class MedicoControlador {
 
         const medicoActualizado = await this.medicoServicio.actualizarMedico(
             idMedico,
-            datos as any
+            datos as Partial<IMedico>
         );
 
         const statusCode = medicoActualizado ? 200 : 404;

@@ -27,8 +27,11 @@ export class ConsultorioControlador {
             reply
         );
 
+        // Type assertion necesario: Zod genera T | null | undefined pero la interfaz espera T | null
         const consultorioCreado =
-            await this.consultorioServicio.crearConsultorio(consultorio as any);
+            await this.consultorioServicio.crearConsultorio(
+                consultorio as Omit<IConsultorio, "idConsultorio">
+            );
 
         return reply.status(201).send({
             mensaje: Mensajes["200_POST_OK"],
@@ -87,7 +90,7 @@ export class ConsultorioControlador {
         const consultorioActualizado =
             await this.consultorioServicio.actualizarConsultorio(
                 idConsultorio,
-                datos as any
+                datos as Partial<IConsultorio>
             );
 
         const statusCode = consultorioActualizado ? 200 : 404;

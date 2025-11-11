@@ -1,4 +1,5 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
+import * as z from "zod";
 import { DisponibilidadServicio } from "../../core/aplicacion/casos-uso-disponibilidad/DisponibilidadServicio.js";
 import type { IDisponibilidad } from "../../core/dominio/disponibilidad/IDisponibilidad.js";
 import {
@@ -54,12 +55,12 @@ export class DisponibilidadControlador {
             if (error.name === "ZodError") {
                 // Detectar si es error de recurso inexistente (404)
                 const errorMedicoInexistente = error.errors.find(
-                    (e: any) =>
+                    (e: z.ZodIssue) =>
                         e.path.includes("idMedico") &&
                         e.message.includes("No se encontró")
                 );
                 const errorConsultorioInexistente = error.errors.find(
-                    (e: any) =>
+                    (e: z.ZodIssue) =>
                         e.path.includes("idConsultorio") &&
                         e.message.includes("No se encontró")
                 );
@@ -68,14 +69,16 @@ export class DisponibilidadControlador {
                     return reply.status(404).send({
                         error: "Recurso inexistente",
                         mensaje: error.errors
-                            .map((e: any) => e.message)
+                            .map((e: z.ZodIssue) => e.message)
                             .join(". "),
                     });
                 }
 
                 return reply.status(400).send({
                     error: "Datos inválidos",
-                    mensaje: error.errors.map((e: any) => e.message).join(". "),
+                    mensaje: error.errors
+                        .map((e: z.ZodIssue) => e.message)
+                        .join(". "),
                 });
             }
 
@@ -187,7 +190,7 @@ export class DisponibilidadControlador {
         const disponibilidadActualizada =
             await this.disponibilidadServicio.actualizarDisponibilidad(
                 idDisponibilidad,
-                datos as any
+                datos as Partial<IDisponibilidad>
             );
 
         const statusCode = disponibilidadActualizada ? 200 : 404;
