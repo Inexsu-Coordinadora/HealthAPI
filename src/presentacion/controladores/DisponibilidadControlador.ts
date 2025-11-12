@@ -81,14 +81,34 @@ export class DisponibilidadControlador {
                 });
             }
 
-            if (
-                error instanceof Error &&
-                error.message.includes("Ya existe una disponibilidad idéntica")
-            ) {
-                return reply.status(409).send({
-                    error: "Asignación duplicada",
-                    mensaje: error.message,
-                });
+            if (error instanceof Error) {
+                // Conflicto: disponibilidad duplicada
+                if (
+                    error.message.includes(
+                        "Ya existe una disponibilidad idéntica"
+                    )
+                ) {
+                    return reply.status(409).send({
+                        error: "Asignación duplicada",
+                        mensaje: error.message,
+                    });
+                }
+
+                // Conflicto: médico en otro consultorio
+                if (error.message.includes("otro consultorio")) {
+                    return reply.status(409).send({
+                        error: "Conflicto de horario del médico",
+                        mensaje: error.message,
+                    });
+                }
+
+                // Conflicto: consultorio ocupado
+                if (error.message.includes("ocupado por otro médico")) {
+                    return reply.status(409).send({
+                        error: "Consultorio no disponible",
+                        mensaje: error.message,
+                    });
+                }
             }
 
             const errorMessage =
@@ -178,31 +198,58 @@ export class DisponibilidadControlador {
         request: FastifyRequest,
         reply: FastifyReply
     ) {
-        const { id: idDisponibilidad } = validadorEsquemas(
-            esquemaDisponibilidadPorId,
-            request.params,
-            reply
-        );
-        const datos = validadorEsquemas(
-            esquemaActualizarDisponibilidad,
-            request.body,
-            reply
-        );
-
-        const disponibilidadActualizada =
-            await this.disponibilidadServicio.actualizarDisponibilidad(
-                idDisponibilidad,
-                datos as Partial<IDisponibilidad>
+        try {
+            const { id: idDisponibilidad } = validadorEsquemas(
+                esquemaDisponibilidadPorId,
+                request.params,
+                reply
+            );
+            const datos = validadorEsquemas(
+                esquemaActualizarDisponibilidad,
+                request.body,
+                reply
             );
 
-        const statusCode = disponibilidadActualizada ? 200 : 404;
-        const mensaje = disponibilidadActualizada
-            ? Mensajes["200_PUT_OK"]
-            : `${Mensajes["404_NOT_FOUND"]} ${idDisponibilidad}`;
-        return reply.status(statusCode).send({
-            mensaje,
-            data: disponibilidadActualizada,
-        });
+            const disponibilidadActualizada =
+                await this.disponibilidadServicio.actualizarDisponibilidad(
+                    idDisponibilidad,
+                    datos as Partial<IDisponibilidad>
+                );
+
+            const statusCode = disponibilidadActualizada ? 200 : 404;
+            const mensaje = disponibilidadActualizada
+                ? Mensajes["200_PUT_OK"]
+                : `${Mensajes["404_NOT_FOUND"]} ${idDisponibilidad}`;
+            return reply.status(statusCode).send({
+                mensaje,
+                data: disponibilidadActualizada,
+            });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                // Conflicto: médico en otro consultorio
+                if (error.message.includes("otro consultorio")) {
+                    return reply.status(409).send({
+                        error: "Conflicto de horario del médico",
+                        mensaje: error.message,
+                    });
+                }
+
+                // Conflicto: consultorio ocupado
+                if (error.message.includes("ocupado por otro médico")) {
+                    return reply.status(409).send({
+                        error: "Consultorio no disponible",
+                        mensaje: error.message,
+                    });
+                }
+            }
+
+            const errorMessage =
+                error instanceof Error ? error.message : "Error desconocido";
+            return reply.status(500).send({
+                error: "Error del servidor",
+                mensaje: errorMessage,
+            });
+        }
     }
 
     async eliminarDisponibilidad(request: FastifyRequest, reply: FastifyReply) {

@@ -27,4 +27,29 @@ export interface IDisponibilidadRepositorio {
         horaInicio: string,
         horaFin: string
     ): Promise<boolean>;
+
+    /**
+     * Verifica si un médico ya tiene disponibilidad en otro consultorio
+     * que se solape con el horario propuesto
+     */
+    verificarConflictoMedicoEnOtroConsultorio(
+        idMedico: number,
+        idConsultorio: number | null,
+        diaSemana: string,
+        horaInicio: string,
+        horaFin: string,
+        idDisponibilidadActual?: number
+    ): Promise<boolean>;
+
+    /**
+     * Verifica si un consultorio ya está ocupado por otro médico
+     * en el mismo horario
+     */
+    verificarConflictoConsultorioOcupado(
+        idConsultorio: number,
+        diaSemana: string,
+        horaInicio: string,
+        horaFin: string,
+        idDisponibilidadActual?: number
+    ): Promise<boolean>;
 }

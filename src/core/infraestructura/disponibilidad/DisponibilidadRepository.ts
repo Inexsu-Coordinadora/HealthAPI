@@ -184,6 +184,89 @@ export class DisponibilidadRepositorioPostgres
         return parseInt(result.rows[0].count) > 0;
     }
 
+    async verificarConflictoMedicoEnOtroConsultorio(
+        idMedico: number,
+        idConsultorio: number | null,
+        diaSemana: string,
+        horaInicio: string,
+        horaFin: string,
+        idDisponibilidadActual?: number
+    ): Promise<boolean> {
+        // Si no hay consultorio asignado, no hay conflicto espacial
+        if (idConsultorio === null) {
+            return false;
+        }
+
+        let query = `
+            SELECT COUNT(*) as count
+            FROM disponibilidad
+            WHERE id_medico = $1
+            AND id_consultorio IS NOT NULL
+            AND id_consultorio != $2
+            AND dia_semana = $3
+            AND (
+                -- Verificar solapamiento de horarios
+                (hora_inicio < $5 AND hora_fin > $4)
+                OR (hora_inicio >= $4 AND hora_inicio < $5)
+                OR (hora_fin > $4 AND hora_fin <= $5)
+            )
+        `;
+
+        const parametros: Array<string | number> = [
+            idMedico,
+            idConsultorio,
+            diaSemana,
+            horaInicio,
+            horaFin,
+        ];
+
+        // Excluir la disponibilidad actual si estamos actualizando
+        if (idDisponibilidadActual !== undefined) {
+            query += ` AND id_disponibilidad != $6`;
+            parametros.push(idDisponibilidadActual);
+        }
+
+        const result = await ejecutarConsulta(query, parametros);
+        return parseInt(result.rows[0].count) > 0;
+    }
+
+    async verificarConflictoConsultorioOcupado(
+        idConsultorio: number,
+        diaSemana: string,
+        horaInicio: string,
+        horaFin: string,
+        idDisponibilidadActual?: number
+    ): Promise<boolean> {
+        let query = `
+            SELECT COUNT(*) as count
+            FROM disponibilidad
+            WHERE id_consultorio = $1
+            AND dia_semana = $2
+            AND (
+                -- Verificar solapamiento de horarios
+                (hora_inicio < $4 AND hora_fin > $3)
+                OR (hora_inicio >= $3 AND hora_inicio < $4)
+                OR (hora_fin > $3 AND hora_fin <= $4)
+            )
+        `;
+
+        const parametros: Array<string | number> = [
+            idConsultorio,
+            diaSemana,
+            horaInicio,
+            horaFin,
+        ];
+
+        // Excluir la disponibilidad actual si estamos actualizando
+        if (idDisponibilidadActual !== undefined) {
+            query += ` AND id_disponibilidad != $5`;
+            parametros.push(idDisponibilidadActual);
+        }
+
+        const result = await ejecutarConsulta(query, parametros);
+        return parseInt(result.rows[0].count) > 0;
+    }
+
     private mapearCampoAColumna(campo: string): string {
         const mapeo: Record<string, string> = {
             idDisponibilidad: "id_disponibilidad",
