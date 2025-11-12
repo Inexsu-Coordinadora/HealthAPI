@@ -2,7 +2,6 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import { CitaMedicaServicio } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
 import { validarActualizarCita, validarCrearCita, validarAgendarCita } from "../esquemas/CitaMedicaEsquemas.js";
 import type { ICitaMedica } from "../../core/dominio/citaMedica/ICitaMedica.js";
-import type { DisponibilidadRepository } from '../../core/infraestructura/disponibilidad/DisponibilidadRepository';
 
 export class CitaControlador {
     constructor(private readonly citaServicio: CitaMedicaServicio) {}
@@ -40,64 +39,42 @@ export class CitaControlador {
     }
 
 
-async agendarCita(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        // Validar datos de entrada
-        const validacion = validarAgendarCita(request.body);
-        if (!validacion.valido) {
-            return reply.status(400).send({
-                error: "Datos inválidos",
-                detalles: validacion.errores,
+    async agendarCita(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            // Validar datos de entrada
+            const validacion = validarAgendarCita(request.body);
+            if (!validacion.valido) {
+                return reply.status(400).send({
+                    error: "Datos inválidos",
+                    detalles: validacion.errores,
+                });
+            }
+
+            const datos = request.body as any;
+
+
+            const citaAgendada = await this.citaServicio.agendarCitaConValidacion({
+                idPaciente: datos.idPaciente,
+                idMedico: datos.idMedico,
+                idDisponibilidad: datos.idDisponibilidad, 
+                fecha: datos.fecha,
+                idConsultorio: datos.idConsultorio || null,
+                motivo: datos.motivo || null,
+                observaciones: datos.observaciones || "",
             });
-        }
 
-        const datos = request.body as any;
-
-        // 1. PRIMERO: Obtener la disponibilidad para extraer idConsultorio
-        const disponibilidad = await this.DisponibilidadRepository.obtenerPorId(
-            datos.idDisponibilidad
-        );
-
-        // 2. Validar que la disponibilidad exista
-        if (!disponibilidad) {
-            return FastifyResponseHelper.sendNotFound(
-                reply,
-                'Disponibilidad',
-                datos.idDisponibilidad
-            );
-        }
-
-        // 3. Validar que la disponibilidad tenga consultorio asignado
-        if (!disponibilidad.idConsultorio) {
-            return FastifyResponseHelper.sendValidationError(
-                reply,
-                'La disponibilidad seleccionada no tiene un consultorio asignado'
-            );
-        }
-
-        // 4. Llamar al servicio CON el idConsultorio
-        const citaAgendada = await this.citaServicio.agendarCitaConValidacion({
-            idPaciente: datos.idPaciente,
-            idMedico: disponibilidad.idMedico, // Obtener de disponibilidad
-            idConsultorio: disponibilidad.idConsultorio, // ← AQUÍ está la clave
-            idDisponibilidad: datos.idDisponibilidad,
-            fecha: datos.fecha,
-            motivo: datos.motivo || null,
-            observaciones: datos.observaciones || "",
-        });
-
-        // 5. Respuesta exitosa
-        return reply.status(201).send({
-            mensaje: "Cita médica agendada exitosamente",
-            data: {
-                idCita: citaAgendada.idCita,
-                idPaciente: citaAgendada.idPaciente,
-                idConsultorio: citaAgendada.idConsultorio,
-                fecha: citaAgendada.fecha,
-                estado: citaAgendada.estado,
-                motivo: citaAgendada.motivo,
-                observaciones: citaAgendada.observaciones,
-            },
+            return reply.status(201).send({
+                mensaje: "Cita médica agendada exitosamente",
+                data: {
+                    idCita: citaAgendada.idCita,
+                    idPaciente: citaAgendada.idPaciente,
+                    idDisponibilidad: citaAgendada.idDisponibilidad,
+                    fecha: citaAgendada.fecha,
+                    idConsultorio: citaAgendada.idConsultorio,
+                    estado: citaAgendada.estado,
+                    motivo: citaAgendada.motivo,
+                    observaciones: citaAgendada.observaciones,
+                },
             });
         } catch (error: any) {
 
