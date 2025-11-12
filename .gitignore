@@ -4,9 +4,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# Lock files - mantener solo pnpm-lock.yaml (no ignorar)
 package-lock.json
 yarn.lock
-pnpm-lock.yaml
 
 # Archivos de compilación
 dist/
@@ -97,5 +98,15 @@ desktop.ini
 *.crt
 *.p12
 
+# TypeScript
+*.js.map
+*.d.ts.map
+
+# Bruno CLI outputs (si usas bruno-cli)
+.bruno/
+
 # Otros
 .history/
+.eslintcache
+*.code-workspace
+CHECKLIST_ASIGNACION_MEDICO_CONSULTORIO.md
