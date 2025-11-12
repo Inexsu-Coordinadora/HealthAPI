@@ -7,7 +7,7 @@ import {
     esquemaActualizarCita,
     crearCitaConValidacionRepositorios,
 } from "../esquemas/CitaMedicaEsquemas.js";
-import { validadorEsquemas } from "../esquemas/Validador.js";
+import { validadorEsquemas } from "../esquemas/ValidadorZod.js";
 import { PacienteRepositorioPostgres } from "../../core/infraestructura/paciente/PacienteRepository.js";
 import { DisponibilidadRepositorioPostgres } from "../../core/infraestructura/disponibilidad/DisponibilidadRepository.js";
 
