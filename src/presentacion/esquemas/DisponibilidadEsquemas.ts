@@ -2,6 +2,11 @@ import * as z from "zod";
 import type { IMedicoRepositorio } from "../../core/dominio/medico/repositorio/IMedicoRepositorio.js";
 import type { IConsultorioRepositorio } from "../../core/dominio/consultorio/repositorio/IConsultorioRepositorio.js";
 import { Disponibilidad } from "../../core/dominio/disponibilidad/Disponibilidad.js";
+import {
+    esquemaIdParam,
+    esquemaIdPositivo,
+    esquemaIdPositivoOpcional,
+} from "./ValidacionesComunes.js";
 
 export interface CrearDisponibilidadDTO {
     idMedico: number;
@@ -11,18 +16,10 @@ export interface CrearDisponibilidadDTO {
     horaFin: string;
 }
 
-const REGEX_STRING_NUMERICO = /^\d+$/;
-
 export const esquemaCrearDisponibilidad = z
     .object({
-        idMedico: z
-            .number("El ID del médico es obligatorio y debe ser un número")
-            .positive("El ID del médico debe ser un número positivo"),
-        idConsultorio: z
-            .number("El ID del consultorio debe ser un número")
-            .positive("El ID del consultorio debe ser un número positivo")
-            .nullable()
-            .optional(),
+        idMedico: esquemaIdPositivo("del médico"),
+        idConsultorio: esquemaIdPositivoOpcional("del consultorio"),
         diaSemana: z
             .string("El día de la semana es obligatorio y debe ser texto")
             .min(1, "El día de la semana no puede estar vacío")
@@ -54,25 +51,12 @@ export const esquemaCrearDisponibilidad = z
     );
 
 export const esquemaDisponibilidadPorId = z.object({
-    id: z
-        .string()
-        .regex(
-            REGEX_STRING_NUMERICO,
-            "El ID de la disponibilidad debe ser un número válido"
-        )
-        .transform((val) => Number(val)),
+    id: esquemaIdParam,
 });
 
 export const esquemaActualizarDisponibilidad = z.object({
-    idMedico: z
-        .number("El ID del médico debe ser un número")
-        .positive("El ID del médico debe ser un número positivo")
-        .optional(),
-    idConsultorio: z
-        .number("El ID del consultorio debe ser un número")
-        .positive("El ID del consultorio debe ser un número positivo")
-        .nullable()
-        .optional(),
+    idMedico: esquemaIdPositivo("del médico").optional(),
+    idConsultorio: esquemaIdPositivoOpcional("del consultorio"),
     diaSemana: z
         .string("El día de la semana debe ser texto")
         .min(1, "El día de la semana no puede estar vacío")
@@ -118,7 +102,9 @@ export const crearDisponibilidadConValidacionRepositorios = (
         )
         .refine(
             async (data) => {
-                if (!data.idConsultorio) {return true;}
+                if (!data.idConsultorio) {
+                    return true;
+                }
                 const consultorioExiste =
                     await consultorioRepo.obtenerConsultorioPorId(
                         data.idConsultorio

@@ -1,12 +1,11 @@
 import * as z from "zod";
+import { esquemaIdParam } from "./ValidacionesComunes.js";
 
 export interface CrearConsultorioDTO {
     nombreConsultorio: string;
     ubicacionConsultorio?: string | null;
     capacidadConsultorio?: number | null;
 }
-
-const REGEX_STRING_NUMERICO = /^\d+$/;
 
 export const esquemaCrearConsultorio = z.object({
     nombreConsultorio: z
@@ -22,13 +21,7 @@ export const esquemaCrearConsultorio = z.object({
 });
 
 export const esquemaConsultorioPorId = z.object({
-    id: z
-        .string()
-        .regex(
-            REGEX_STRING_NUMERICO,
-            "El ID del consultorio debe ser un número válido"
-        )
-        .transform((val) => Number(val)),
+    id: esquemaIdParam,
 });
 
 export const esquemaActualizarConsultorio = z.object({

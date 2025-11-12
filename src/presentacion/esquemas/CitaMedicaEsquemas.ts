@@ -2,6 +2,7 @@ import * as z from "zod";
 import type { IPacienteRepositorio } from "../../core/dominio/paciente/repositorio/IPacienteRepositorio.js";
 import type { IDisponibilidadRepositorio } from "../../core/dominio/disponibilidad/repositorio/IDisponibilidadRepositorio.js";
 import { CitaMedica } from "../../core/dominio/citaMedica/CitaMedica.js";
+import { esquemaIdParam, esquemaIdPositivo } from "./ValidacionesComunes.js";
 
 export interface CrearCitaDTO {
     idPaciente: number;
@@ -12,15 +13,9 @@ export interface CrearCitaDTO {
     observaciones?: string;
 }
 
-const REGEX_STRING_NUMERICO = /^\d+$/;
-
 export const esquemaCrearCita = z.object({
-    idPaciente: z
-        .number("El ID del paciente es obligatorio y debe ser un número")
-        .positive("El ID del paciente debe ser un número positivo"),
-    idDisponibilidad: z
-        .number("El ID de disponibilidad es obligatorio y debe ser un número")
-        .positive("El ID de disponibilidad debe ser un número positivo"),
+    idPaciente: esquemaIdPositivo("del paciente"),
+    idDisponibilidad: esquemaIdPositivo("de disponibilidad"),
     fecha: z
         .string("La fecha es obligatoria")
         .or(z.date())
@@ -33,31 +28,19 @@ export const esquemaCrearCita = z.object({
         .min(1, "El estado no puede estar vacío")
         .refine((val) => CitaMedica.validarEstado(val), {
             message:
-                "El estado de la cita es inválido (programada, cancelada, completada)",
+                "El estado de la cita es inválido (programada, cancelada, realizada)",
         }),
     motivo: z.string("El motivo debe ser texto").nullable().optional(),
     observaciones: z.string("Las observaciones deben ser texto").optional(),
 });
 
 export const esquemaCitaPorId = z.object({
-    id: z
-        .string()
-        .regex(
-            REGEX_STRING_NUMERICO,
-            "El ID de la cita debe ser un número válido"
-        )
-        .transform((val) => Number(val)),
+    id: esquemaIdParam,
 });
 
 export const esquemaActualizarCita = z.object({
-    idPaciente: z
-        .number("El ID del paciente debe ser un número")
-        .positive("El ID del paciente debe ser un número positivo")
-        .optional(),
-    idDisponibilidad: z
-        .number("El ID de disponibilidad debe ser un número")
-        .positive("El ID de disponibilidad debe ser un número positivo")
-        .optional(),
+    idPaciente: esquemaIdPositivo("del paciente").optional(),
+    idDisponibilidad: esquemaIdPositivo("de disponibilidad").optional(),
     fecha: z
         .string("La fecha debe tener un formato válido")
         .or(z.date())
@@ -71,7 +54,7 @@ export const esquemaActualizarCita = z.object({
         .min(1, "El estado no puede estar vacío")
         .refine((val) => CitaMedica.validarEstado(val), {
             message:
-                "El estado de la cita es inválido (programada, cancelada, completada)",
+                "El estado de la cita es inválido (programada, cancelada, realizada)",
         })
         .optional(),
     motivo: z.string("El motivo debe ser texto").nullable().optional(),

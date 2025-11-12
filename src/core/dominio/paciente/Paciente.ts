@@ -39,9 +39,13 @@ export class Paciente implements IPaciente {
         });
     }
 
-    validarCorreo(): boolean {
+    static validarCorreo(correo: string): boolean {
         const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regexCorreo.test(this.correoPaciente);
+        return regexCorreo.test(correo);
+    }
+
+    static validarTelefono(telefono: string): boolean {
+        return telefono.length >= 7;
     }
 
     toObject(): IPaciente {
