@@ -80,19 +80,12 @@ export class DisponibilidadNoExisteError extends Error {
     }
 }
 
-// ============================================================================
-// FUNCIÓN AUXILIAR
-// ============================================================================
-
 // Función auxiliar para validar estado
 function validarEstado(estado: string): boolean {
     const estadosValidos = ["programada", "cancelada", "realizada"];
     return estadosValidos.includes(estado.toLowerCase());
 }
 
-// ============================================================================
-// SERVICIO
-// ============================================================================
 
 export class CitaMedicaServicio {
     constructor(private citaMedicaRepositorio: ICitaMedicaRepositorio) {}
@@ -112,7 +105,7 @@ export class CitaMedicaServicio {
         const nuevaCita: Omit<ICitaMedica, "idCita"> = {
             idPaciente: datos.idPaciente,
             idDisponibilidad: datos.idDisponibilidad,
-            idConsultorio: 0,
+            idConsultorio: null,
             fecha: datos.fecha,
             estado: datos.estado,
             motivo: datos.motivo,
@@ -308,7 +301,7 @@ export class CitaMedicaServicio {
         const nuevaCita: Omit<ICitaMedica, "idCita"> = {
             idPaciente: datos.idPaciente,
             idDisponibilidad: datos.idDisponibilidad,
-            idConsultorio: idConsultorioFinal || 0,
+            idConsultorio: idConsultorioFinal || null,
             fecha: fecha,
             estado: "programada",
             motivo: datos.motivo || null,
