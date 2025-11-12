@@ -1,7 +1,7 @@
 export interface CrearCitaDTO {
     idPaciente: number;
     idDisponibilidad: number;
-    fecha: Date | string;
+    fecha: Date;
     estado: string;
     motivo?: string | null;
     observaciones?: string;
@@ -10,7 +10,7 @@ export interface CrearCitaDTO {
 export interface ActualizarCitaDTO {
     idPaciente?: number;
     idDisponibilidad?: number;
-    fecha?: Date | string;
+    fecha?: Date ;
     estado?: string;
     motivo?: string | null;
     observaciones?: string;
@@ -19,9 +19,9 @@ export interface ActualizarCitaDTO {
 export interface AgendarCitaDTO {
     idPaciente: number;
     idMedico: number;
-    fecha: Date | string;
+    fecha: Date ;
     idDisponibilidad: number;
-    idConsultorio?: number | null;
+    idConsultorio: number | null;
     motivo?: string | null;
     observaciones?: string;
 }
