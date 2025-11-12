@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "healthAPI",
+  "name": "HealthAPI",
   "type": "collection",
   "ignore": [
     "node_modules",
