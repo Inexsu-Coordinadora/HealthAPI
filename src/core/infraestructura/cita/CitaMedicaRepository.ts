@@ -138,16 +138,12 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
             SELECT * FROM cita_medica
             WHERE id_paciente = $1
             AND estado != 'cancelada'
-            AND (
-                (fecha < $3 AND hora_fin > $2) OR
-                (fecha = $2 AND hora_fin > $2) OR
-                (fecha = $3 AND fecha < $3)
-            )
+            AND DATE(fecha) = DATE($2)
         `;
-        const params: any[] = [idPaciente, fechaInicio, fechaFin];
+        const params: any[] = [idPaciente, fechaInicio];
 
         if (excluirCitaId) {
-            query += ` AND id_cita != $4`;
+            query += ` AND id_cita != $3`;
             params.push(excluirCitaId);
         }
 
@@ -167,16 +163,12 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
             INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
             WHERE d.id_disponibilidad = $1
             AND cm.estado != 'cancelada'
-            AND (
-                (cm.fecha < $3 AND cm.hora_fin > $2) OR
-                (cm.fecha = $2 AND cm.hora_fin > $2) OR
-                (cm.fecha = $3 AND cm.fecha < $3)
-            )
+            AND DATE(cm.fecha) = DATE($2)
         `;
-        const params: any[] = [idDisponibilidad, fechaInicio, fechaFin];
+        const params: any[] = [idDisponibilidad, fechaInicio];
 
         if (excluirCitaId) {
-            query += ` AND cm.id_cita != $4`;
+            query += ` AND cm.id_cita != $3`;
             params.push(excluirCitaId);
         }
 
@@ -195,16 +187,12 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
             SELECT * FROM cita_medica
             WHERE id_consultorio = $1
             AND estado != 'cancelada'
-            AND (
-                (fecha < $3 AND hora_fin > $2) OR
-                (fecha = $2 AND hora_fin > $2) OR
-                (fecha = $3 AND fecha < $3)
-            )
+            AND DATE(fecha) = DATE($2)
         `;
-        const params: any[] = [idConsultorio, fechaInicio, fechaFin];
+        const params: any[] = [idConsultorio, fechaInicio];
 
         if (excluirCitaId) {
-            query += ` AND id_cita != $4`;
+            query += ` AND id_cita != $3`;
             params.push(excluirCitaId);
         }
 
