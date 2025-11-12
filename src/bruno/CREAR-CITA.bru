@@ -1,0 +1,45 @@
+meta {
+  name: CREAR-CITA
+  type: http
+  seq: 21
+}
+
+post {
+  url: http://localhost:3000/api/citas
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "idPaciente": 1,
+    "idDisponibilidad": 1,
+    "fecha": "2025-11-20T14:00:00Z",
+    "estado": "programada",
+    "motivo": "Consulta de seguimiento",
+    "observaciones": "Paciente referencias previas"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+tests {
+  test("Response status should be 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("Response should contain idCita", function() {
+    expect(res.getBody().data).to.have.property("idCita");
+  });
+  
+  test("Response should contain idPaciente", function() {
+    expect(res.getBody().data.idPaciente).to.equal(1);
+  });
+  
+  test("Response should have estado programada", function() {
+    expect(res.getBody().data.estado).to.equal("programada");
+  });
+}

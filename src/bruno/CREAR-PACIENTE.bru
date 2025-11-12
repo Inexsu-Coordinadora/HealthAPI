@@ -1,7 +1,7 @@
 meta {
   name: CREAR-PACIENTE
   type: http
-  seq: 1
+  seq: 6
 }
 
 post {
@@ -12,13 +12,31 @@ post {
 
 body:json {
   {
-    "nombrePaciente": "Samuel Restrepo",
-    "correoPaciente": "samurdev@gmail.com",
-    "telefonoPaciente": "55555555"
+    "nombrePaciente": "Carlos Mendez",
+    "correoPaciente": "carlos.mendez@email.com",
+    "telefonoPaciente": "555-0200"
   }
 }
 
 settings {
   encodeUrl: true
   timeout: 0
+}
+
+tests {
+  test("Response status should be 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("Response should contain idPaciente", function() {
+    expect(res.getBody().data).to.have.property("idPaciente");
+  });
+  
+  test("Response should contain nombrePaciente", function() {
+    expect(res.getBody().data.nombrePaciente).to.equal("Carlos Mendez");
+  });
+  
+  test("Response should contain correoPaciente", function() {
+    expect(res.getBody().data.correoPaciente).to.equal("carlos.mendez@email.com");
+  });
 }

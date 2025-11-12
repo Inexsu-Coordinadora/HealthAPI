@@ -1,7 +1,8 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { CitaMedicaServicio } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
-import { validarActualizarCita, validarCrearCita } from "../esquemas/CitaMedicaEsquemas.js";
+import { validarActualizarCita, validarCrearCita, validarAgendarCita } from "../esquemas/CitaMedicaEsquemas.js";
 import type { ICitaMedica } from "../../core/dominio/citaMedica/ICitaMedica.js";
+import type { DisponibilidadRepository } from '../../core/infraestructura/disponibilidad/DisponibilidadRepository';
 
 export class CitaControlador {
     constructor(private readonly citaServicio: CitaMedicaServicio) {}
@@ -33,6 +34,131 @@ export class CitaControlador {
         } catch (error: any) {
             return reply.status(500).send({
                 error: "Error al crear la cita médica",
+                mensaje: error.message,
+            });
+        }
+    }
+
+
+async agendarCita(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        // Validar datos de entrada
+        const validacion = validarAgendarCita(request.body);
+        if (!validacion.valido) {
+            return reply.status(400).send({
+                error: "Datos inválidos",
+                detalles: validacion.errores,
+            });
+        }
+
+        const datos = request.body as any;
+
+        // 1. PRIMERO: Obtener la disponibilidad para extraer idConsultorio
+        const disponibilidad = await this.DisponibilidadRepository.obtenerPorId(
+            datos.idDisponibilidad
+        );
+
+        // 2. Validar que la disponibilidad exista
+        if (!disponibilidad) {
+            return FastifyResponseHelper.sendNotFound(
+                reply,
+                'Disponibilidad',
+                datos.idDisponibilidad
+            );
+        }
+
+        // 3. Validar que la disponibilidad tenga consultorio asignado
+        if (!disponibilidad.idConsultorio) {
+            return FastifyResponseHelper.sendValidationError(
+                reply,
+                'La disponibilidad seleccionada no tiene un consultorio asignado'
+            );
+        }
+
+        // 4. Llamar al servicio CON el idConsultorio
+        const citaAgendada = await this.citaServicio.agendarCitaConValidacion({
+            idPaciente: datos.idPaciente,
+            idMedico: disponibilidad.idMedico, // Obtener de disponibilidad
+            idConsultorio: disponibilidad.idConsultorio, // ← AQUÍ está la clave
+            idDisponibilidad: datos.idDisponibilidad,
+            fecha: datos.fecha,
+            motivo: datos.motivo || null,
+            observaciones: datos.observaciones || "",
+        });
+
+        // 5. Respuesta exitosa
+        return reply.status(201).send({
+            mensaje: "Cita médica agendada exitosamente",
+            data: {
+                idCita: citaAgendada.idCita,
+                idPaciente: citaAgendada.idPaciente,
+                idConsultorio: citaAgendada.idConsultorio,
+                fecha: citaAgendada.fecha,
+                estado: citaAgendada.estado,
+                motivo: citaAgendada.motivo,
+                observaciones: citaAgendada.observaciones,
+            },
+            });
+        } catch (error: any) {
+
+            if (error.message.includes("Paciente inexistente")) {
+                return reply.status(404).send({
+                    error: "Paciente inexistente",
+                    mensaje: error.message,
+                    codigo: "PACIENTE_NO_EXISTE",
+                });
+            }
+
+            if (error.message.includes("Médico inexistente")) {
+                return reply.status(404).send({
+                    error: "Médico inexistente",
+                    mensaje: error.message,
+                    codigo: "MEDICO_NO_EXISTE",
+                });
+            }
+
+            if (error.message.includes("Consultorio inexistente")) {
+                return reply.status(404).send({
+                    error: "Consultorio inexistente",
+                    mensaje: error.message,
+                    codigo: "CONSULTORIO_NO_EXISTE",
+                });
+            }
+
+            if (error.message.includes("Disponibilidad inexistente")) {
+                return reply.status(404).send({
+                    error: "Disponibilidad inexistente",
+                    mensaje: error.message,
+                    codigo: "DISPONIBILIDAD_NO_EXISTE",
+                });
+            }
+
+            if (error.message.includes("traslape para el Paciente")) {
+                return reply.status(409).send({
+                    error: "Conflicto de agenda - Paciente",
+                    mensaje: error.message,
+                    codigo: "TRASLAPE_PACIENTE",
+                });
+            }
+
+            if (error.message.includes("traslape para el Médico")) {
+                return reply.status(409).send({
+                    error: "Conflicto de agenda - Médico",
+                    mensaje: error.message,
+                    codigo: "TRASLAPE_MEDICO",
+                });
+            }
+
+            if (error.message.includes("traslape para el Consultorio")) {
+                return reply.status(409).send({
+                    error: "Conflicto de agenda - Consultorio",
+                    mensaje: error.message,
+                    codigo: "TRASLAPE_CONSULTORIO",
+                });
+            }
+
+            return reply.status(500).send({
+                error: "Error al agendar la cita médica",
                 mensaje: error.message,
             });
         }

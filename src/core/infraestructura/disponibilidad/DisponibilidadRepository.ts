@@ -5,26 +5,33 @@ import { ejecutarConsulta } from "../DBpostgres.js";
 export class DisponibilidadRepositorioPostgres implements IDisponibilidadRepositorio {
     
     async crearDisponibilidad(datosDisponibilidad: IDisponibilidad): Promise<IDisponibilidad> {
-        const { idDisponibilidad, ...datosParaInsertar } = datosDisponibilidad;
+        // Construir manualmente el query sin idDisponibilidad
+        const { idMedico, diaSemana, horaInicio, horaFin, idConsultorio } = datosDisponibilidad;
 
-        
-        const datosLimpios = Object.entries(datosParaInsertar)
-            .filter(([_, value]) => value !== undefined)
-            .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+        let query: string;
+        let parametros: Array<string | number | null>;
 
-        const columnas = Object.keys(datosLimpios).map((key) => this.mapearCampoAColumna(key));
-        const parametros: Array<string | number | null> = Object.values(datosLimpios);
-        const placeholders = columnas.map((_, i) => `$${i + 1}`).join(", ");
-
-        const query = `
-            INSERT INTO disponibilidad (${columnas.join(", ")})
-            VALUES (${placeholders})
-            RETURNING *
-        `;
+        if (idConsultorio === null || idConsultorio === undefined) {
+            // Sin consultorio
+            query = `
+                INSERT INTO disponibilidad (id_medico, dia_semana, hora_inicio, hora_fin)
+                VALUES ($1, $2, $3, $4)
+                RETURNING *
+            `;
+            parametros = [idMedico, diaSemana, horaInicio, horaFin];
+        } else {
+            // Con consultorio
+            query = `
+                INSERT INTO disponibilidad (id_medico, dia_semana, hora_inicio, hora_fin, id_consultorio)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING *
+            `;
+            parametros = [idMedico, diaSemana, horaInicio, horaFin, idConsultorio];
+        }
 
         const respuesta = await ejecutarConsulta(query, parametros);
-    return this.mapearFilaADisponibilidad(respuesta.rows[0]);
-}
+        return this.mapearFilaADisponibilidad(respuesta.rows[0]);
+    }
 
     // OBTENER DISPONIBILIDAD POR ID
     async obtenerDisponibilidadPorId(idDisponibilidad: number): Promise<IDisponibilidad | null> {

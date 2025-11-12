@@ -1,0 +1,38 @@
+meta {
+  name: ACTUALIZAR-MEDICO
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:3000/api/medicos/1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nombreMedico": "Dr. Juan Pérez García",
+    "correoMedico": "juan.perez.garcia@clinica.com",
+    "especialidadMedico": "Cardiología"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+tests {
+  test("Response status should be 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response should contain updated nombreMedico", function() {
+    expect(res.getBody().nombreMedico).to.equal("Dr. Juan Pérez García");
+  });
+  
+  test("Response should contain updated correoMedico", function() {
+    expect(res.getBody().correoMedico).to.equal("juan.perez.garcia@clinica.com");
+  });
+}

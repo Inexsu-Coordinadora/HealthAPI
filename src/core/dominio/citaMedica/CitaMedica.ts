@@ -8,7 +8,6 @@ export class CitaMedica implements ICitaMedica {
   idDisponibilidad: number;
   idConsultorio: number;           
   fecha: Date;
-  horaFin: Date;                  
   estado: string;
   motivo: string | null;
   observaciones: string;
@@ -19,7 +18,6 @@ export class CitaMedica implements ICitaMedica {
     this.idDisponibilidad = datosCita.idDisponibilidad;
     this.idConsultorio = datosCita.idConsultorio;        
     this.fecha = datosCita.fecha;
-    this.horaFin = datosCita.horaFin;                    
     this.estado = datosCita.estado;
     this.motivo = datosCita.motivo;
     this.observaciones = datosCita.observaciones;
@@ -30,7 +28,6 @@ export class CitaMedica implements ICitaMedica {
     idDisponibilidad: number,
     idConsultorio: number,         
     fecha: Date,
-    horaFin: Date,                  
     estado: string,
     motivo: string | null,
     observaciones: string
@@ -40,7 +37,6 @@ export class CitaMedica implements ICitaMedica {
       idDisponibilidad,
       idConsultorio,
       fecha,
-      horaFin,                      
       estado,
       motivo,
       observaciones
@@ -53,7 +49,6 @@ export class CitaMedica implements ICitaMedica {
     idDisponibilidad: number,
     idConsultorio: number,          
     fecha: Date,
-    horaFin: Date,                  
     estado: string,
     motivo: string,
     observaciones: string
@@ -64,7 +59,6 @@ export class CitaMedica implements ICitaMedica {
       idDisponibilidad,
       idConsultorio,                
       fecha,
-      horaFin,                      
       estado,
       motivo,
       observaciones
@@ -83,7 +77,6 @@ export class CitaMedica implements ICitaMedica {
       idDisponibilidad: this.idDisponibilidad,
       idConsultorio: this.idConsultorio,     
       fecha: this.fecha,
-      horaFin: this.horaFin,                 
       estado: this.estado,
       motivo: this.motivo,
       observaciones: this.observaciones

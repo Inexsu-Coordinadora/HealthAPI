@@ -6,7 +6,6 @@ export interface ICitaMedica {
   idDisponibilidad: number; 
   idConsultorio: number;          
   fecha: Date; 
-  horaFin: Date;                  
   estado: string;
   motivo: string | null; 
   observaciones: string;

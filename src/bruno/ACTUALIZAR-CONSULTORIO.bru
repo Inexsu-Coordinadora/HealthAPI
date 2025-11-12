@@ -1,0 +1,30 @@
+meta {
+  name: ACTUALIZAR-CONSULTORIO
+  type: http
+  seq: 14
+}
+
+put {
+  url: http://localhost:3000/api/consultorios/1
+  body: json
+}
+
+body:json {
+  {
+    "nombreConsultorio": "Consultorio A - Actualizado",
+    "ubicacion": "Piso 2, Ala Sur",
+    "capacidad": 3
+  }
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response has updated data", function() {
+    expect(res.body.data).to.have.property("nombreConsultorio", "Consultorio A - Actualizado");
+    expect(res.body.data).to.have.property("ubicacion", "Piso 2, Ala Sur");
+    expect(res.body.data).to.have.property("capacidad", 3);
+  });
+}

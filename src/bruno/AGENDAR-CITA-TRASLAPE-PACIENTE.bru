@@ -1,0 +1,41 @@
+meta {
+  name: AGENDAR-CITA-TRASLAPE-PACIENTE
+  type: http
+  seq: 29
+}
+
+post {
+  url: http://localhost:3000/api/citas/agendar
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "idPaciente": 1,
+    "idMedico": 1,
+    "fecha": "2025-11-20T10:30:00Z",
+    "idDisponibilidad": 1,
+    "idConsultorio": 1,
+    "motivo": "Consulta con traslape"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+tests {
+  test("Response status should be 409", function() {
+    expect(res.getStatus()).to.equal(409);
+  });
+  
+  test("Error code should be TRASLAPE_PACIENTE", function() {
+    expect(res.getBody().codigo).to.equal("TRASLAPE_PACIENTE");
+  });
+  
+  test("Response should contain conflict message", function() {
+    expect(res.getBody().error).to.include("Conflicto");
+  });
+}

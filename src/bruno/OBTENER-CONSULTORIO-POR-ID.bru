@@ -1,0 +1,27 @@
+meta {
+  name: OBTENER-CONSULTORIO-POR-ID
+  type: http
+  seq: 13
+}
+
+get {
+  url: http://localhost:3000/api/consultorios/1
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response has expected properties", function() {
+    expect(res.body).to.have.property("data");
+    expect(res.body.data).to.have.property("idConsultorio");
+    expect(res.body.data).to.have.property("nombreConsultorio");
+    expect(res.body.data).to.have.property("ubicacion");
+    expect(res.body.data).to.have.property("capacidad");
+  });
+  
+  test("ID matches requested", function() {
+    expect(res.body.data.idConsultorio).to.equal(1);
+  });
+}

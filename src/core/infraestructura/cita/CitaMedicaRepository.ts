@@ -99,12 +99,126 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         return result.rows.map((row) => this.mapearFilaACitaMedica(row));
     }
 
+    // 9. Verificar si un paciente existe
+    async verificarPacienteExiste(idPaciente: number): Promise<boolean> {
+        const query = "SELECT 1 FROM paciente WHERE id_paciente = $1";
+        const result = await ejecutarConsulta(query, [idPaciente]);
+        return result.rows.length > 0;
+    }
+
+    // 10. Verificar si un médico existe
+    async verificarMedicoExiste(idMedico: number): Promise<boolean> {
+        const query = "SELECT 1 FROM medico WHERE id_medico = $1";
+        const result = await ejecutarConsulta(query, [idMedico]);
+        return result.rows.length > 0;
+    }
+
+    // 11. Verificar si un consultorio existe
+    async verificarConsultorioExiste(idConsultorio: number): Promise<boolean> {
+        const query = "SELECT 1 FROM consultorio WHERE id_consultorio = $1";
+        const result = await ejecutarConsulta(query, [idConsultorio]);
+        return result.rows.length > 0;
+    }
+
+    // 12. Verificar si una disponibilidad existe
+    async verificarDisponibilidadExiste(idDisponibilidad: number): Promise<boolean> {
+        const query = "SELECT 1 FROM disponibilidad WHERE id_disponibilidad = $1";
+        const result = await ejecutarConsulta(query, [idDisponibilidad]);
+        return result.rows.length > 0;
+    }
+
+    // 13. Verificar traslape de citas para un paciente
+    async verificarTraslapePaciente(
+        idPaciente: number,
+        fechaInicio: Date,
+        fechaFin: Date,
+        excluirCitaId?: number
+    ): Promise<ICitaMedica | null> {
+        let query = `
+            SELECT * FROM cita_medica
+            WHERE id_paciente = $1
+            AND estado != 'cancelada'
+            AND (
+                (fecha < $3 AND hora_fin > $2) OR
+                (fecha = $2 AND hora_fin > $2) OR
+                (fecha = $3 AND fecha < $3)
+            )
+        `;
+        const params: any[] = [idPaciente, fechaInicio, fechaFin];
+
+        if (excluirCitaId) {
+            query += ` AND id_cita != $4`;
+            params.push(excluirCitaId);
+        }
+
+        const result = await ejecutarConsulta(query, params);
+        return result.rows.length > 0 ? this.mapearFilaACitaMedica(result.rows[0]) : null;
+    }
+
+    // 14. Verificar traslape de citas para un médico
+    async verificarTraslapeMedico(
+        idDisponibilidad: number,
+        fechaInicio: Date,
+        fechaFin: Date,
+        excluirCitaId?: number
+    ): Promise<ICitaMedica | null> {
+        let query = `
+            SELECT cm.* FROM cita_medica cm
+            INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
+            WHERE d.id_disponibilidad = $1
+            AND cm.estado != 'cancelada'
+            AND (
+                (cm.fecha < $3 AND cm.hora_fin > $2) OR
+                (cm.fecha = $2 AND cm.hora_fin > $2) OR
+                (cm.fecha = $3 AND cm.fecha < $3)
+            )
+        `;
+        const params: any[] = [idDisponibilidad, fechaInicio, fechaFin];
+
+        if (excluirCitaId) {
+            query += ` AND cm.id_cita != $4`;
+            params.push(excluirCitaId);
+        }
+
+        const result = await ejecutarConsulta(query, params);
+        return result.rows.length > 0 ? this.mapearFilaACitaMedica(result.rows[0]) : null;
+    }
+
+    // 15. Verificar traslape de citas para un consultorio
+    async verificarTraslapeConsultorio(
+        idConsultorio: number,
+        fechaInicio: Date,
+        fechaFin: Date,
+        excluirCitaId?: number
+    ): Promise<ICitaMedica | null> {
+        let query = `
+            SELECT * FROM cita_medica
+            WHERE id_consultorio = $1
+            AND estado != 'cancelada'
+            AND (
+                (fecha < $3 AND hora_fin > $2) OR
+                (fecha = $2 AND hora_fin > $2) OR
+                (fecha = $3 AND fecha < $3)
+            )
+        `;
+        const params: any[] = [idConsultorio, fechaInicio, fechaFin];
+
+        if (excluirCitaId) {
+            query += ` AND id_cita != $4`;
+            params.push(excluirCitaId);
+        }
+
+        const result = await ejecutarConsulta(query, params);
+        return result.rows.length > 0 ? this.mapearFilaACitaMedica(result.rows[0]) : null;
+    }
+
     // Método auxiliar: Mapear nombres de campos TypeScript a columnas SQL
     private mapearCampoAColumna(campo: string): string {
         const mapeo: Record<string, string> = {
             idCita: "id_cita",
             idPaciente: "id_paciente",
             idDisponibilidad: "id_disponibilidad",
+            idConsultorio: "id_consultorio",
             fecha: "fecha",
             estado: "estado",
             motivo: "motivo",
@@ -113,12 +227,13 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         return mapeo[campo] || campo.toLowerCase();
     }
 
-    // Método auxiliar: Mapear fila de BD a objeto ICitaMedica
+    
     private mapearFilaACitaMedica(row: any): ICitaMedica {
         return {
             idCita: row.id_cita,
             idPaciente: row.id_paciente,
             idDisponibilidad: row.id_disponibilidad,
+            idConsultorio: row.id_consultorio,
             fecha: new Date(row.fecha),
             estado: row.estado,
             motivo: row.motivo,

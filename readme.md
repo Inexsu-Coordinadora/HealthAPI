@@ -35,9 +35,11 @@ La consola debe mostrar un mensaje que dice: "El servidor se esta ejecutando cor
 
 ## 5. 📘 Documentación
 
-Toda la información técnica y funcional del módulo se encuentra en el siguiente documento:
+
 
 📄 [Ver DOCUMENTACIÓN HEALTHAPI (PDF)](./docs/DOCUMENTACION%20HEALTHAPI.pdf)
+
+
 
 ## 6. Video Demostrativo
 

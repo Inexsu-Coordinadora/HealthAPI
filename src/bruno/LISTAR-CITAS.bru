@@ -1,12 +1,11 @@
 meta {
-  name: LISTAR-PACIENTES
+  name: LISTAR-CITAS
   type: http
-  seq: 7
+  seq: 22
 }
 
 get {
-  url: http://localhost:3000/api/pacientes
-  body: none
+  url: http://localhost:3000/api/citas
   auth: inherit
 }
 
@@ -24,9 +23,9 @@ tests {
     expect(res.getBody()).to.be.an("array");
   });
   
-  test("Response should contain pacientes with idPaciente", function() {
+  test("Response should contain citas with idCita", function() {
     if (res.getBody().length > 0) {
-      expect(res.getBody()[0]).to.have.property("idPaciente");
+      expect(res.getBody()[0]).to.have.property("idCita");
     }
   });
 }

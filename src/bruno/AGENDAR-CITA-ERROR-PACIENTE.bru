@@ -1,0 +1,37 @@
+meta {
+  name: AGENDAR-CITA-ERROR-PACIENTE
+  type: http
+  seq: 27
+}
+
+post {
+  url: http://localhost:3000/api/citas/agendar
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "idPaciente": 9999,
+    "idMedico": 1,
+    "fecha": "2025-11-20T10:00:00Z",
+    "idDisponibilidad": 1,
+    "idConsultorio": 1,
+    "motivo": "Consulta general"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+tests {
+  test("Response status should be 404", function() {
+    expect(res.getStatus()).to.equal(404);
+  });
+  
+  test("Error code should be PACIENTE_NO_EXISTE", function() {
+    expect(res.getBody().codigo).to.equal("PACIENTE_NO_EXISTE");
+  });
+}
