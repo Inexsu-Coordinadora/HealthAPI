@@ -2,6 +2,15 @@ import type { IDisponibilidadRepositorio } from "../../dominio/disponibilidad/re
 import type { IDisponibilidad } from "../../dominio/disponibilidad/IDisponibilidad.js";
 import { ejecutarConsulta } from "../DBpostgres.js";
 
+interface DisponibilidadRow {
+    id_disponibilidad: number;
+    id_medico: number;
+    id_consultorio: number | null;
+    dia_semana: string;
+    hora_inicio: string;
+    hora_fin: string;
+}
+
 export class DisponibilidadRepositorioPostgres
     implements IDisponibilidadRepositorio
 {
@@ -25,7 +34,7 @@ export class DisponibilidadRepositorioPostgres
         const query = `
             INSERT INTO disponibilidad (${columnas.join(", ")})
             VALUES (${placeholders})
-            RETURNING *
+            RETURNING id_disponibilidad, id_medico, id_consultorio, dia_semana, hora_inicio, hora_fin
         `;
 
         const respuesta = await ejecutarConsulta(query, parametros);
@@ -187,7 +196,7 @@ export class DisponibilidadRepositorioPostgres
         return mapeo[campo] || campo.toLowerCase();
     }
 
-    private mapearFilaADisponibilidad(row: any): IDisponibilidad {
+    private mapearFilaADisponibilidad(row: DisponibilidadRow): IDisponibilidad {
         return {
             idDisponibilidad: row.id_disponibilidad,
             idMedico: row.id_medico,

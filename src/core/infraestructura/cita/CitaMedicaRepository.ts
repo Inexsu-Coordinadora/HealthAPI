@@ -2,6 +2,16 @@ import type { ICitaMedicaRepositorio } from "../../dominio/citaMedica/repositori
 import type { ICitaMedica } from "../../dominio/citaMedica/ICitaMedica.js";
 import { ejecutarConsulta } from "../DBpostgres.js";
 
+interface CitaMedicaRow {
+    id_cita: number;
+    id_paciente: number;
+    id_disponibilidad: number;
+    fecha: Date | string;
+    estado: string;
+    motivo: string | null;
+    observaciones: string;
+}
+
 export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
     // 1. Crear una nueva cita médica
     async crear(datosCita: Omit<ICitaMedica, "idCita">): Promise<ICitaMedica> {
@@ -19,7 +29,7 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         const query = `
       INSERT INTO cita_medica (${columnas.join(", ")})
       VALUES (${placeholders})
-      RETURNING *
+      RETURNING id_cita, id_paciente, id_disponibilidad, fecha, estado, motivo, observaciones
     `;
 
         const respuesta = await ejecutarConsulta(query, parametros);
@@ -134,7 +144,7 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
     }
 
     // Método auxiliar: Mapear fila de BD a objeto ICitaMedica
-    private mapearFilaACitaMedica(row: any): ICitaMedica {
+    private mapearFilaACitaMedica(row: CitaMedicaRow): ICitaMedica {
         return {
             idCita: row.id_cita,
             idPaciente: row.id_paciente,

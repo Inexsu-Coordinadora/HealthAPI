@@ -2,6 +2,13 @@ import type { IMedicoRepositorio } from "../../dominio/medico/repositorio/IMedic
 import type { IMedico } from "../../dominio/medico/IMedico.js";
 import { ejecutarConsulta } from "../DBpostgres.js";
 
+interface MedicoRow {
+    id_medico: number;
+    nombre: string;
+    correo: string;
+    especialidad: string;
+}
+
 export class MedicoRepositorioPostgres implements IMedicoRepositorio {
     // CREAR UN NUEVO MÉDICO
     async crearMedico(datosMedico: IMedico): Promise<IMedico> {
@@ -17,7 +24,7 @@ export class MedicoRepositorioPostgres implements IMedicoRepositorio {
         const query = `
       INSERT INTO medico (${columnas.join(", ")})
       VALUES (${placeholders})
-      RETURNING *
+      RETURNING id_medico, nombre, correo, especialidad
     `;
 
         const respuesta = await ejecutarConsulta(query, parametros);
@@ -70,7 +77,7 @@ export class MedicoRepositorioPostgres implements IMedicoRepositorio {
       UPDATE medico
       SET ${setClause}
       WHERE id_medico = $${parametros.length}
-      RETURNING *
+      RETURNING id_medico, nombre, correo, especialidad
     `;
 
         const result = await ejecutarConsulta(query, parametros);
@@ -102,7 +109,7 @@ export class MedicoRepositorioPostgres implements IMedicoRepositorio {
     }
 
     // METODO AUXILIAR
-    private mapearFilaAMedico(row: any): IMedico {
+    private mapearFilaAMedico(row: MedicoRow): IMedico {
         return {
             idMedico: row.id_medico,
             nombreMedico: row.nombre,

@@ -2,6 +2,13 @@ import type { IConsultorioRepositorio } from "../../dominio/consultorio/reposito
 import type { IConsultorio } from "../../dominio/consultorio/IConsultorio.js";
 import { ejecutarConsulta } from "../DBpostgres.js";
 
+interface ConsultorioRow {
+    id_consultorio: number;
+    nombre_consultorio: string;
+    ubicacion_consultorio: string | null;
+    capacidad_consultorio: number | null;
+}
+
 export class ConsultorioRepositorioPostgres implements IConsultorioRepositorio {
     async crearConsultorio(
         datosConsultorio: IConsultorio
@@ -19,7 +26,7 @@ export class ConsultorioRepositorioPostgres implements IConsultorioRepositorio {
         const query = `
             INSERT INTO consultorio (${columnas.join(", ")})
             VALUES (${placeholders})
-            RETURNING *
+            RETURNING id_consultorio, nombre_consultorio, ubicacion_consultorio, capacidad_consultorio
         `;
 
         const respuesta = await ejecutarConsulta(query, parametros);
@@ -101,7 +108,7 @@ export class ConsultorioRepositorioPostgres implements IConsultorioRepositorio {
         return mapeo[campo] || campo.toLowerCase();
     }
 
-    private mapearFilaAConsultorio(row: any): IConsultorio {
+    private mapearFilaAConsultorio(row: ConsultorioRow): IConsultorio {
         return {
             idConsultorio: row.id_consultorio,
             nombreConsultorio: row.nombre_consultorio,
