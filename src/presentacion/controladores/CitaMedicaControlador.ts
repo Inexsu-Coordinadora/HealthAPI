@@ -39,7 +39,7 @@ export class CitaControlador {
     }
 
 
-    async agendarCita(request: FastifyRequest, reply: FastifyReply) {
+async agendarCita(request: FastifyRequest, reply: FastifyReply) {
         try {
             // Validar datos de entrada
             const validacion = validarAgendarCita(request.body);
@@ -50,18 +50,16 @@ export class CitaControlador {
                 });
             }
 
-            const datos = request.body as any;
+              const datos = request.body as any;
 
-
-            const citaAgendada = await this.citaServicio.agendarCitaConValidacion({
-                idPaciente: datos.idPaciente,
-                idMedico: datos.idMedico,
-                idDisponibilidad: datos.idDisponibilidad, 
-                fecha: datos.fecha,
-                idConsultorio: datos.idConsultorio || null,
-                motivo: datos.motivo || null,
-                observaciones: datos.observaciones || "",
-            });
+        const citaAgendada = await this.citaServicio.CrearCitaMedica({
+            idPaciente: datos.idPaciente,
+            idDisponibilidad: datos.idDisponibilidad,
+            fecha: new Date(datos.fecha),
+            estado: datos.estado,
+            motivo: datos.motivo ?? null,
+            observaciones: datos.observaciones ?? "",
+        });
 
             return reply.status(201).send({
                 mensaje: "Cita médica agendada exitosamente",
