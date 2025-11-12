@@ -14,13 +14,8 @@ body:json {
   {
     "nombrePaciente": "Carlos Mendez López",
     "correoPaciente": "carlos.mendez.actualizado@email.com",
-    "telefonoPaciente": "555-0201"
+    "telefonoPaciente": "32145312"
   }
-}
-
-settings {
-  encodeUrl: true
-  timeout: 0
 }
 
 tests {
@@ -35,4 +30,9 @@ tests {
   test("Response should contain updated correoPaciente", function() {
     expect(res.getBody().correoPaciente).to.equal("carlos.mendez.actualizado@email.com");
   });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
 }
