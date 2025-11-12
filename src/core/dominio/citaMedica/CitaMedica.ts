@@ -6,7 +6,7 @@ export class CitaMedica implements ICitaMedica {
   idCita: number | null;
   idPaciente: number;
   idDisponibilidad: number;
-  idConsultorio: number;           
+  idConsultorio: number | null;           
   fecha: Date;
   estado: string;
   motivo: string | null;
@@ -26,7 +26,7 @@ export class CitaMedica implements ICitaMedica {
   static crear(
     idPaciente: number,
     idDisponibilidad: number,
-    idConsultorio: number,         
+    idConsultorio: number | null,         
     fecha: Date,
     estado: string,
     motivo: string | null,
