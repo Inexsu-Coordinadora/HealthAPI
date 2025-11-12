@@ -50,25 +50,25 @@ export class DisponibilidadControlador {
                 mensaje: Mensajes["200_POST_OK"],
                 data: disponibilidadCreada,
             });
-        } catch (error: any) {
+        } catch (error: unknown) {
             if (error instanceof z.ZodError) {
                 // Detectar si es error de recurso inexistente (404)
                 const errorMedicoInexistente = error.issues.find(
-                    (e: z.ZodIssue) =>
-                        e.path.includes("idMedico") &&
-                        e.message.includes("No se encontró")
+                    (issue) =>
+                        issue.path.includes("idMedico") &&
+                        issue.message.includes("No se encontró")
                 );
                 const errorConsultorioInexistente = error.issues.find(
-                    (e: z.ZodIssue) =>
-                        e.path.includes("idConsultorio") &&
-                        e.message.includes("No se encontró")
+                    (issue) =>
+                        issue.path.includes("idConsultorio") &&
+                        issue.message.includes("No se encontró")
                 );
 
                 if (errorMedicoInexistente || errorConsultorioInexistente) {
                     return reply.status(404).send({
                         error: "Recurso inexistente",
                         mensaje: error.issues
-                            .map((e: z.ZodIssue) => e.message)
+                            .map((issue) => issue.message)
                             .join(". "),
                     });
                 }
@@ -76,12 +76,13 @@ export class DisponibilidadControlador {
                 return reply.status(400).send({
                     error: "Datos inválidos",
                     mensaje: error.issues
-                        .map((e: z.ZodIssue) => e.message)
+                        .map((issue) => issue.message)
                         .join(". "),
                 });
             }
 
             if (
+                error instanceof Error &&
                 error.message.includes("Ya existe una disponibilidad idéntica")
             ) {
                 return reply.status(409).send({
@@ -90,9 +91,11 @@ export class DisponibilidadControlador {
                 });
             }
 
+            const errorMessage =
+                error instanceof Error ? error.message : "Error desconocido";
             return reply.status(500).send({
                 error: "Error del servidor",
-                mensaje: error.message,
+                mensaje: errorMessage,
             });
         }
     }

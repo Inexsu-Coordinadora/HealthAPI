@@ -1,4 +1,5 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
+import { ZodError } from "zod";
 import { CitaMedicaServicio } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
 import type { ICitaMedica } from "../../core/dominio/citaMedica/ICitaMedica.js";
 import {
@@ -43,16 +44,19 @@ export class CitaControlador {
                 mensaje: Mensajes["200_POST_OK"],
                 data: citaCreada,
             });
-        } catch (error: any) {
-            if (error.name === "ZodError") {
+        } catch (error: unknown) {
+            if (error instanceof ZodError) {
                 return reply.status(400).send({
                     error: "Datos inválidos",
-                    detalles: error.issues.map((e: any) => e.message),
+                    detalles: error.issues.map((issue) => issue.message),
                 });
             }
 
             // Error de disponibilidad no encontrada
-            if (error.message.includes("No se encontró una disponibilidad")) {
+            if (
+                error instanceof Error &&
+                error.message.includes("No se encontró una disponibilidad")
+            ) {
                 return reply.status(404).send({
                     error: "Disponibilidad no encontrada",
                     mensaje: error.message,
@@ -61,8 +65,9 @@ export class CitaControlador {
 
             // Error de validación de fecha con disponibilidad
             if (
-                error.message.includes("no coincide") ||
-                error.message.includes("no está dentro del rango")
+                error instanceof Error &&
+                (error.message.includes("no coincide") ||
+                    error.message.includes("no está dentro del rango"))
             ) {
                 return reply.status(400).send({
                     error: "Fecha inválida",
@@ -71,16 +76,18 @@ export class CitaControlador {
             }
 
             // Error de duplicado desde el servicio
-            if (error.message.includes("Ya existe")) {
+            if (error instanceof Error && error.message.includes("Ya existe")) {
                 return reply.status(409).send({
                     error: "Conflicto",
                     mensaje: error.message,
                 });
             }
 
+            const errorMessage =
+                error instanceof Error ? error.message : "Error desconocido";
             return reply.status(500).send({
                 error: "Error al crear la cita médica",
-                mensaje: error.message,
+                mensaje: errorMessage,
             });
         }
     }
