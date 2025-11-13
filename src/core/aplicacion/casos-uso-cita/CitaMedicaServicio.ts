@@ -1,6 +1,7 @@
 import type { ICitaMedica } from "../../dominio/citaMedica/ICitaMedica.js";
 import { CitaMedica } from "../../dominio/citaMedica/CitaMedica.js";
 import type { ICitaMedicaRepositorio } from "../../dominio/citaMedica/repositorio/ICitaMedicaRepositorio.js";
+import type { IDisponibilidad } from "../../dominio/disponibilidad/IDisponibilidad.js";
 
 export class PacienteNoExisteError extends Error {
     constructor(idPaciente: number) {
@@ -88,7 +89,10 @@ function validarEstado(estado: string): boolean {
 
 
 export class CitaMedicaServicio {
-    constructor(private citaMedicaRepositorio: ICitaMedicaRepositorio) {}
+    constructor(
+        private citaMedicaRepositorio: ICitaMedicaRepositorio,
+        private disponibilidadRepositorio?: any
+    ) {}
 
     async CrearCitaMedica(datos: {
         idPaciente: number;
@@ -215,7 +219,7 @@ export class CitaMedicaServicio {
         }
         console.log("✓ Médico existe");
 
-        // VALIDACIÓN 3: Verificar que la Disponibilidad existe
+        // VALIDACIÓN 3: Verificar que la Disponibilidad existe Y obtener sus horarios
         console.log(`[3] Verificando existencia de la Disponibilidad ID: ${datos.idDisponibilidad}`);
         const disponibilidadExiste = await this.citaMedicaRepositorio.verificarDisponibilidadExiste(
             datos.idDisponibilidad
@@ -226,6 +230,25 @@ export class CitaMedicaServicio {
             );
         }
         console.log("✓ Disponibilidad existe");
+
+        // Obtener la disponibilidad para extraer horarios
+        let horaInicio = "09:00";
+        let horaFin = "17:00";
+        
+        if (this.disponibilidadRepositorio) {
+            try {
+                const disponibilidad = await this.disponibilidadRepositorio.obtenerDisponibilidadPorId(
+                    datos.idDisponibilidad
+                );
+                if (disponibilidad) {
+                    horaInicio = disponibilidad.horaInicio;
+                    horaFin = disponibilidad.horaFin;
+                    console.log(`✓ Horarios obtenidos: ${horaInicio} - ${horaFin}`);
+                }
+            } catch (error) {
+                console.warn("No se pudo obtener la disponibilidad, usando horarios por defecto");
+            }
+        }
 
         // VALIDACIÓN 4: Verificar que el Consultorio existe (si se proporciona)
         let idConsultorioFinal = datos.idConsultorio;
@@ -250,7 +273,8 @@ export class CitaMedicaServicio {
         );
         const traslapePaciente = await this.citaMedicaRepositorio.verificarTraslapePaciente(
             datos.idPaciente,
-            fecha,
+            horaInicio,
+            horaFin,
             fecha
         );
         if (traslapePaciente) {
@@ -265,8 +289,9 @@ export class CitaMedicaServicio {
             `[6] Validando traslape para Médico ID: ${datos.idMedico} en Disponibilidad ID: ${datos.idDisponibilidad}`
         );
         const traslapeMedico = await this.citaMedicaRepositorio.verificarTraslapeMedico(
-            datos.idDisponibilidad,
-            fecha,
+            datos.idMedico,
+            horaInicio,
+            horaFin,
             fecha
         );
         if (traslapeMedico) {
@@ -283,7 +308,8 @@ export class CitaMedicaServicio {
             );
             const traslapeConsultorio = await this.citaMedicaRepositorio.verificarTraslapeConsultorio(
                 idConsultorioFinal,
-                fecha,
+                horaInicio,
+                horaFin,
                 fecha
             );
             if (traslapeConsultorio) {

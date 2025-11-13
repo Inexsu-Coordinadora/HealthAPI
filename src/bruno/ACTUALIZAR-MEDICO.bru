@@ -1,7 +1,7 @@
 meta {
   name: ACTUALIZAR-MEDICO
   type: http
-  seq: 4
+  seq: 6
 }
 
 put {
@@ -18,11 +18,6 @@ body:json {
   }
 }
 
-settings {
-  encodeUrl: true
-  timeout: 0
-}
-
 tests {
   test("Response status should be 200", function() {
     expect(res.getStatus()).to.equal(200);
@@ -35,4 +30,9 @@ tests {
   test("Response should contain updated correoMedico", function() {
     expect(res.getBody().correoMedico).to.equal("juan.perez.garcia@clinica.com");
   });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
 }

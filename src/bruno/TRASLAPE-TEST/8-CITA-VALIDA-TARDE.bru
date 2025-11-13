@@ -1,0 +1,33 @@
+meta {
+  name: CITA-VALIDA-TARDE
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://localhost:3000/api/citas/agendar
+  body: json
+}
+
+body:json {
+  {
+    "idPaciente": 1,
+    "idMedico": 1,
+    "idDisponibilidad": 2,
+    "idConsultorio": 1,
+    "fecha": "2025-11-17T14:00:00",
+    "motivo": "Segunda cita",
+    "observaciones": "Sin traslape, diferente horario"
+  }
+}
+
+tests {
+  test("Status es 201 o 200 (cita válida)", function() {
+    expect(res.getStatus()).to.be.oneOf([201, 200]);
+  });
+  
+  test("Respuesta contiene idCita", function() {
+    expect(res.body).to.have.property('data');
+    expect(res.body.data).to.have.property('idCita');
+  });
+}

@@ -130,20 +130,27 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
     // 13. Verificar traslape de citas para un paciente
     async verificarTraslapePaciente(
         idPaciente: number,
-        fechaInicio: Date,
-        fechaFin: Date,
+        horaInicio: string,
+        horaFin: string,
+        fecha?: Date,
         excluirCitaId?: number
     ): Promise<ICitaMedica | null> {
         let query = `
-            SELECT * FROM cita_medica
-            WHERE id_paciente = $1
-            AND estado != 'cancelada'
-            AND DATE(fecha) = DATE($2)
+            SELECT cm.* FROM cita_medica cm
+            INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
+            WHERE cm.id_paciente = $1
+            AND cm.estado != 'cancelada'
+            AND (d.hora_fin > $2 AND d.hora_inicio < $3)
         `;
-        const params: any[] = [idPaciente, fechaInicio];
+        const params: any[] = [idPaciente, horaInicio, horaFin];
+
+        if (fecha) {
+            query += ` AND DATE(cm.fecha) = DATE($${params.length + 1})`;
+            params.push(fecha);
+        }
 
         if (excluirCitaId) {
-            query += ` AND id_cita != $3`;
+            query += ` AND cm.id_cita != $${params.length + 1}`;
             params.push(excluirCitaId);
         }
 
@@ -153,22 +160,28 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
 
     // 14. Verificar traslape de citas para un médico
     async verificarTraslapeMedico(
-        idDisponibilidad: number,
-        fechaInicio: Date,
-        fechaFin: Date,
+        idMedico: number,
+        horaInicio: string,
+        horaFin: string,
+        fecha?: Date,
         excluirCitaId?: number
     ): Promise<ICitaMedica | null> {
         let query = `
             SELECT cm.* FROM cita_medica cm
             INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
-            WHERE d.id_disponibilidad = $1
+            WHERE d.id_medico = $1
             AND cm.estado != 'cancelada'
-            AND DATE(cm.fecha) = DATE($2)
+            AND (d.hora_fin > $2 AND d.hora_inicio < $3)
         `;
-        const params: any[] = [idDisponibilidad, fechaInicio];
+        const params: any[] = [idMedico, horaInicio, horaFin];
+
+        if (fecha) {
+            query += ` AND DATE(cm.fecha) = DATE($${params.length + 1})`;
+            params.push(fecha);
+        }
 
         if (excluirCitaId) {
-            query += ` AND cm.id_cita != $3`;
+            query += ` AND cm.id_cita != $${params.length + 1}`;
             params.push(excluirCitaId);
         }
 
@@ -179,20 +192,27 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
     // 15. Verificar traslape de citas para un consultorio
     async verificarTraslapeConsultorio(
         idConsultorio: number,
-        fechaInicio: Date,
-        fechaFin: Date,
+        horaInicio: string,
+        horaFin: string,
+        fecha?: Date,
         excluirCitaId?: number
     ): Promise<ICitaMedica | null> {
         let query = `
-            SELECT * FROM cita_medica
-            WHERE id_consultorio = $1
-            AND estado != 'cancelada'
-            AND DATE(fecha) = DATE($2)
+            SELECT cm.* FROM cita_medica cm
+            INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
+            WHERE cm.id_consultorio = $1
+            AND cm.estado != 'cancelada'
+            AND (d.hora_fin > $2 AND d.hora_inicio < $3)
         `;
-        const params: any[] = [idConsultorio, fechaInicio];
+        const params: any[] = [idConsultorio, horaInicio, horaFin];
+
+        if (fecha) {
+            query += ` AND DATE(cm.fecha) = DATE($${params.length + 1})`;
+            params.push(fecha);
+        }
 
         if (excluirCitaId) {
-            query += ` AND id_cita != $3`;
+            query += ` AND cm.id_cita != $${params.length + 1}`;
             params.push(excluirCitaId);
         }
 

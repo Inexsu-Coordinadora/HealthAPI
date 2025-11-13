@@ -20,22 +20,25 @@ export interface ICitaMedicaRepositorio {
   
   verificarTraslapePaciente(
     idPaciente: number,
-    fechaInicio: Date,
-    fechaFin: Date,
+    horaInicio: string,
+    horaFin: string,
+    fecha?: Date,
     excluirCitaId?: number
   ): Promise<ICitaMedica | null>;
   
   verificarTraslapeMedico(
-    idDisponibilidad: number,
-    fechaInicio: Date,
-    fechaFin: Date,
+    idMedico: number,
+    horaInicio: string,
+    horaFin: string,
+    fecha?: Date,
     excluirCitaId?: number
   ): Promise<ICitaMedica | null>;
   
   verificarTraslapeConsultorio(
     idConsultorio: number,
-    fechaInicio: Date,
-    fechaFin: Date,
+    horaInicio: string,
+    horaFin: string,
+    fecha?: Date,
     excluirCitaId?: number
   ): Promise<ICitaMedica | null>;
 }
