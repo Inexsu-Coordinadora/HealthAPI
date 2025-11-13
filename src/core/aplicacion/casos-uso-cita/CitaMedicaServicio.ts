@@ -1,12 +1,14 @@
 import type { ICitaMedica } from "../../dominio/citaMedica/ICitaMedica.js";
-import { CitaMedica } from "../../dominio/citaMedica/CitaMedica.js";
+import type { ICitaMedicaConDetalles } from "../../dominio/citaMedica/ICitaMedicaConDetalles.js";
 import type { ICitaMedicaRepositorio } from "../../dominio/citaMedica/repositorio/ICitaMedicaRepositorio.js";
 import type { IDisponibilidadRepositorio } from "../../dominio/disponibilidad/repositorio/IDisponibilidadRepositorio.js";
+import type { IPacienteRepositorio } from "../../dominio/paciente/repositorio/IPacienteRepositorio.js"; 
 
 export class CitaMedicaServicio {
     constructor(
         private citaMedicaRepositorio: ICitaMedicaRepositorio,
-        private disponibilidadRepositorio: IDisponibilidadRepositorio
+        private disponibilidadRepositorio: IDisponibilidadRepositorio,
+        private pacienteRepositorio: IPacienteRepositorio  
     ) {}
 
     async CrearCitaMedica(
@@ -27,14 +29,42 @@ export class CitaMedicaServicio {
         // Validar que la fecha de la cita coincida con la disponibilidad
         this.validarFechaConDisponibilidad(datos.fecha, disponibilidad);
 
-        const nuevaCita = CitaMedica.crear(
-            datos.idPaciente,
+        const nuevaCita: Omit<ICitaMedica, "idCita"> = {
+            idPaciente: datos.idPaciente,
+            idDisponibilidad: datos.idDisponibilidad,
+            fecha: datos.fecha,
+            estado: datos.estado,
+            motivo: datos.motivo,
+            observaciones: datos.observaciones,
+        };
+
+        const medicoOcupado = await this.citaMedicaRepositorio.verificarCitasSuperpuestasMedico(
             datos.idDisponibilidad,
-            datos.fecha,
-            datos.estado,
-            datos.motivo,
-            datos.observaciones
+            datos.fecha
+            );
+    
+            if (medicoOcupado) {
+                throw new Error(`El médico ya tiene una cita programada en ese horario`);
+            }
+
+            const pacienteTieneCita = await this.citaMedicaRepositorio.verificarCitasSuperpuestasPaciente(
+                datos.idPaciente,
+                datos.fecha
+            );
+            
+            if (pacienteTieneCita) {
+                throw new Error("El paciente ya tiene una cita programada en ese horario");
+            }
+
+
+        const consultorioOcupado = await this.citaMedicaRepositorio.verificarCitasSuperpuestasConsultorio(
+            datos.idDisponibilidad,
+            datos.fecha
         );
+    
+        if (consultorioOcupado) {
+            throw new Error(`El consultorio ya está ocupado en ese horario`);
+        }
 
         return await this.citaMedicaRepositorio.crear(nuevaCita);
     }
@@ -138,4 +168,24 @@ export class CitaMedicaServicio {
     async eliminarCitaMedica(id: number): Promise<boolean> {
         return await this.citaMedicaRepositorio.eliminarCita(id);
     }
-}
+
+    
+    async obtenerCitasPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]> {
+    
+        if (idPaciente <= 0) {
+            throw new Error("El ID del paciente debe ser un número positivo");
+        }
+
+    
+        const paciente = await this.pacienteRepositorio.obtenerPacientePorId(idPaciente);
+        if (!paciente) {
+            throw new Error(`No se encontró un paciente con el ID ${idPaciente}`);
+        }
+
+    
+        const citas = await this.citaMedicaRepositorio.obtenerCitasConDetallesPorPaciente(idPaciente);
+
+    
+        return citas;
+    };
+};

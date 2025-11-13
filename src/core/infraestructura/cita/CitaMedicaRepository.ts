@@ -1,6 +1,7 @@
 import type { ICitaMedicaRepositorio } from "../../dominio/citaMedica/repositorio/ICitaMedicaRepositorio.js";
 import type { ICitaMedica } from "../../dominio/citaMedica/ICitaMedica.js";
 import { ejecutarConsulta } from "../DBpostgres.js";
+import type { ICitaMedicaConDetalles } from "../../dominio/citaMedica/ICitaMedicaConDetalles.js";
 
 interface CitaMedicaRow {
     id_cita: number;
@@ -129,6 +130,40 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         return result.rows.map((row) => this.mapearFilaACitaMedica(row));
     }
 
+    async verificarCitasSuperpuestasMedico(idDisponibilidad: number, fecha: Date): Promise<boolean> {
+        const query = `
+            SELECT COUNT(*) as count
+            FROM cita_medica cm
+            INNER JOIN disponibilidad d1 ON cm.id_disponibilidad = d1.id_disponibilidad
+            INNER JOIN disponibilidad d2 ON d1.id_medico = d2.id_medico
+            WHERE d2.id_disponibilidad = $1
+            AND cm.fecha BETWEEN $2::timestamp - interval '1 hour' 
+                            AND $2::timestamp + interval '1 hour'
+            AND cm.estado != 'cancelada'
+        `;
+    
+        const result = await ejecutarConsulta(query, [idDisponibilidad, fecha]);
+        return parseInt(result.rows[0].count) > 0;
+    }
+
+
+    async verificarCitasSuperpuestasConsultorio(idDisponibilidad: number, fecha: Date): Promise<boolean> {
+        const query = `
+            SELECT COUNT(*) as count
+            FROM cita_medica cm
+            INNER JOIN disponibilidad d1 ON cm.id_disponibilidad = d1.id_disponibilidad
+            INNER JOIN disponibilidad d2 ON d1.id_consultorio = d2.id_consultorio
+            WHERE d2.id_disponibilidad = $1
+            AND d2.id_consultorio IS NOT NULL
+            AND cm.fecha BETWEEN $2::timestamp - interval '1 hour' 
+                            AND $2::timestamp + interval '1 hour'
+            AND cm.estado != 'cancelada'
+        `;
+    
+        const result = await ejecutarConsulta(query, [idDisponibilidad, fecha]);
+        return parseInt(result.rows[0].count) > 0;
+    }
+
     // Método auxiliar: Mapear nombres de campos TypeScript a columnas SQL
     private mapearCampoAColumna(campo: string): string {
         const mapeo: Record<string, string> = {
@@ -143,6 +178,20 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         return mapeo[campo] || campo.toLowerCase();
     }
 
+    async verificarCitasSuperpuestasPaciente(idPaciente: number, fecha: Date): Promise<boolean> {
+        const query = `
+            SELECT COUNT(*) as count
+            FROM cita_medica
+            WHERE id_paciente = $1
+            AND fecha BETWEEN $2::timestamp - interval '1 hour' 
+                        AND $2::timestamp + interval '1 hour'
+            AND estado != 'cancelada'
+        `;
+        
+        const result = await ejecutarConsulta(query, [idPaciente, fecha]);
+        return parseInt(result.rows[0].count) > 0;
+    }
+
     // Método auxiliar: Mapear fila de BD a objeto ICitaMedica
     private mapearFilaACitaMedica(row: CitaMedicaRow): ICitaMedica {
         return {
@@ -155,4 +204,47 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
             observaciones: row.observaciones,
         };
     }
+
+    async obtenerCitasConDetallesPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]> {
+    const query = `
+        SELECT 
+            cm.id_cita,
+            cm.fecha,
+            cm.estado,
+            cm.motivo,
+            cm.observaciones,
+            p.id_paciente,
+            p.nombre as nombre_paciente,
+            p.correo as correo_paciente,
+            m.id_medico,
+            m.nombre as nombre_medico,
+            m.especialidad as especialidad_medico
+        FROM cita_medica cm
+        INNER JOIN paciente p ON cm.id_paciente = p.id_paciente
+        INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
+        INNER JOIN medico m ON d.id_medico = m.id_medico
+        WHERE cm.id_paciente = $1
+        ORDER BY cm.fecha DESC
+    `;
+
+    const result = await ejecutarConsulta(query, [idPaciente]);
+    
+    return result.rows.map((row) => ({
+        idCita: row.id_cita,
+        fecha: new Date(row.fecha),
+        estado: row.estado,
+        motivo: row.motivo,
+        observaciones: row.observaciones,
+        paciente: {
+            idPaciente: row.id_paciente,
+            nombrePaciente: row.nombre_paciente,
+            correoPaciente: row.correo_paciente,
+        },
+        medico: {
+            idMedico: row.id_medico,
+            nombreMedico: row.nombre_medico,
+            especialidadMedico: row.especialidad_medico,
+        },
+    }));
+}
 }

@@ -1,4 +1,5 @@
 import type { ICitaMedica } from "../ICitaMedica.js";
+import type { ICitaMedicaConDetalles } from "../ICitaMedicaConDetalles.js";
 
 export interface ICitaMedicaRepositorio {
     crear(cita: Omit<ICitaMedica, `idCita`>): Promise<ICitaMedica>;
@@ -9,4 +10,8 @@ export interface ICitaMedicaRepositorio {
     obtenerPorPaciente(idPaciente: number): Promise<ICitaMedica[]>;
     obtenerPorMedico(idMedico: number): Promise<ICitaMedica[]>;
     obtenerPorEstado(estado: string): Promise<ICitaMedica[]>;
+    obtenerCitasConDetallesPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]>;
+    verificarCitasSuperpuestasPaciente(idPaciente: number, fecha: Date): Promise<boolean>;
+    verificarCitasSuperpuestasMedico(idDisponibilidad: number, fecha: Date): Promise<boolean>;
+    verificarCitasSuperpuestasConsultorio(idDisponibilidad: number, fecha: Date): Promise<boolean>;
 }
