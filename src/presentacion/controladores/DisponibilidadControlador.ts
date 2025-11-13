@@ -1,236 +1,273 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
+import * as z from "zod";
 import { DisponibilidadServicio } from "../../core/aplicacion/casos-uso-disponibilidad/DisponibilidadServicio.js";
-import { validarCrearDisponibilidad, validarActualizarDisponibilidad } from "../esquemas/DisponibilidadEsquemas.js";
+import type { IDisponibilidad } from "../../core/dominio/disponibilidad/IDisponibilidad.js";
+import {
+    esquemaDisponibilidadPorId,
+    esquemaActualizarDisponibilidad,
+    crearDisponibilidadConValidacionRepositorios,
+} from "../esquemas/DisponibilidadEsquemas.js";
+import { validadorEsquemas } from "../esquemas/ValidadorZod.js";
+import { MedicoRepositorioPostgres } from "../../core/infraestructura/medico/MedicoRepository.js";
+import { ConsultorioRepositorioPostgres } from "../../core/infraestructura/consultorio/ConsultorioRepository.js";
+
+enum Mensajes {
+    "200_POST_OK" = "Disponibilidad creada exitosamente",
+    "200_GET_OK" = "Disponibilidad obtenida exitosamente",
+    "200_GET_ALL_OK" = "Lista de disponibilidades obtenida exitosamente",
+    "200_PUT_OK" = "Disponibilidad actualizada exitosamente",
+    "200_DELETE_OK" = "Disponibilidad eliminada exitosamente",
+    "404_NOT_FOUND" = "No se encontró una disponibilidad con el ID",
+}
 
 export class DisponibilidadControlador {
-    constructor(private readonly disponibilidadServicio: DisponibilidadServicio) {}
+    constructor(
+        private readonly disponibilidadServicio: DisponibilidadServicio
+    ) {}
 
     async crearDisponibilidad(request: FastifyRequest, reply: FastifyReply) {
         try {
-            const validacion = validarCrearDisponibilidad(request.body);
+            const medicoRepo = new MedicoRepositorioPostgres();
+            const consultorioRepo = new ConsultorioRepositorioPostgres();
+            const esquemaConValidaciones =
+                crearDisponibilidadConValidacionRepositorios(
+                    medicoRepo,
+                    consultorioRepo
+                );
 
-            if (!validacion.valido) {
-                return reply.status(400).send({
-                    error: "Datos inválidos",
-                    detalles: validacion.errores,
-                });
-            }
+            const disponibilidadValidada =
+                await esquemaConValidaciones.parseAsync(request.body);
 
-            const datos: any = request.body;
-            const disponibilidadCreada = await this.disponibilidadServicio.crearDisponibilidad({
-                idMedico: datos.idMedico,
-                idConsultorio: datos.idConsultorio ?? null,
-                diaSemana: datos.diaSemana,
-                horaInicio: datos.horaInicio,
-                horaFin: datos.horaFin,
-            });
+            const disponibilidadCreada =
+                await this.disponibilidadServicio.crearDisponibilidad(
+                    disponibilidadValidada as Omit<
+                        IDisponibilidad,
+                        "idDisponibilidad"
+                    >
+                );
 
             return reply.status(201).send({
-                mensaje: "Disponibilidad creada exitosamente",
+                mensaje: Mensajes["200_POST_OK"],
                 data: disponibilidadCreada,
             });
-        } catch (error: any) {
-            // Error: Disponibilidad duplicada
-            if (error.message.includes("Ya existe una disponibilidad idéntica")) {
-                return reply.status(409).send({
-                    error: "Disponibilidad duplicada",
-                    mensaje: error.message,
-                });
-            }
+        } catch (error: unknown) {
+            if (error instanceof z.ZodError) {
+                // Detectar si es error de recurso inexistente (404)
+                const errorMedicoInexistente = error.issues.find(
+                    (issue) =>
+                        issue.path.includes("idMedico") &&
+                        issue.message.includes("No se encontró")
+                );
+                const errorConsultorioInexistente = error.issues.find(
+                    (issue) =>
+                        issue.path.includes("idConsultorio") &&
+                        issue.message.includes("No se encontró")
+                );
 
-            return reply.status(500).send({
-                error: "Error al crear la disponibilidad",
-                mensaje: error.message,
-            });
-        }
-    }
+                if (errorMedicoInexistente || errorConsultorioInexistente) {
+                    return reply.status(404).send({
+                        error: "Recurso inexistente",
+                        mensaje: error.issues
+                            .map((issue) => issue.message)
+                            .join(". "),
+                    });
+                }
 
-    async listarDisponibilidades(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const disponibilidades = await this.disponibilidadServicio.listarDisponibilidades();
-
-            return reply.status(200).send({
-                mensaje: "Lista de disponibilidades obtenida exitosamente",
-                data: disponibilidades,
-                total: disponibilidades.length,
-            });
-        } catch (error: any) {
-            return reply.status(500).send({
-                error: "Error al obtener la lista de disponibilidades",
-                mensaje: error.message,
-            });
-        }
-    }
-
-    async obtenerDisponibilidadPorId(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { id } = request.params as { id: string };
-            const idDisponibilidad = parseInt(id, 10);
-
-            if (isNaN(idDisponibilidad)) {
-                return reply.status(400).send({
-                    error: "ID inválido",
-                    mensaje: "El ID debe ser un número válido",
-                });
-            }
-
-            const disponibilidad = await this.disponibilidadServicio.obtenerDisponibilidadPorId(idDisponibilidad);
-
-            return reply.status(200).send({
-                mensaje: "Disponibilidad obtenida exitosamente",
-                data: disponibilidad,
-            });
-        } catch (error: any) {
-            if (error.message.includes("No se encontró")) {
-                return reply.status(404).send({
-                    error: "Disponibilidad no encontrada",
-                    mensaje: error.message,
-                });
-            }
-
-            return reply.status(500).send({
-                error: "Error al obtener la disponibilidad",
-                mensaje: error.message,
-            });
-        }
-    }
-
-    async obtenerDisponibilidadesPorMedico(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { idMedico } = request.params as { idMedico: string };
-            const id = parseInt(idMedico, 10);
-
-            if (isNaN(id)) {
-                return reply.status(400).send({
-                    error: "ID inválido",
-                    mensaje: "El ID del médico debe ser un número válido",
-                });
-            }
-
-            const disponibilidades = await this.disponibilidadServicio.obtenerDisponibilidadesPorMedico(id);
-
-            return reply.status(200).send({
-                mensaje: "Disponibilidades del médico obtenidas exitosamente",
-                data: disponibilidades,
-                total: disponibilidades.length,
-            });
-        } catch (error: any) {
-            return reply.status(500).send({
-                error: "Error al obtener las disponibilidades del médico",
-                mensaje: error.message,
-            });
-        }
-    }
-
-    async obtenerDisponibilidadesPorConsultorio(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { idConsultorio } = request.params as { idConsultorio: string };
-            const id = parseInt(idConsultorio, 10);
-
-            if (isNaN(id)) {
-                return reply.status(400).send({
-                    error: "ID inválido",
-                    mensaje: "El ID del consultorio debe ser un número válido",
-                });
-            }
-
-            const disponibilidades = await this.disponibilidadServicio.obtenerDisponibilidadesPorConsultorio(id);
-
-            return reply.status(200).send({
-                mensaje: "Disponibilidades del consultorio obtenidas exitosamente",
-                data: disponibilidades,
-                total: disponibilidades.length,
-            });
-        } catch (error: any) {
-            return reply.status(500).send({
-                error: "Error al obtener las disponibilidades del consultorio",
-                mensaje: error.message,
-            });
-        }
-    }
-
-    async actualizarDisponibilidad(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { id } = request.params as { id: string };
-            const idDisponibilidad = parseInt(id, 10);
-
-            if (isNaN(idDisponibilidad)) {
-                return reply.status(400).send({
-                    error: "ID inválido",
-                    mensaje: "El ID debe ser un número válido",
-                });
-            }
-
-            const validacion = validarActualizarDisponibilidad(request.body);
-
-            if (!validacion.valido) {
                 return reply.status(400).send({
                     error: "Datos inválidos",
-                    detalles: validacion.errores,
+                    mensaje: error.issues
+                        .map((issue) => issue.message)
+                        .join(". "),
                 });
             }
 
-            const datos: any = request.body;
-            const disponibilidadActualizada = await this.disponibilidadServicio.actualizarDisponibilidad(
-                idDisponibilidad,
-                datos
+            if (error instanceof Error) {
+                // Conflicto: disponibilidad duplicada
+                if (
+                    error.message.includes(
+                        "Ya existe una disponibilidad idéntica"
+                    )
+                ) {
+                    return reply.status(409).send({
+                        error: "Asignación duplicada",
+                        mensaje: error.message,
+                    });
+                }
+
+                // Conflicto: médico en otro consultorio
+                if (error.message.includes("otro consultorio")) {
+                    return reply.status(409).send({
+                        error: "Conflicto de horario del médico",
+                        mensaje: error.message,
+                    });
+                }
+
+                // Conflicto: consultorio ocupado
+                if (error.message.includes("ocupado por otro médico")) {
+                    return reply.status(409).send({
+                        error: "Consultorio no disponible",
+                        mensaje: error.message,
+                    });
+                }
+            }
+
+            const errorMessage =
+                error instanceof Error ? error.message : "Error desconocido";
+            return reply.status(500).send({
+                error: "Error del servidor",
+                mensaje: errorMessage,
+            });
+        }
+    }
+
+    async listarDisponibilidades(reply: FastifyReply) {
+        const disponibilidades =
+            await this.disponibilidadServicio.listarDisponibilidades();
+
+        return reply.status(200).send({
+            mensaje: Mensajes["200_GET_ALL_OK"],
+            data: disponibilidades,
+            total: disponibilidades.length,
+        });
+    }
+
+    async obtenerDisponibilidadPorId(
+        request: FastifyRequest,
+        reply: FastifyReply
+    ) {
+        const { id: idDisponibilidad } = validadorEsquemas(
+            esquemaDisponibilidadPorId,
+            request.params,
+            reply
+        );
+
+        const disponibilidad =
+            await this.disponibilidadServicio.obtenerDisponibilidadPorId(
+                idDisponibilidad
             );
 
-            return reply.status(200).send({
-                mensaje: "Disponibilidad actualizada exitosamente",
+        const statusCode = disponibilidad ? 200 : 404;
+        const mensaje = disponibilidad
+            ? Mensajes["200_GET_OK"]
+            : `${Mensajes["404_NOT_FOUND"]} ${idDisponibilidad}`;
+        return reply.status(statusCode).send({
+            mensaje,
+            data: disponibilidad,
+        });
+    }
+
+    async obtenerDisponibilidadesPorMedico(
+        request: FastifyRequest,
+        reply: FastifyReply
+    ) {
+        const { idMedico } = request.params as { idMedico: string };
+        const id = parseInt(idMedico, 10);
+
+        const disponibilidades =
+            await this.disponibilidadServicio.obtenerDisponibilidadesPorMedico(
+                id
+            );
+
+        return reply.status(200).send({
+            mensaje: "Disponibilidades del médico obtenidas exitosamente",
+            data: disponibilidades,
+            total: disponibilidades.length,
+        });
+    }
+
+    async obtenerDisponibilidadesPorConsultorio(
+        request: FastifyRequest,
+        reply: FastifyReply
+    ) {
+        const { idConsultorio } = request.params as { idConsultorio: string };
+        const id = parseInt(idConsultorio, 10);
+
+        const disponibilidades =
+            await this.disponibilidadServicio.obtenerDisponibilidadesPorConsultorio(
+                id
+            );
+
+        return reply.status(200).send({
+            mensaje: "Disponibilidades del consultorio obtenidas exitosamente",
+            data: disponibilidades,
+            total: disponibilidades.length,
+        });
+    }
+
+    async actualizarDisponibilidad(
+        request: FastifyRequest,
+        reply: FastifyReply
+    ) {
+        try {
+            const { id: idDisponibilidad } = validadorEsquemas(
+                esquemaDisponibilidadPorId,
+                request.params,
+                reply
+            );
+            const datos = validadorEsquemas(
+                esquemaActualizarDisponibilidad,
+                request.body,
+                reply
+            );
+
+            const disponibilidadActualizada =
+                await this.disponibilidadServicio.actualizarDisponibilidad(
+                    idDisponibilidad,
+                    datos as Partial<IDisponibilidad>
+                );
+
+            const statusCode = disponibilidadActualizada ? 200 : 404;
+            const mensaje = disponibilidadActualizada
+                ? Mensajes["200_PUT_OK"]
+                : `${Mensajes["404_NOT_FOUND"]} ${idDisponibilidad}`;
+            return reply.status(statusCode).send({
+                mensaje,
                 data: disponibilidadActualizada,
             });
-        } catch (error: any) {
-            if (error.message.includes("No se encontró")) {
-                return reply.status(404).send({
-                    error: "Disponibilidad no encontrada",
-                    mensaje: error.message,
-                });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                // Conflicto: médico en otro consultorio
+                if (error.message.includes("otro consultorio")) {
+                    return reply.status(409).send({
+                        error: "Conflicto de horario del médico",
+                        mensaje: error.message,
+                    });
+                }
+
+                // Conflicto: consultorio ocupado
+                if (error.message.includes("ocupado por otro médico")) {
+                    return reply.status(409).send({
+                        error: "Consultorio no disponible",
+                        mensaje: error.message,
+                    });
+                }
             }
 
+            const errorMessage =
+                error instanceof Error ? error.message : "Error desconocido";
             return reply.status(500).send({
-                error: "Error al actualizar la disponibilidad",
-                mensaje: error.message,
+                error: "Error del servidor",
+                mensaje: errorMessage,
             });
         }
     }
 
     async eliminarDisponibilidad(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { id } = request.params as { id: string };
-            const idDisponibilidad = parseInt(id, 10);
+        const { id: idDisponibilidad } = validadorEsquemas(
+            esquemaDisponibilidadPorId,
+            request.params,
+            reply
+        );
 
-            if (isNaN(idDisponibilidad)) {
-                return reply.status(400).send({
-                    error: "ID inválido",
-                    mensaje: "El ID debe ser un número válido",
-                });
-            }
+        const eliminado =
+            await this.disponibilidadServicio.eliminarDisponibilidad(
+                idDisponibilidad
+            );
 
-            const eliminado = await this.disponibilidadServicio.eliminarDisponibilidad(idDisponibilidad);
-
-            if (eliminado) {
-                return reply.status(200).send({
-                    mensaje: "Disponibilidad eliminada exitosamente",
-                });
-            } else {
-                return reply.status(404).send({
-                    error: "Disponibilidad no encontrada",
-                    mensaje: `No se encontró una disponibilidad con el ID ${idDisponibilidad}`,
-                });
-            }
-        } catch (error: any) {
-            if (error.message.includes("No se encontró")) {
-                return reply.status(404).send({
-                    error: "Disponibilidad no encontrada",
-                    mensaje: error.message,
-                });
-            }
-
-            return reply.status(500).send({
-                error: "Error al eliminar la disponibilidad",
-                mensaje: error.message,
-            });
-        }
+        const statusCode = eliminado ? 200 : 404;
+        const mensaje = eliminado
+            ? Mensajes["200_DELETE_OK"]
+            : `${Mensajes["404_NOT_FOUND"]} ${idDisponibilidad}`;
+        return reply.status(statusCode).send({ mensaje });
     }
 }
