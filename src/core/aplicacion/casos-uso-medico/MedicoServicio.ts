@@ -12,6 +12,25 @@ export class MedicoServicio {
             datos.especialidadMedico
         );
 
+        if (!datos.correoMedico || datos.correoMedico.trim() === "") {
+            throw new Error("El correo del médico es obligatorio");
+        }
+
+        if (!datos.especialidadMedico || datos.especialidadMedico.trim() === "") {
+            throw new Error("La especialidad del médico es obligatoria");
+        }
+
+        const medicoExistente = await this.medicoRepositorio.obtenerPorCorreo(datos.correoMedico);
+            if (medicoExistente) {
+        throw new Error(`Ya existe un médico con el correo ${datos.correoMedico}`);
+        }
+
+        // VALIDACIÓN DEL FORMATO DEL CORREO
+        if (!Medico.validarCorreo(nuevoMedico.correoMedico)) {
+            throw new Error("El formato del correo electrónico es inválido");
+        }
+
+        // GUARDAR EN EL REPOSITORIO
         return await this.medicoRepositorio.crearMedico(nuevoMedico);
     }
 

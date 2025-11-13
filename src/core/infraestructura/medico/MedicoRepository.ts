@@ -97,6 +97,15 @@ export class MedicoRepositorioPostgres implements IMedicoRepositorio {
         return result.rows.length > 0;
     }
 
+    async obtenerPorCorreo(correo: string): Promise<IMedico | null> {
+        const query = "SELECT * FROM medico WHERE correo = $1";
+        const result = await ejecutarConsulta(query, [correo]);
+    
+    if (result.rows.length === 0) return null;
+    
+    return this.mapearFilaAMedico(result.rows[0]);
+    }
+
     // METODO AXILIAR
     private mapearCampoAColumna(campo: string): string {
         const mapeo: Record<string, string> = {

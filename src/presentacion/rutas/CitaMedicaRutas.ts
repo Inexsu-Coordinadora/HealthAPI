@@ -3,14 +3,19 @@ import { CitaControlador } from "../controladores/CitaMedicaControlador.js";
 import { CitaMedicaServicio } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
 import { CitaMedicaRepositorioPostgres } from "../../core/infraestructura/cita/CitaMedicaRepository.js";
 import { DisponibilidadRepositorioPostgres } from "../../core/infraestructura/disponibilidad/DisponibilidadRepository.js";
+import { PacienteRepositorioPostgres } from "../../core/infraestructura/paciente/PacienteRepository.js";
+
 export async function citaRutas(fastify: FastifyInstance) {
     const citaRepositorio = new CitaMedicaRepositorioPostgres();
     const disponibilidadRepositorio = new DisponibilidadRepositorioPostgres();
+    const pacienteRepositorio = new PacienteRepositorioPostgres();
     const citaServicio = new CitaMedicaServicio(
         citaRepositorio,
-        disponibilidadRepositorio
+        disponibilidadRepositorio,
+        pacienteRepositorio
     );
     const citaControlador = new CitaControlador(citaServicio);
+    
 
     
     fastify.post("/citas", async (request, reply) => {
@@ -35,5 +40,8 @@ export async function citaRutas(fastify: FastifyInstance) {
 
     fastify.post("/citas/agendar", async (request, reply) => {
         return citaControlador.agendarCita(request, reply);
+    });
+    fastify.get("/pacientes/:idPaciente/citas", async (request, reply) => {
+        return citaControlador.consultarCitasPorPaciente(request, reply);
     });
 }

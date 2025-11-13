@@ -1,0 +1,15 @@
+meta {
+  name: PACIENTE INVALIDO (TEXTO)
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:3000/api/pacientes/abc/citas
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
