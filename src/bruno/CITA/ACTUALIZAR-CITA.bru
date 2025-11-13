@@ -1,0 +1,27 @@
+meta {
+  name: ACTUALIZAR-CITA
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:3000/api/citas/1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+  "idPaciente": 1,
+    "idDisponibilidad": 1,
+    "fecha": "2025-11-10T14:30:00.000Z",
+    "estado": "realizada",
+    "motivo": "tenia gripa",
+    "observaciones": "Primera consulta completa del paciente"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

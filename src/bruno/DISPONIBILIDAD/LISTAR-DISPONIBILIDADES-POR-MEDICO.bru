@@ -1,0 +1,44 @@
+meta {
+  name: LISTAR-DISPONIBILIDADES-POR-MEDICO
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:3000/api/medicos/1/disponibilidades
+  body: none
+  auth: none
+}
+
+docs {
+  # Listar Disponibilidades por Médico
+  
+  ## Descripción
+  Obtiene todas las disponibilidades de un médico específico.
+  
+  ## Respuesta esperada: 200
+  ```json
+  {
+    "mensaje": "Disponibilidades del médico obtenidas exitosamente",
+    "data": [
+      {
+        "idDisponibilidad": 1,
+        "idMedico": 1,
+        "idConsultorio": 1,
+        "diaSemana": "lunes",
+        "horaInicio": "08:00:00",
+        "horaFin": "12:00:00"
+      },
+      {
+        "idDisponibilidad": 2,
+        "idMedico": 1,
+        "idConsultorio": 2,
+        "diaSemana": "martes",
+        "horaInicio": "14:00:00",
+        "horaFin": "18:00:00"
+      }
+    ],
+    "total": 2
+  }
+  ```
+}

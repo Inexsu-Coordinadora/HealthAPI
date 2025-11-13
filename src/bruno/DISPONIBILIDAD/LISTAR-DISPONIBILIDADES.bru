@@ -1,0 +1,36 @@
+meta {
+  name: LISTAR-DISPONIBILIDADES
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:3000/api/disponibilidades
+  body: none
+  auth: none
+}
+
+docs {
+  # Listar Disponibilidades
+  
+  ## Descripción
+  Obtiene la lista completa de todas las disponibilidades registradas.
+  
+  ## Respuesta esperada: 200
+  ```json
+  {
+    "mensaje": "Lista de disponibilidades obtenida exitosamente",
+    "data": [
+      {
+        "idDisponibilidad": 1,
+        "idMedico": 1,
+        "idConsultorio": 1,
+        "diaSemana": "lunes",
+        "horaInicio": "08:00:00",
+        "horaFin": "12:00:00"
+      }
+    ],
+    "total": 1
+  }
+  ```
+}

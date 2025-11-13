@@ -1,13 +1,22 @@
-import type { IPacienteRepositorio } from "../../dominio/paciente/repo/IPacienteRepo.js";
-import type { IPaciente, IPacienteActualizar } from "../../dominio/paciente/IPaciente.js";
+import type { IPacienteRepositorio } from "../../dominio/paciente/repositorio/IPacienteRepositorio.js";
+import type {
+    IPaciente,
+    IPacienteActualizar,
+} from "../../dominio/paciente/IPaciente.js";
 import { Paciente } from "../../dominio/paciente/Paciente.js";
 
 export class PacienteServicio {
     constructor(private readonly pacienteRepositorio: IPacienteRepositorio) {}
 
-    async crearPaciente(datos: Omit<IPaciente, "idPaciente">): Promise<IPaciente> {
+    async crearPaciente(
+        datos: Omit<IPaciente, "idPaciente">
+    ): Promise<IPaciente> {
         // Crear instancia de Paciente
-        const nuevoPaciente = Paciente.crear(datos.nombrePaciente, datos.correoPaciente, datos.telefonoPaciente || "");
+        const nuevoPaciente = Paciente.crear(
+            datos.nombrePaciente,
+            datos.correoPaciente,
+            datos.telefonoPaciente || ""
+        );
 
         return await this.pacienteRepositorio.crearPaciente(nuevoPaciente);
     }
@@ -22,13 +31,14 @@ export class PacienteServicio {
     }
 
     // Actualizar un paciente
-    async actualizarPaciente(id: number, datosActualizados: IPacienteActualizar): Promise<IPaciente | null> {
-        // Verificar que el paciente existe
-        const pacienteExistente = await this.pacienteRepositorio.obtenerPacientePorId(id);
-        if (!pacienteExistente) return null;
-
-        // Actualizar en el repositorio
-        return await this.pacienteRepositorio.actualizarPaciente(id, datosActualizados);
+    async actualizarPaciente(
+        id: number,
+        datosActualizados: IPacienteActualizar
+    ): Promise<IPaciente | null> {
+        return await this.pacienteRepositorio.actualizarPaciente(
+            id,
+            datosActualizados
+        );
     }
 
     // Eliminar un paciente
