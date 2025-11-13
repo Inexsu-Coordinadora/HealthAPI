@@ -1,169 +1,109 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { MedicoServicio } from "../../core/aplicacion/casos-uso-medico/MedicoServicio.js";
-import { validarCrearMedico, validarActualizarMedico } from "../esquemas/MedicoEsquemas.js";
+import type { IMedico } from "../../core/dominio/medico/IMedico.js";
+import {
+    esquemaCrearMedico,
+    esquemaMedicoPorId,
+    esquemaActualizarMedico,
+} from "../esquemas/MedicoEsquemas.js";
+import { validadorEsquemas } from "../esquemas/ValidadorZod.js";
+
+enum Mensajes {
+    "200_POST_OK" = "Médico creado exitosamente",
+    "200_GET_OK" = "Médico obtenido exitosamente",
+    "200_GET_ALL_OK" = "Lista de médicos obtenida exitosamente",
+    "200_PUT_OK" = "Médico actualizado exitosamente",
+    "200_DELETE_OK" = "Médico eliminado exitosamente",
+    "404_NOT_FOUND" = "No se encontró un médico con el ID",
+}
 
 export class MedicoControlador {
     constructor(private readonly medicoServicio: MedicoServicio) {}
 
     async crearMedico(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const validacion = validarCrearMedico(request.body);
+        const medico = validadorEsquemas(
+            esquemaCrearMedico,
+            request.body,
+            reply
+        );
 
-            if (!validacion.valido) {
-                return reply.status(400).send({
-                    error: "Datos inválidos",
-                    detalles: validacion.errores,
-                });
-            }
+        const medicoCreado = await this.medicoServicio.crearMedico(medico);
 
-            const datos: any = request.body;
-            const medicoCreado = await this.medicoServicio.crearMedico({
-                nombreMedico: datos.nombreMedico,
-                correoMedico: datos.correoMedico,
-                especialidadMedico: datos.especialidadMedico,
-            });
-
-            return reply.status(201).send({
-                mensaje: "Médico creado exitosamente",
-                data: medicoCreado,
-            });
-        } catch (error: any) {
-            return reply.status(500).send({
-                error: "Error al crear el médico",
-                mensaje: error.message,
-            });
-        }
+        return reply.status(201).send({
+            mensaje: Mensajes["200_POST_OK"],
+            data: medicoCreado,
+        });
     }
 
-    async listarMedicos(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const medicos = await this.medicoServicio.listarMedicos();
+    async listarMedicos(reply: FastifyReply) {
+        const medicos = await this.medicoServicio.listarMedicos();
 
-            return reply.status(200).send({
-                mensaje: "Lista de médicos obtenida exitosamente",
-                data: medicos,
-                total: medicos.length,
-            });
-        } catch (error: any) {
-            return reply.status(500).send({
-                error: "Error al obtener la lista de médicos",
-                mensaje: error.message,
-            });
-        }
+        return reply.status(200).send({
+            mensaje: Mensajes["200_GET_ALL_OK"],
+            data: medicos,
+            total: medicos.length,
+        });
     }
 
     async obtenerMedicoPorId(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { id } = request.params as { id: string };
-            const idMedico = parseInt(id, 10);
+        const { id: idMedico } = validadorEsquemas(
+            esquemaMedicoPorId,
+            request.params,
+            reply
+        );
 
-            if (isNaN(idMedico)) {
-                return reply.status(400).send({
-                    error: "ID inválido",
-                    mensaje: "El ID debe ser un número válido",
-                });
-            }
+        const medico = await this.medicoServicio.obtenerMedicoPorId(idMedico);
 
-            const medico = await this.medicoServicio.obtenerMedicoPorId(idMedico);
-
-            return reply.status(200).send({
-                mensaje: "Médico obtenido exitosamente",
-                data: medico,
-            });
-        } catch (error: any) {
-            if (error.message.includes("No se encontró")) {
-                return reply.status(404).send({
-                    error: "Médico no encontrado",
-                    mensaje: error.message,
-                });
-            }
-
-            return reply.status(500).send({
-                error: "Error al obtener el médico",
-                mensaje: error.message,
-            });
-        }
+        const statusCode = medico ? 200 : 404;
+        const mensaje = medico
+            ? Mensajes["200_GET_OK"]
+            : `${Mensajes["404_NOT_FOUND"]} ${idMedico}`;
+        return reply.status(statusCode).send({
+            mensaje,
+            data: medico,
+        });
     }
 
     async actualizarMedico(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { id } = request.params as { id: string };
-            const idMedico = parseInt(id, 10);
+        const { id: idMedico } = validadorEsquemas(
+            esquemaMedicoPorId,
+            request.params,
+            reply
+        );
+        const datos = validadorEsquemas(
+            esquemaActualizarMedico,
+            request.body,
+            reply
+        );
 
-            if (isNaN(idMedico)) {
-                return reply.status(400).send({
-                    error: "ID inválido",
-                    mensaje: "El ID debe ser un número válido",
-                });
-            }
+        const medicoActualizado = await this.medicoServicio.actualizarMedico(
+            idMedico,
+            datos as Partial<IMedico>
+        );
 
-            const validacion = validarActualizarMedico(request.body);
-
-            if (!validacion.valido) {
-                return reply.status(400).send({
-                    error: "Datos inválidos",
-                    detalles: validacion.errores,
-                });
-            }
-
-            const datos: any = request.body;
-            const medicoActualizado = await this.medicoServicio.actualizarMedico(idMedico, datos);
-
-            return reply.status(200).send({
-                mensaje: "Médico actualizado exitosamente",
-                data: medicoActualizado,
-            });
-        } catch (error: any) {
-            if (error.message.includes("No se encontró")) {
-                return reply.status(404).send({
-                    error: "Médico no encontrado",
-                    mensaje: error.message,
-                });
-            }
-
-            return reply.status(500).send({
-                error: "Error al actualizar el médico",
-                mensaje: error.message,
-            });
-        }
+        const statusCode = medicoActualizado ? 200 : 404;
+        const mensaje = medicoActualizado
+            ? Mensajes["200_PUT_OK"]
+            : `${Mensajes["404_NOT_FOUND"]} ${idMedico}`;
+        return reply.status(statusCode).send({
+            mensaje,
+            data: medicoActualizado,
+        });
     }
 
     async eliminarMedico(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { id } = request.params as { id: string };
-            const idMedico = parseInt(id, 10);
+        const { id: idMedico } = validadorEsquemas(
+            esquemaMedicoPorId,
+            request.params,
+            reply
+        );
 
-            if (isNaN(idMedico)) {
-                return reply.status(400).send({
-                    error: "ID inválido",
-                    mensaje: "El ID debe ser un número válido",
-                });
-            }
+        const eliminado = await this.medicoServicio.eliminarMedico(idMedico);
 
-            const eliminado = await this.medicoServicio.eliminarMedico(idMedico);
-
-            if (eliminado) {
-                return reply.status(200).send({
-                    mensaje: "Médico eliminado exitosamente",
-                });
-            } else {
-                return reply.status(404).send({
-                    error: "Médico no encontrado",
-                    mensaje: `No se encontró un médico con el ID ${idMedico}`,
-                });
-            }
-        } catch (error: any) {
-            if (error.message.includes("No se encontró")) {
-                return reply.status(404).send({
-                    error: "Médico no encontrado",
-                    mensaje: error.message,
-                });
-            }
-
-            return reply.status(500).send({
-                error: "Error al eliminar el médico",
-                mensaje: error.message,
-            });
-        }
+        const statusCode = eliminado ? 200 : 404;
+        const mensaje = eliminado
+            ? Mensajes["200_DELETE_OK"]
+            : `${Mensajes["404_NOT_FOUND"]} ${idMedico}`;
+        return reply.status(statusCode).send({ mensaje });
     }
 }

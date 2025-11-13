@@ -22,7 +22,12 @@ export class Medico implements IMedico {
         });
     }
 
-    static desdeBD(id: number, nombre: string, correo: string, especialidad: string): Medico {
+    static desdeBD(
+        id: number,
+        nombre: string,
+        correo: string,
+        especialidad: string
+    ): Medico {
         return new Medico({
             idMedico: id,
             nombreMedico: nombre,
@@ -31,9 +36,9 @@ export class Medico implements IMedico {
         });
     }
 
-    validarCorreo(): boolean {
+    static validarCorreo(correo: string): boolean {
         const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regexCorreo.test(this.correoMedico);
+        return regexCorreo.test(correo);
     }
 
     toObject(): IMedico {
