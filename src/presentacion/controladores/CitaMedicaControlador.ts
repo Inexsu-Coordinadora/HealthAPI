@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { ZodError } from "zod";
 import { CitaMedicaServicio } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
+import { validarAgendarCita } from "../esquemas/CitaMedicaEsquemas.js";
 import type { ICitaMedica } from "../../core/dominio/citaMedica/ICitaMedica.js";
 import {
     esquemaCitaPorId,
@@ -92,8 +93,110 @@ export class CitaControlador {
         }
     }
 
-    async listarCitas(reply: FastifyReply) {
-        const citas = await this.citaServicio.listarCitas();
+
+async agendarCita(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            // Validar datos de entrada
+            const validacion = validarAgendarCita(request.body);
+            if (!validacion.valido) {
+                return reply.status(400).send({
+                    error: "Datos inválidos",
+                    detalles: validacion.errores,
+                });
+            }
+
+            const datos = request.body as any;
+
+            const citaAgendada = await this.citaServicio.agendarCitaConValidacion({
+                idPaciente: datos.idPaciente,
+                idMedico: datos.idMedico,
+                idDisponibilidad: datos.idDisponibilidad,
+                fecha: new Date(datos.fecha),
+                idConsultorio: datos.idConsultorio ?? null,
+                motivo: datos.motivo ?? null,
+                observaciones: datos.observaciones ?? "",
+            });
+
+            return reply.status(201).send({
+                mensaje: "Cita médica agendada exitosamente",
+                data: {
+                    idCita: citaAgendada.idCita,
+                    idPaciente: citaAgendada.idPaciente,
+                    idDisponibilidad: citaAgendada.idDisponibilidad,
+                    fecha: citaAgendada.fecha,
+                    estado: citaAgendada.estado,
+                    motivo: citaAgendada.motivo,
+                    observaciones: citaAgendada.observaciones,
+                },
+            });
+        } catch (error: any) {
+
+            if (error.message.includes("Paciente inexistente")) {
+                return reply.status(404).send({
+                    error: "Paciente inexistente",
+                    mensaje: error.message,
+                    codigo: "PACIENTE_NO_EXISTE",
+                });
+            }
+
+            if (error.message.includes("Médico inexistente")) {
+                return reply.status(404).send({
+                    error: "Médico inexistente",
+                    mensaje: error.message,
+                    codigo: "MEDICO_NO_EXISTE",
+                });
+            }
+
+            if (error.message.includes("Consultorio inexistente")) {
+                return reply.status(404).send({
+                    error: "Consultorio inexistente",
+                    mensaje: error.message,
+                    codigo: "CONSULTORIO_NO_EXISTE",
+                });
+            }
+
+            if (error.message.includes("Disponibilidad inexistente")) {
+                return reply.status(404).send({
+                    error: "Disponibilidad inexistente",
+                    mensaje: error.message,
+                    codigo: "DISPONIBILIDAD_NO_EXISTE",
+                });
+            }
+
+            if (error.message.includes("traslape para el Paciente")) {
+                return reply.status(409).send({
+                    error: "Conflicto de agenda - Paciente",
+                    mensaje: error.message,
+                    codigo: "TRASLAPE_PACIENTE",
+                });
+            }
+
+            if (error.message.includes("traslape para el Médico")) {
+                return reply.status(409).send({
+                    error: "Conflicto de agenda - Médico",
+                    mensaje: error.message,
+                    codigo: "TRASLAPE_MEDICO",
+                });
+            }
+
+            if (error.message.includes("traslape para el Consultorio")) {
+                return reply.status(409).send({
+                    error: "Conflicto de agenda - Consultorio",
+                    mensaje: error.message,
+                    codigo: "TRASLAPE_CONSULTORIO",
+                });
+            }
+
+            return reply.status(500).send({
+                error: "Error al agendar la cita médica",
+                mensaje: error.message,
+            });
+        }
+    }
+
+    async listarCitas(request: FastifyRequest, reply: FastifyReply) {
+         
+            const citas = await this.citaServicio.listarCitas();
 
         return reply.status(200).send({
             mensaje: Mensajes["200_GET_ALL_OK"],

@@ -12,6 +12,7 @@ export async function citaRutas(fastify: FastifyInstance) {
     );
     const citaControlador = new CitaControlador(citaServicio);
 
+    
     fastify.post("/citas", async (request, reply) => {
         return citaControlador.crearCita(request, reply);
     });
@@ -21,7 +22,7 @@ export async function citaRutas(fastify: FastifyInstance) {
     });
 
     fastify.get("/citas", async (request, reply) => {
-        return citaControlador.listarCitas(reply);
+        return citaControlador.listarCitas(request, reply);
     });
 
     fastify.put("/citas/:id", async (request, reply) => {
@@ -30,5 +31,9 @@ export async function citaRutas(fastify: FastifyInstance) {
 
     fastify.delete("/citas/:id", async (request, reply) => {
         return citaControlador.eliminarCita(request, reply);
+    });
+
+    fastify.post("/citas/agendar", async (request, reply) => {
+        return citaControlador.agendarCita(request, reply);
     });
 }

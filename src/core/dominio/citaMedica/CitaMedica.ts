@@ -1,13 +1,13 @@
 import type { ICitaMedica } from "./ICitaMedica.js";
 
 export class CitaMedica implements ICitaMedica {
-    idCita: number | null;
-    idPaciente: number;
-    idDisponibilidad: number;
-    fecha: Date;
-    estado: string;
-    motivo: string | null;
-    observaciones: string;
+  idCita: number | null;
+  idPaciente: number;
+  idDisponibilidad: number;
+  fecha: Date;
+  estado: string;
+  motivo: string | null;
+  observaciones: string;
 
     constructor(datosCita: ICitaMedica) {
         this.idCita = datosCita.idCita;
