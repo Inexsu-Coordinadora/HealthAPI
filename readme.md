@@ -39,10 +39,18 @@ Toda la información técnica y funcional del módulo se encuentra en el siguien
 
 📄 [Ver DOCUMENTACIÓN HEALTHAPI (PDF)](./docs/DOCUMENTACION%20HEALTHAPI.pdf)
 
-## 6. Video Demostrativo
+📄[Ver CHECKLIST HEALTHAPI (PDF)](./docs/CHECKLIST.pdf)
+
+## 6. Video Demostrativo 1
 
 Se puede ver la demostración del funcionamiento en BRUNO de todas las entidades, tales como, Médico, Paciente y Cita médica, dar click en el siguiente link para verlo:
 
 https://youtu.be/cAphvJFwm6w
+
+## 7. Video Demostrativo 2
+
+Se puede ver la demostración del funcionamiento en BRUNO de todos los servicios y validaciones especiales de HealthAPI, dar click en el siguiente link para verlo:
+
+https://youtu.be/Vo3zB2sekeU
 
 
