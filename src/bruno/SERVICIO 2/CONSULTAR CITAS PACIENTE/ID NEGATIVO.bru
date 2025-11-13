@@ -1,0 +1,15 @@
+meta {
+  name: ID NEGATIVO
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:3000/api/pacientes/-1/citas
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

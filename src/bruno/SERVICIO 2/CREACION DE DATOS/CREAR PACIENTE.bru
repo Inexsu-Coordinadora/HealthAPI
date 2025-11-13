@@ -1,0 +1,24 @@
+meta {
+  name: CREAR PACIENTE
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/api/pacientes
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "nombrePaciente": "Juan Pérez",
+      "correoPaciente": "juan.perez@example.com",
+      "telefonoPaciente": "3001234567"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

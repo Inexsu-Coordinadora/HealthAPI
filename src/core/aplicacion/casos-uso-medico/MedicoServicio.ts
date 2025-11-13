@@ -5,12 +5,12 @@ import { Medico } from "../../dominio/medico/Medico.js";
 export class MedicoServicio {
     constructor(private readonly medicoRepositorio: IMedicoRepositorio) {}
 
-    // CREACIÓN DE UN NUEVO MÉDICO
-
     async crearMedico(datos: Omit<IMedico, "idMedico">): Promise<IMedico> {
-        if (!datos.nombreMedico || datos.nombreMedico.trim() === "") {
-            throw new Error("El nombre del médico es obligatorio");
-        }
+        const nuevoMedico = Medico.crear(
+            datos.nombreMedico,
+            datos.correoMedico,
+            datos.especialidadMedico
+        );
 
         if (!datos.correoMedico || datos.correoMedico.trim() === "") {
             throw new Error("El correo del médico es obligatorio");
@@ -20,11 +20,13 @@ export class MedicoServicio {
             throw new Error("La especialidad del médico es obligatoria");
         }
 
-        // INSTANCIAR MÉDICO
-        const nuevoMedico = Medico.crear(datos.nombreMedico, datos.correoMedico, datos.especialidadMedico);
+        const medicoExistente = await this.medicoRepositorio.obtenerPorCorreo(datos.correoMedico);
+            if (medicoExistente) {
+        throw new Error(`Ya existe un médico con el correo ${datos.correoMedico}`);
+        }
 
         // VALIDACIÓN DEL FORMATO DEL CORREO
-        if (!nuevoMedico.validarCorreo()) {
+        if (!Medico.validarCorreo(nuevoMedico.correoMedico)) {
             throw new Error("El formato del correo electrónico es inválido");
         }
 
@@ -32,84 +34,29 @@ export class MedicoServicio {
         return await this.medicoRepositorio.crearMedico(nuevoMedico);
     }
 
-    // OBTENER MEDICO POR ID
-    async obtenerMedicoPorId(id: number): Promise<IMedico> {
-        if (id <= 0) {
-            throw new Error("El ID del médico debe ser un número positivo");
-        }
-
-        const medico = await this.medicoRepositorio.obtenerMedicoPorId(id);
-
-        if (!medico) {
-            throw new Error(`No se encontró un médico con el ID ${id}`);
-        }
-
-        return medico;
+    async obtenerMedicoPorId(id: number): Promise<IMedico | null> {
+        return await this.medicoRepositorio.obtenerMedicoPorId(id);
     }
 
-    // OBTENER TODOS LOS MEDICOS EN UNA LISTA
     async listarMedicos(): Promise<IMedico[]> {
         return await this.medicoRepositorio.listarMedicos();
     }
 
-    // ACTUALIZAR MEDICO
-    async actualizarMedico(id: number, datosActualizados: Partial<IMedico>): Promise<IMedico> {
-        if (id <= 0) {
-            throw new Error("El ID del médico debe ser un número positivo");
-        }
+    async actualizarMedico(
+        id: number,
+        datosActualizados: Partial<IMedico>
+    ): Promise<IMedico | null> {
+        const medicoExistente =
+            await this.medicoRepositorio.obtenerMedicoPorId(id);
+        if (!medicoExistente) {return null;}
 
-        // VERIFICACION DE SI EL MEDICO EXISTE O NO
-        const medicoExistente = await this.medicoRepositorio.obtenerMedicoPorId(id);
-        if (!medicoExistente) {
-            throw new Error(`No se encontró un médico con el ID ${id}`);
-        }
-
-        // VALIDAR SI LOS CAMPOS TIENEN VALORES VÁLIDOS
-        if (datosActualizados.nombreMedico !== undefined) {
-            if (datosActualizados.nombreMedico.trim() === "") {
-                throw new Error("El nombre del médico no puede estar vacío");
-            }
-        }
-
-        if (datosActualizados.correoMedico !== undefined) {
-            if (datosActualizados.correoMedico.trim() === "") {
-                throw new Error("El correo del médico no puede estar vacío");
-            }
-            // VALIDACION DEL FORMATO DEL CORREO
-            const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!regexCorreo.test(datosActualizados.correoMedico)) {
-                throw new Error("El formato del correo electrónico es inválido");
-            }
-        }
-
-        if (datosActualizados.especialidadMedico !== undefined) {
-            if (datosActualizados.especialidadMedico.trim() === "") {
-                throw new Error("La especialidad del médico no puede estar vacía");
-            }
-        }
-
-        // ACTUALIZAR EN EL REPOSITORIO
-        const medicoActualizado = await this.medicoRepositorio.actualizarMedico(id, datosActualizados);
-
-        if (!medicoActualizado) {
-            throw new Error("Error al actualizar el médico");
-        }
-
-        return medicoActualizado;
+        return await this.medicoRepositorio.actualizarMedico(
+            id,
+            datosActualizados
+        );
     }
 
-    // ELIMINAR UN MEDICO
     async eliminarMedico(id: number): Promise<boolean> {
-        if (id <= 0) {
-            throw new Error("El ID del médico debe ser un número positivo");
-        }
-
-        // VERIFICACION DE SI EL MEDICO EXISTE O NO
-        const medicoExistente = await this.medicoRepositorio.obtenerMedicoPorId(id);
-        if (!medicoExistente) {
-            throw new Error(`No se encontró un médico con el ID ${id}`);
-        }
-
         return await this.medicoRepositorio.eliminarMedico(id);
     }
 }

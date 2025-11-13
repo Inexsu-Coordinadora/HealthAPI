@@ -1,13 +1,13 @@
-import type { ICitaMedica } from "./ICitaMedica.ts";
+import type { ICitaMedica } from "./ICitaMedica.js";
 
 export class CitaMedica implements ICitaMedica {
-    idCita: number | null;
-    idPaciente: number;
-    idDisponibilidad: number;
-    fecha: Date;
-    estado: string;
-    motivo: string | null;
-    observaciones: string;
+  idCita: number | null;
+  idPaciente: number;
+  idDisponibilidad: number;
+  fecha: Date;
+  estado: string;
+  motivo: string | null;
+  observaciones: string;
 
     constructor(datosCita: ICitaMedica) {
         this.idCita = datosCita.idCita;
@@ -24,16 +24,17 @@ export class CitaMedica implements ICitaMedica {
         fecha: Date,
         estado: string,
         motivo: string | null,
-        observaciones: string,
-    ) {
-        return {
-            idPaciente: idPaciente,
-            idDisponibilidad: idDisponibilidad,
-            fecha: fecha,
-            estado: estado,
-            motivo: motivo,
-            observaciones: observaciones,
-        };
+        observaciones: string
+    ): CitaMedica {
+        return new CitaMedica({
+            idCita: null,
+            idPaciente,
+            idDisponibilidad,
+            fecha,
+            estado,
+            motivo,
+            observaciones,
+        });
     }
     static desdeBD(
         idCita: number,
@@ -42,7 +43,7 @@ export class CitaMedica implements ICitaMedica {
         fecha: Date,
         estado: string,
         motivo: string,
-        observaciones: string,
+        observaciones: string
     ): CitaMedica {
         return new CitaMedica({
             idCita,

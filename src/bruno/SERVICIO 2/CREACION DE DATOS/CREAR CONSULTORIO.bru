@@ -1,0 +1,24 @@
+meta {
+  name: CREAR CONSULTORIO
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/api/consultorios
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "nombreConsultorio": "Consultorio 401",
+      "ubicacionConsultorio": "Piso 1, Ala C",
+      "capacidadConsultorio": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

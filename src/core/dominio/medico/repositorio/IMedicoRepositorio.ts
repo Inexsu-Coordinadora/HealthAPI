@@ -6,4 +6,5 @@ export interface IMedicoRepositorio {
     actualizarMedico(idMedico: number, datosMedico: Partial<IMedico>): Promise<IMedico>;
     listarMedicos(): Promise<IMedico[]>;
     eliminarMedico(idMedico: number): Promise<boolean>;
+    obtenerPorCorreo(correo: string): Promise<IMedico | null>;
 }
