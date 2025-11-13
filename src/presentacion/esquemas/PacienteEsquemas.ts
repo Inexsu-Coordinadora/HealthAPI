@@ -1,4 +1,6 @@
 import * as z from "zod";
+import { Paciente } from "../../core/dominio/paciente/Paciente.js";
+import { esquemaIdParam } from "./ValidacionesComunes.js";
 
 export interface CrearPacienteDTO {
     nombrePaciente: string;
@@ -6,34 +8,43 @@ export interface CrearPacienteDTO {
     telefonoPaciente?: string | null;
 }
 
-const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const REGEX_STRING_NUMERICO = /^\d+$/;
-
 export const esquemaCrearPaciente = z.object({
-    nombrePaciente: z.string("El nombre del paciente es obligatorio y debe ser texto"),
+    nombrePaciente: z
+        .string("El nombre del paciente es obligatorio y debe ser texto")
+        .min(1, "El nombre no puede estar vacío"),
     correoPaciente: z
         .string("El correo del paciente es obligatorio y debe ser texto")
-        .regex(REGEX_CORREO, "El formato del correo electrónico es inválido"),
+        .refine((val) => Paciente.validarCorreo(val), {
+            message: "El formato del correo electrónico es inválido",
+        }),
     telefonoPaciente: z
         .string("El teléfono del paciente es obligatorio y debe ser texto")
-        .min(7, "El teléfono del paciente debe tener al menos 7 caracteres"),
+        .refine((val) => Paciente.validarTelefono(val), {
+            message:
+                "El teléfono del paciente debe tener al menos 7 caracteres",
+        }),
 });
 
 export const esquemaPacientePorId = z.object({
-    id: z
-        .string()
-        .regex(REGEX_STRING_NUMERICO, "El ID del paciente debe ser un número válido")
-        .transform((val) => Number(val)),
+    id: esquemaIdParam,
 });
 
 export const esquemaActualizarPaciente = z.object({
-    nombrePaciente: z.string("El nombre del paciente debe ser texto").optional(),
+    nombrePaciente: z
+        .string("El nombre del paciente debe ser texto")
+        .min(1, "El nombre no puede estar vacío")
+        .optional(),
     correoPaciente: z
         .string("El correo del paciente debe ser texto")
-        .regex(REGEX_CORREO, "El formato del correo electrónico es inválido")
+        .refine((val) => Paciente.validarCorreo(val), {
+            message: "El formato del correo electrónico es inválido",
+        })
         .optional(),
     telefonoPaciente: z
         .string("El teléfono del paciente debe ser texto")
-        .min(7, "El teléfono del paciente debe tener al menos 7 caracteres")
+        .refine((val) => Paciente.validarTelefono(val), {
+            message:
+                "El teléfono del paciente debe tener al menos 7 caracteres",
+        })
         .optional(),
 });

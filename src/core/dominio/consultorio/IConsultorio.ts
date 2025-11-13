@@ -3,4 +3,4 @@ export interface IConsultorio {
     nombreConsultorio: string;
     ubicacionConsultorio?: string | null;
     capacidadConsultorio?: number | null;
-};
+}

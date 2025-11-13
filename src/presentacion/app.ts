@@ -21,18 +21,18 @@ export const startServer = async (): Promise<void> => {
             host: "0.0.0.0",
         });
         app.log.info("El servidor se esta ejecutando correctamente...");
-
         app.printRoutes();
     } catch (err) {
-        app.log.error(`Error al ejecutar el servidor\n ${(err as Error).message}`);
-
+        app.log.error(
+            `Error al ejecutar el servidor\n ${(err as Error).message}`
+        );
         const serverError = {
             code: "FST_ERR_INIT_SERVER",
             name: "ServidorError",
             statusCode: 500,
-            message: "El servidor no se pudo iniciar: ${(err as Error).message}",
+            message:
+                "El servidor no se pudo iniciar: ${(err as Error).message}",
         };
-
         throw serverError;
     }
 };
