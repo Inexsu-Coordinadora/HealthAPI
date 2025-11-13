@@ -8,7 +8,7 @@ export const configuracion = {
         puerto: Number(process.env.DB_PORT) || 5432,
         nombreDB: process.env.DB_NAME || "healthapi",
         usuario: process.env.DB_USER || "postgres",
-        contrasena: process.env.DB_PASSWORD || "",
+        contrasena: process.env.DB_PASSWORD || "pokemon3",
     },
     servidor: {
         puerto: Number(process.env.PUERTO) || 3000,

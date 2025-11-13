@@ -17,7 +17,7 @@ export async function pacienteRutas(fastify: FastifyInstance) {
     });
 
     fastify.get("/pacientes", async (request, reply) => {
-        return pacienteControlador.listarPacientes(request, reply);
+        return pacienteControlador.listarPacientes(reply);
     });
 
     fastify.put("/pacientes/:id", async (request, reply) => {
