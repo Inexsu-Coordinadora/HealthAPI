@@ -2,19 +2,29 @@ import type { IMedicoRepositorio } from "../../dominio/medico/repositorio/IMedic
 import type { IMedico } from "../../dominio/medico/IMedico.js";
 import { ejecutarConsulta } from "../DBpostgres.js";
 
+interface MedicoRow {
+    id_medico: number;
+    nombre: string;
+    correo: string;
+    especialidad: string;
+}
+
 export class MedicoRepositorioPostgres implements IMedicoRepositorio {
     // CREAR UN NUEVO MÉDICO
     async crearMedico(datosMedico: IMedico): Promise<IMedico> {
-        const { idMedico, ...datosParaInsertar } = datosMedico;
+        const { idMedico: _idMedico, ...datosParaInsertar } = datosMedico;
 
-        const columnas = Object.keys(datosParaInsertar).map((key) => this.mapearCampoAColumna(key));
-        const parametros: Array<string | number> = Object.values(datosParaInsertar);
+        const columnas = Object.keys(datosParaInsertar).map((key) =>
+            this.mapearCampoAColumna(key)
+        );
+        const parametros: Array<string | number> =
+            Object.values(datosParaInsertar);
         const placeholders = columnas.map((_, i) => `$${i + 1}`).join(", ");
 
         const query = `
       INSERT INTO medico (${columnas.join(", ")})
       VALUES (${placeholders})
-      RETURNING *
+      RETURNING id_medico, nombre, correo, especialidad
     `;
 
         const respuesta = await ejecutarConsulta(query, parametros);
@@ -23,41 +33,51 @@ export class MedicoRepositorioPostgres implements IMedicoRepositorio {
 
     // LISTAR TODOS LOS MÉDICOS
     async listarMedicos(): Promise<IMedico[]> {
-        const query = "SELECT * FROM medico ORDER BY id_medico ASC";
-        const result = await ejecutarConsulta(query, []);
-        return result.rows.map((row) => this.mapearFilaAMedico(row));
+        const query =
+            "SELECT id_medico, nombre, correo, especialidad FROM medico ORDER BY id_medico ASC";
+        const resultado = await ejecutarConsulta(query, []);
+        return resultado.rows.map((row) => this.mapearFilaAMedico(row));
     }
 
     // OBTENER UN MEDICO POR ID
     async obtenerMedicoPorId(idMedico: number): Promise<IMedico | null> {
-        const query = "SELECT * FROM medico WHERE id_medico = $1";
-        const result = await ejecutarConsulta(query, [idMedico]);
+        const query =
+            "SELECT id_medico, nombre, correo, especialidad FROM medico WHERE id_medico = $1";
+        const resultado = await ejecutarConsulta(query, [idMedico]);
 
-        if (result.rows.length === 0) {
+        if (resultado.rows.length === 0) {
             return null;
         }
 
-        return this.mapearFilaAMedico(result.rows[0]);
+        return this.mapearFilaAMedico(resultado.rows[0]);
     }
 
     // ACTUALIZAR UN MÉDICO
-    async actualizarMedico(idMedico: number, datosMedico: Partial<IMedico>): Promise<IMedico> {
+    async actualizarMedico(
+        idMedico: number,
+        datosMedico: Partial<IMedico>
+    ): Promise<IMedico> {
         const { idMedico: _, ...datosParaActualizar } = datosMedico as IMedico;
 
         if (Object.keys(datosParaActualizar).length === 0) {
             throw new Error("No hay campos para actualizar");
         }
 
-        const columnas = Object.keys(datosParaActualizar).map((key) => this.mapearCampoAColumna(key));
-        const parametros: Array<string | number> = Object.values(datosParaActualizar);
-        const setClause = columnas.map((col, i) => `${col} = $${i + 1}`).join(", ");
+        const columnas = Object.keys(datosParaActualizar).map((key) =>
+            this.mapearCampoAColumna(key)
+        );
+        const parametros: Array<string | number> =
+            Object.values(datosParaActualizar);
+        const setClause = columnas
+            .map((col, i) => `${col} = $${i + 1}`)
+            .join(", ");
         parametros.push(idMedico);
 
         const query = `
       UPDATE medico
       SET ${setClause}
       WHERE id_medico = $${parametros.length}
-      RETURNING *
+      RETURNING id_medico, nombre, correo, especialidad
     `;
 
         const result = await ejecutarConsulta(query, parametros);
@@ -71,9 +91,19 @@ export class MedicoRepositorioPostgres implements IMedicoRepositorio {
 
     // ELIMINAR UN MÉDICO
     async eliminarMedico(idMedico: number): Promise<boolean> {
-        const query = "DELETE FROM medico WHERE id_medico = $1 RETURNING id_medico";
+        const query =
+            "DELETE FROM medico WHERE id_medico = $1 RETURNING id_medico";
         const result = await ejecutarConsulta(query, [idMedico]);
         return result.rows.length > 0;
+    }
+
+    async obtenerPorCorreo(correo: string): Promise<IMedico | null> {
+        const query = "SELECT * FROM medico WHERE correo = $1";
+        const result = await ejecutarConsulta(query, [correo]);
+    
+    if (result.rows.length === 0) return null;
+    
+    return this.mapearFilaAMedico(result.rows[0]);
     }
 
     // METODO AXILIAR
@@ -88,7 +118,7 @@ export class MedicoRepositorioPostgres implements IMedicoRepositorio {
     }
 
     // METODO AUXILIAR
-    private mapearFilaAMedico(row: any): IMedico {
+    private mapearFilaAMedico(row: MedicoRow): IMedico {
         return {
             idMedico: row.id_medico,
             nombreMedico: row.nombre,
