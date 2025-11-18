@@ -5,7 +5,7 @@ import {
     esquemaPacientePorId,
     esquemaActualizarPaciente,
 } from "../esquemas/PacienteEsquemas.js";
-import { validadorEsquemas } from "../esquemas/Validador.js";
+import { validadorEsquemas } from "../esquemas/ValidadorZod.js";
 
 enum Mensajes {
     "200_POST_OK" = "Paciente creado exitosamente",

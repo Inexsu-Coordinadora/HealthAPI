@@ -1,10 +1,10 @@
 meta {
-  name: ACTUALIZAR-MEDICO
+  name: OBTENER-MEDICO-POR-ID
   type: http
-  seq: 4
+  seq: 2
 }
 
-put {
+get {
   url: http://localhost:3000/api/medicos/9
   body: none
   auth: inherit
@@ -12,4 +12,5 @@ put {
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

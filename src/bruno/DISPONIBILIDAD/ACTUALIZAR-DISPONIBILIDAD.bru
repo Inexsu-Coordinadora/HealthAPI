@@ -1,0 +1,48 @@
+meta {
+  name: ACTUALIZAR-DISPONIBILIDAD
+  type: http
+  seq: 6
+}
+
+put {
+  url: http://localhost:3000/api/disponibilidades/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "horaInicio": "09:00:00",
+    "horaFin": "13:00:00"
+  }
+}
+
+docs {
+  # Actualizar Disponibilidad
+  
+  ## Descripción
+  Actualiza los datos de una disponibilidad existente. Se pueden actualizar campos parciales.
+  
+  ## Respuesta esperada: 200
+  ```json
+  {
+    "mensaje": "Disponibilidad actualizada exitosamente",
+    "data": {
+      "idDisponibilidad": 1,
+      "idMedico": 1,
+      "idConsultorio": 1,
+      "diaSemana": "lunes",
+      "horaInicio": "09:00:00",
+      "horaFin": "13:00:00"
+    }
+  }
+  ```
+  
+  ## Caso de error: ID inexistente → 404
+  ```json
+  {
+    "error": "Disponibilidad no encontrada",
+    "mensaje": "No se encontró una disponibilidad con el ID 999"
+  }
+  ```
+}

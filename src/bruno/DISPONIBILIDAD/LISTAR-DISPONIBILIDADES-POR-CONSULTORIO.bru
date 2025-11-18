@@ -1,0 +1,44 @@
+meta {
+  name: LISTAR-DISPONIBILIDADES-POR-CONSULTORIO
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:3000/api/consultorios/1/disponibilidades
+  body: none
+  auth: none
+}
+
+docs {
+  # Listar Disponibilidades por Consultorio
+  
+  ## Descripción
+  Obtiene todas las disponibilidades asociadas a un consultorio específico.
+  
+  ## Respuesta esperada: 200
+  ```json
+  {
+    "mensaje": "Disponibilidades del consultorio obtenidas exitosamente",
+    "data": [
+      {
+        "idDisponibilidad": 1,
+        "idMedico": 1,
+        "idConsultorio": 1,
+        "diaSemana": "lunes",
+        "horaInicio": "08:00:00",
+        "horaFin": "12:00:00"
+      },
+      {
+        "idDisponibilidad": 3,
+        "idMedico": 2,
+        "idConsultorio": 1,
+        "diaSemana": "miercoles",
+        "horaInicio": "09:00:00",
+        "horaFin": "13:00:00"
+      }
+    ],
+    "total": 2
+  }
+  ```
+}

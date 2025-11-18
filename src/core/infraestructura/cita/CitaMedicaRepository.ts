@@ -13,6 +13,16 @@ interface CitaMedicaRow {
     observaciones: string;
 }
 
+interface CitaMedicaRow {
+    id_cita: number;
+    id_paciente: number;
+    id_disponibilidad: number;
+    fecha: Date | string;
+    estado: string;
+    motivo: string | null;
+    observaciones: string;
+}
+
 export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
     // 1. Crear una nueva cita médica
     async crear(datosCita: Omit<ICitaMedica, "idCita">): Promise<ICitaMedica> {

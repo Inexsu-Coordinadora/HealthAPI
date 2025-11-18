@@ -1,4 +1,4 @@
-import type { IPacienteRepositorio } from "../../dominio/paciente/repo/IPacienteRepo.js";
+import type { IPacienteRepositorio } from "../../dominio/paciente/repositorio/IPacienteRepositorio.js";
 import type {
     IPaciente,
     IPacienteActualizar,
@@ -17,11 +17,6 @@ export class PacienteServicio {
             datos.correoPaciente,
             datos.telefonoPaciente || ""
         );
-
-        const pacienteExistente = await this.pacienteRepositorio.obtenerPorCorreo(datos.correoPaciente);
-            if (pacienteExistente) {
-        throw new Error(`Ya existe un paciente con el correo ${datos.correoPaciente}`);
-    }
 
         return await this.pacienteRepositorio.crearPaciente(nuevoPaciente);
     }

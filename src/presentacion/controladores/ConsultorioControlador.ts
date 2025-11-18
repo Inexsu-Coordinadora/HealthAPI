@@ -6,7 +6,7 @@ import {
     esquemaConsultorioPorId,
     esquemaActualizarConsultorio,
 } from "../esquemas/ConsultorioEsquemas.js";
-import { validadorEsquemas } from "../esquemas/Validador.js";
+import { validadorEsquemas } from "../esquemas/ValidadorZod.js";
 
 enum Mensajes {
     "200_POST_OK" = "Consultorio creado exitosamente",

@@ -1,15 +1,16 @@
 meta {
-  name: LISTAR-MEDICOS
+  name: LISTAR-PACIENTES
   type: http
   seq: 2
 }
 
 get {
-  url: http://localhost:3000/api/medicos
+  url: http://localhost:3000/api/pacientes
   body: none
   auth: inherit
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

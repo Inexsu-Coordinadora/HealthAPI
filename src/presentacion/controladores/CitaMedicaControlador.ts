@@ -1,17 +1,15 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { ZodError } from "zod";
 import { CitaMedicaServicio } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
-import { validarAgendarCita } from "../esquemas/CitaMedicaEsquemas.js";
 import type { ICitaMedica } from "../../core/dominio/citaMedica/ICitaMedica.js";
 import {
     esquemaCitaPorId,
     esquemaActualizarCita,
     crearCitaConValidacionRepositorios,
 } from "../esquemas/CitaMedicaEsquemas.js";
-import { validadorEsquemas } from "../esquemas/Validador.js";
+import { validadorEsquemas } from "../esquemas/ValidadorZod.js";
 import { PacienteRepositorioPostgres } from "../../core/infraestructura/paciente/PacienteRepository.js";
 import { DisponibilidadRepositorioPostgres } from "../../core/infraestructura/disponibilidad/DisponibilidadRepository.js";
-import type { ICitaMedicaConDetalles } from "../../core/dominio/citaMedica/ICitaMedicaConDetalles.js";
 
 enum Mensajes {
     "200_POST_OK" = "Cita médica creada exitosamente",
@@ -21,7 +19,6 @@ enum Mensajes {
     "200_DELETE_OK" = "Cita médica eliminada exitosamente",
     "404_NOT_FOUND" = "No se encontró una cita con el ID",
 }
-
 
 export class CitaControlador {
     constructor(private readonly citaServicio: CitaMedicaServicio) {}
@@ -95,110 +92,8 @@ export class CitaControlador {
         }
     }
 
-
-async agendarCita(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            // Validar datos de entrada
-            const validacion = validarAgendarCita(request.body);
-            if (!validacion.valido) {
-                return reply.status(400).send({
-                    error: "Datos inválidos",
-                    detalles: validacion.errores,
-                });
-            }
-
-            const datos = request.body as any;
-
-            const citaAgendada = await this.citaServicio.agendarCitaConValidacion({
-                idPaciente: datos.idPaciente,
-                idMedico: datos.idMedico,
-                idDisponibilidad: datos.idDisponibilidad,
-                fecha: new Date(datos.fecha),
-                idConsultorio: datos.idConsultorio ?? null,
-                motivo: datos.motivo ?? null,
-                observaciones: datos.observaciones ?? "",
-            });
-
-            return reply.status(201).send({
-                mensaje: "Cita médica agendada exitosamente",
-                data: {
-                    idCita: citaAgendada.idCita,
-                    idPaciente: citaAgendada.idPaciente,
-                    idDisponibilidad: citaAgendada.idDisponibilidad,
-                    fecha: citaAgendada.fecha,
-                    estado: citaAgendada.estado,
-                    motivo: citaAgendada.motivo,
-                    observaciones: citaAgendada.observaciones,
-                },
-            });
-        } catch (error: any) {
-
-            if (error.message.includes("Paciente inexistente")) {
-                return reply.status(404).send({
-                    error: "Paciente inexistente",
-                    mensaje: error.message,
-                    codigo: "PACIENTE_NO_EXISTE",
-                });
-            }
-
-            if (error.message.includes("Médico inexistente")) {
-                return reply.status(404).send({
-                    error: "Médico inexistente",
-                    mensaje: error.message,
-                    codigo: "MEDICO_NO_EXISTE",
-                });
-            }
-
-            if (error.message.includes("Consultorio inexistente")) {
-                return reply.status(404).send({
-                    error: "Consultorio inexistente",
-                    mensaje: error.message,
-                    codigo: "CONSULTORIO_NO_EXISTE",
-                });
-            }
-
-            if (error.message.includes("Disponibilidad inexistente")) {
-                return reply.status(404).send({
-                    error: "Disponibilidad inexistente",
-                    mensaje: error.message,
-                    codigo: "DISPONIBILIDAD_NO_EXISTE",
-                });
-            }
-
-            if (error.message.includes("traslape para el Paciente")) {
-                return reply.status(409).send({
-                    error: "Conflicto de agenda - Paciente",
-                    mensaje: error.message,
-                    codigo: "TRASLAPE_PACIENTE",
-                });
-            }
-
-            if (error.message.includes("traslape para el Médico")) {
-                return reply.status(409).send({
-                    error: "Conflicto de agenda - Médico",
-                    mensaje: error.message,
-                    codigo: "TRASLAPE_MEDICO",
-                });
-            }
-
-            if (error.message.includes("traslape para el Consultorio")) {
-                return reply.status(409).send({
-                    error: "Conflicto de agenda - Consultorio",
-                    mensaje: error.message,
-                    codigo: "TRASLAPE_CONSULTORIO",
-                });
-            }
-
-            return reply.status(500).send({
-                error: "Error al agendar la cita médica",
-                mensaje: error.message,
-            });
-        }
-    }
-
-    async listarCitas(request: FastifyRequest, reply: FastifyReply) {
-         
-            const citas = await this.citaServicio.listarCitas();
+    async listarCitas(reply: FastifyReply) {
+        const citas = await this.citaServicio.listarCitas();
 
         return reply.status(200).send({
             mensaje: Mensajes["200_GET_ALL_OK"],
@@ -268,55 +163,4 @@ async agendarCita(request: FastifyRequest, reply: FastifyReply) {
             : `${Mensajes["404_NOT_FOUND"]} ${idCita}`;
         return reply.status(statusCode).send({ mensaje });
     }
-
-    
-async consultarCitasPorPaciente(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const { idPaciente } = request.params as { idPaciente: string };
-        const id = parseInt(idPaciente, 10);
-
-        if (isNaN(id)) {
-            return reply.status(400).send({
-                error: "ID inválido",
-                mensaje: "El ID del paciente debe ser un número válido",
-            });
-        }
-
-        const citas = await this.citaServicio.obtenerCitasPorPaciente(id);
-
-        if (citas.length === 0) {
-            return reply.status(200).send({
-                mensaje: "El paciente no tiene citas registradas",
-                data: [],
-                total: 0,
-            });
-        }
-
-        return reply.status(200).send({
-            mensaje: "Citas del paciente obtenidas exitosamente",
-            data: citas,
-            total: citas.length,
-        });
-    } catch (error: any) {
-        if (error.message.includes("debe ser un número positivo")) {
-            return reply.status(400).send({
-                error: "ID inválido",
-                mensaje: error.message,
-            });
-        }
-
-        // ✨ Error: Paciente no encontrado
-        if (error.message.includes("No se encontró")) {
-            return reply.status(404).send({
-                error: "Paciente no encontrado",
-                mensaje: error.message,
-            });
-        }
-
-        return reply.status(500).send({
-            error: "Error al obtener las citas del paciente",
-            mensaje: error.message,
-        });
-    }
-}
 }

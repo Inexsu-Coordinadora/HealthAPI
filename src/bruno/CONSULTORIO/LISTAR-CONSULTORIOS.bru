@@ -1,0 +1,34 @@
+meta {
+  name: LISTAR-CONSULTORIOS
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3000/api/consultorios
+  body: none
+  auth: none
+}
+
+docs {
+  # Listar Consultorios
+  
+  ## Descripción
+  Obtiene la lista completa de todos los consultorios registrados.
+  
+  ## Respuesta esperada: 200
+  ```json
+  {
+    "mensaje": "Lista de consultorios obtenida exitosamente",
+    "data": [
+      {
+        "idConsultorio": 1,
+        "nombreConsultorio": "Consultorio A",
+        "ubicacionConsultorio": "Piso 3 - Sala 301",
+        "capacidadConsultorio": 15
+      }
+    ],
+    "total": 1
+  }
+  ```
+}

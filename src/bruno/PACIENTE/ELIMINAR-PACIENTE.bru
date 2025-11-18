@@ -1,23 +1,17 @@
 meta {
-  name: ACTUALIZAR-PACIENTE
+  name: ELIMINAR-PACIENTE
   type: http
-  seq: 4
+  seq: 2
 }
 
-put {
+delete {
   url: http://localhost:3000/api/pacientes/:id
-  body: json
+  body: none
   auth: inherit
 }
 
 params:path {
-  id: 6
-}
-
-body:json {
-  {
-    "telefonoPaciente": "1831838"
-  }
+  id: 23
 }
 
 settings {

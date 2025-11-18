@@ -9,8 +9,10 @@ export class Consultorio implements IConsultorio {
     constructor(datosConsultorio: IConsultorio) {
         this.idConsultorio = datosConsultorio.idConsultorio;
         this.nombreConsultorio = datosConsultorio.nombreConsultorio;
-        this.ubicacionConsultorio = datosConsultorio.ubicacionConsultorio ?? null;
-        this.capacidadConsultorio = datosConsultorio.capacidadConsultorio ?? null;
+        this.ubicacionConsultorio =
+            datosConsultorio.ubicacionConsultorio ?? null;
+        this.capacidadConsultorio =
+            datosConsultorio.capacidadConsultorio ?? null;
     }
 
     static crear(

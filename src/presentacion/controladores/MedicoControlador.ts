@@ -6,7 +6,7 @@ import {
     esquemaMedicoPorId,
     esquemaActualizarMedico,
 } from "../esquemas/MedicoEsquemas.js";
-import { validadorEsquemas } from "../esquemas/Validador.js";
+import { validadorEsquemas } from "../esquemas/ValidadorZod.js";
 
 enum Mensajes {
     "200_POST_OK" = "Médico creado exitosamente",

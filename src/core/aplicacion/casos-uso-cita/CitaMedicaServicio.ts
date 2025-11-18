@@ -2,8 +2,7 @@ import type { ICitaMedica } from "../../dominio/citaMedica/ICitaMedica.js";
 import type { ICitaMedicaConDetalles } from "../../dominio/citaMedica/ICitaMedicaConDetalles.js";
 import type { ICitaMedicaRepositorio } from "../../dominio/citaMedica/repositorio/ICitaMedicaRepositorio.js";
 import type { IDisponibilidadRepositorio } from "../../dominio/disponibilidad/repositorio/IDisponibilidadRepositorio.js";
-import type { IDisponibilidad } from "../../dominio/disponibilidad/IDisponibilidad.js";
-import type { IPacienteRepositorio } from "../../dominio/paciente/repo/IPacienteRepo.js"; 
+import type { IPacienteRepositorio } from "../../dominio/paciente/repositorio/IPacienteRepositorio.js"; 
 export class PacienteNoExisteError extends Error {
     constructor(idPaciente: number) {
         super(`El paciente con ID ${idPaciente} no existe`);

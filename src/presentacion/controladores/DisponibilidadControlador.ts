@@ -7,7 +7,7 @@ import {
     esquemaActualizarDisponibilidad,
     crearDisponibilidadConValidacionRepositorios,
 } from "../esquemas/DisponibilidadEsquemas.js";
-import { validadorEsquemas } from "../esquemas/Validador.js";
+import { validadorEsquemas } from "../esquemas/ValidadorZod.js";
 import { MedicoRepositorioPostgres } from "../../core/infraestructura/medico/MedicoRepository.js";
 import { ConsultorioRepositorioPostgres } from "../../core/infraestructura/consultorio/ConsultorioRepository.js";
 
