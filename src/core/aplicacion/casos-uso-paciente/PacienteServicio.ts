@@ -18,6 +18,11 @@ export class PacienteServicio {
             datos.telefonoPaciente || ""
         );
 
+        const pacienteExistente = await this.pacienteRepositorio.obtenerPorCorreo(datos.correoPaciente);
+            if (pacienteExistente) {
+        throw new Error(`Ya existe un paciente con el correo ${datos.correoPaciente}`);
+    }
+
         return await this.pacienteRepositorio.crearPaciente(nuevoPaciente);
     }
     // Obtener un paciente por ID

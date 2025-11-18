@@ -1,0 +1,32 @@
+meta {
+  name: LISTAR-MEDICOS
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:3000/api/medicos
+  body: none
+  auth: inherit
+}
+
+tests {
+  test("Response status should be 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response should be an array", function() {
+    expect(res.getBody()).to.be.an("array");
+  });
+  
+  test("Response should contain medicos with idMedico", function() {
+    if (res.getBody().length > 0) {
+      expect(res.getBody()[0]).to.have.property("idMedico");
+    }
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

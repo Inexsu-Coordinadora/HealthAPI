@@ -8,4 +8,3 @@ export interface IPacienteRepositorio {
     eliminarPaciente(idPaciente: number): Promise<boolean>;
     obtenerPorCorreo(correo: string): Promise<IPaciente | null>;
 }
-

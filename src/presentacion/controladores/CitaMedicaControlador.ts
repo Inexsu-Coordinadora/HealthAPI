@@ -163,4 +163,55 @@ export class CitaControlador {
             : `${Mensajes["404_NOT_FOUND"]} ${idCita}`;
         return reply.status(statusCode).send({ mensaje });
     }
+
+    
+async consultarCitasPorPaciente(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const { idPaciente } = request.params as { idPaciente: string };
+        const id = parseInt(idPaciente, 10);
+
+        if (isNaN(id)) {
+            return reply.status(400).send({
+                error: "ID inválido",
+                mensaje: "El ID del paciente debe ser un número válido",
+            });
+        }
+
+        const citas = await this.citaServicio.obtenerCitasPorPaciente(id);
+
+        if (citas.length === 0) {
+            return reply.status(200).send({
+                mensaje: "El paciente no tiene citas registradas",
+                data: [],
+                total: 0,
+            });
+        }
+
+        return reply.status(200).send({
+            mensaje: "Citas del paciente obtenidas exitosamente",
+            data: citas,
+            total: citas.length,
+        });
+    } catch (error: any) {
+        if (error.message.includes("debe ser un número positivo")) {
+            return reply.status(400).send({
+                error: "ID inválido",
+                mensaje: error.message,
+            });
+        }
+
+        // ✨ Error: Paciente no encontrado
+        if (error.message.includes("No se encontró")) {
+            return reply.status(404).send({
+                error: "Paciente no encontrado",
+                mensaje: error.message,
+            });
+        }
+
+        return reply.status(500).send({
+            error: "Error al obtener las citas del paciente",
+            mensaje: error.message,
+        });
+    }
+}
 }

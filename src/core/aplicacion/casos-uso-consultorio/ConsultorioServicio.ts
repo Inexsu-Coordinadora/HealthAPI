@@ -1,6 +1,6 @@
 import type { IConsultorioRepositorio } from "../../dominio/consultorio/repositorio/IConsultorioRepositorio.js";
 import type { IConsultorio } from "../../dominio/consultorio/IConsultorio.js";
-import { Consultorio } from "../../dominio/consultorio/Consultorio.js";
+import { Consultorio } from "../../dominio/consultorio/consultorio.js";
 
 export class ConsultorioServicio {
     constructor(private readonly consultorioRepositorio: IConsultorioRepositorio) {}

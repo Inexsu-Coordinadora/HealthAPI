@@ -1,0 +1,42 @@
+meta {
+  name: CREAR-MEDICO
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/api/medicos
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nombreMedico": "Dra. Juaan Péreza",
+    "correoMedico": "juana.pereza@clinica.com",
+    "especialidadMedico": "Cardiologí"
+  }
+}
+
+tests {
+  test("Response status should be 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("Response should contain idMedico", function() {
+    expect(res.getBody().data).to.have.property("idMedico");
+  });
+  
+  test("Response should contain nombreMedico", function() {
+    expect(res.getBody().data.nombreMedico).to.equal("Dr. Juan Pérez");
+  });
+  
+  test("Response should contain especialidadMedico", function() {
+    expect(res.getBody().data.especialidadMedico).to.equal("Cardiología");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
