@@ -1,169 +1,122 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { ConsultorioServicio } from "../../core/aplicacion/casos-uso-consultorio/ConsultorioServicio.js";
-import { validarCrearConsultorio, validarActualizarConsultorio } from "../esquemas/ConsultorioEsquemas.js";
+import type { IConsultorio } from "../../core/dominio/consultorio/IConsultorio.js";
+import {
+    esquemaCrearConsultorio,
+    esquemaConsultorioPorId,
+    esquemaActualizarConsultorio,
+} from "../esquemas/ConsultorioEsquemas.js";
+import { validadorEsquemas } from "../esquemas/ValidadorZod.js";
+
+enum Mensajes {
+    "200_POST_OK" = "Consultorio creado exitosamente",
+    "200_GET_OK" = "Consultorio obtenido exitosamente",
+    "200_GET_ALL_OK" = "Lista de consultorios obtenida exitosamente",
+    "200_PUT_OK" = "Consultorio actualizado exitosamente",
+    "200_DELETE_OK" = "Consultorio eliminado exitosamente",
+    "404_NOT_FOUND" = "No se encontró un consultorio con el ID",
+}
 
 export class ConsultorioControlador {
     constructor(private readonly consultorioServicio: ConsultorioServicio) {}
 
     async crearConsultorio(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const validacion = validarCrearConsultorio(request.body);
+        const consultorio = validadorEsquemas(
+            esquemaCrearConsultorio,
+            request.body,
+            reply
+        );
 
-            if (!validacion.valido) {
-                return reply.status(400).send({
-                    error: "Datos inválidos",
-                    detalles: validacion.errores,
-                });
-            }
+        // Type assertion necesario: Zod genera T | null | undefined pero la interfaz espera T | null
+        const consultorioCreado =
+            await this.consultorioServicio.crearConsultorio(
+                consultorio as Omit<IConsultorio, "idConsultorio">
+            );
 
-            const datos: any = request.body;
-            const consultorioCreado = await this.consultorioServicio.crearConsultorio({
-                nombreConsultorio: datos.nombreConsultorio,
-                ubicacionConsultorio: datos.ubicacionConsultorio,
-                capacidadConsultorio: datos.capacidadConsultorio,
-            });
-
-            return reply.status(201).send({
-                mensaje: "Consultorio creado exitosamente",
-                data: consultorioCreado,
-            });
-        } catch (error: any) {
-            return reply.status(500).send({
-                error: "Error al crear el consultorio",
-                mensaje: error.message,
-            });
-        }
+        return reply.status(201).send({
+            mensaje: Mensajes["200_POST_OK"],
+            data: consultorioCreado,
+        });
     }
 
-    async listarConsultorios(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const consultorios = await this.consultorioServicio.listarConsultorios();
+    async listarConsultorios(reply: FastifyReply) {
+        const consultorios =
+            await this.consultorioServicio.listarConsultorios();
 
-            return reply.status(200).send({
-                mensaje: "Lista de consultorios obtenida exitosamente",
-                data: consultorios,
-                total: consultorios.length,
-            });
-        } catch (error: any) {
-            return reply.status(500).send({
-                error: "Error al obtener la lista de consultorios",
-                mensaje: error.message,
-            });
-        }
+        return reply.status(200).send({
+            mensaje: Mensajes["200_GET_ALL_OK"],
+            data: consultorios,
+            total: consultorios.length,
+        });
     }
 
-    async obtenerConsultorioPorId(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { id } = request.params as { id: string };
-            const idConsultorio = parseInt(id, 10);
+    async obtenerConsultorioPorId(
+        request: FastifyRequest,
+        reply: FastifyReply
+    ) {
+        const { id: idConsultorio } = validadorEsquemas(
+            esquemaConsultorioPorId,
+            request.params,
+            reply
+        );
 
-            if (isNaN(idConsultorio)) {
-                return reply.status(400).send({
-                    error: "ID inválido",
-                    mensaje: "El ID debe ser un número válido",
-                });
-            }
+        const consultorio =
+            await this.consultorioServicio.obtenerConsultorioPorId(
+                idConsultorio
+            );
 
-            const consultorio = await this.consultorioServicio.obtenerConsultorioPorId(idConsultorio);
-
-            return reply.status(200).send({
-                mensaje: "Consultorio obtenido exitosamente",
-                data: consultorio,
-            });
-        } catch (error: any) {
-            if (error.message.includes("No se encontró")) {
-                return reply.status(404).send({
-                    error: "Consultorio no encontrado",
-                    mensaje: error.message,
-                });
-            }
-
-            return reply.status(500).send({
-                error: "Error al obtener el consultorio",
-                mensaje: error.message,
-            });
-        }
+        const statusCode = consultorio ? 200 : 404;
+        const mensaje = consultorio
+            ? Mensajes["200_GET_OK"]
+            : `${Mensajes["404_NOT_FOUND"]} ${idConsultorio}`;
+        return reply.status(statusCode).send({
+            mensaje,
+            data: consultorio,
+        });
     }
 
     async actualizarConsultorio(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { id } = request.params as { id: string };
-            const idConsultorio = parseInt(id, 10);
+        const { id: idConsultorio } = validadorEsquemas(
+            esquemaConsultorioPorId,
+            request.params,
+            reply
+        );
+        const datos = validadorEsquemas(
+            esquemaActualizarConsultorio,
+            request.body,
+            reply
+        );
 
-            if (isNaN(idConsultorio)) {
-                return reply.status(400).send({
-                    error: "ID inválido",
-                    mensaje: "El ID debe ser un número válido",
-                });
-            }
+        const consultorioActualizado =
+            await this.consultorioServicio.actualizarConsultorio(
+                idConsultorio,
+                datos as Partial<IConsultorio>
+            );
 
-            const validacion = validarActualizarConsultorio(request.body);
-
-            if (!validacion.valido) {
-                return reply.status(400).send({
-                    error: "Datos inválidos",
-                    detalles: validacion.errores,
-                });
-            }
-
-            const datos: any = request.body;
-            const consultorioActualizado = await this.consultorioServicio.actualizarConsultorio(idConsultorio, datos);
-
-            return reply.status(200).send({
-                mensaje: "Consultorio actualizado exitosamente",
-                data: consultorioActualizado,
-            });
-        } catch (error: any) {
-            if (error.message.includes("No se encontró")) {
-                return reply.status(404).send({
-                    error: "Consultorio no encontrado",
-                    mensaje: error.message,
-                });
-            }
-
-            return reply.status(500).send({
-                error: "Error al actualizar el consultorio",
-                mensaje: error.message,
-            });
-        }
+        const statusCode = consultorioActualizado ? 200 : 404;
+        const mensaje = consultorioActualizado
+            ? Mensajes["200_PUT_OK"]
+            : `${Mensajes["404_NOT_FOUND"]} ${idConsultorio}`;
+        return reply.status(statusCode).send({
+            mensaje,
+            data: consultorioActualizado,
+        });
     }
 
     async eliminarConsultorio(request: FastifyRequest, reply: FastifyReply) {
-        try {
-            const { id } = request.params as { id: string };
-            const idConsultorio = parseInt(id, 10);
+        const { id: idConsultorio } = validadorEsquemas(
+            esquemaConsultorioPorId,
+            request.params,
+            reply
+        );
 
-            if (isNaN(idConsultorio)) {
-                return reply.status(400).send({
-                    error: "ID inválido",
-                    mensaje: "El ID debe ser un número válido",
-                });
-            }
+        const eliminado =
+            await this.consultorioServicio.eliminarConsultorio(idConsultorio);
 
-            const eliminado = await this.consultorioServicio.eliminarConsultorio(idConsultorio);
-
-            if (eliminado) {
-                return reply.status(200).send({
-                    mensaje: "Consultorio eliminado exitosamente",
-                });
-            } else {
-                return reply.status(404).send({
-                    error: "Consultorio no encontrado",
-                    mensaje: `No se encontró un consultorio con el ID ${idConsultorio}`,
-                });
-            }
-        } catch (error: any) {
-            if (error.message.includes("No se encontró")) {
-                return reply.status(404).send({
-                    error: "Consultorio no encontrado",
-                    mensaje: error.message,
-                });
-            }
-
-            return reply.status(500).send({
-                error: "Error al eliminar el consultorio",
-                mensaje: error.message,
-            });
-        }
+        const statusCode = eliminado ? 200 : 404;
+        const mensaje = eliminado
+            ? Mensajes["200_DELETE_OK"]
+            : `${Mensajes["404_NOT_FOUND"]} ${idConsultorio}`;
+        return reply.status(statusCode).send({ mensaje });
     }
 }

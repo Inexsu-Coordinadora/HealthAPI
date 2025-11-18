@@ -1,0 +1,28 @@
+meta {
+  name: CITA-LIMITE-EXACTO
+  type: http
+  seq: 13
+}
+
+post {
+  url: http://localhost:3000/api/citas/agendar
+  body: json
+}
+
+body:json {
+  {
+    "idPaciente": 1,
+    "idMedico": 1,
+    "idDisponibilidad": 1,
+    "idConsultorio": 1,
+    "fecha": "2025-11-17T10:00:00",
+    "motivo": "Prueba: inicio exacto en fin anterior",
+    "observaciones": "Hora: 10:00 (anterior termina 10:00). Debe pasar sin traslape"
+  }
+}
+
+tests {
+  test("Status es 201 o 200 (sin traslape, hora exacta límite)", function() {
+    expect(res.getStatus()).to.be.oneOf([201, 200]);
+  });
+}

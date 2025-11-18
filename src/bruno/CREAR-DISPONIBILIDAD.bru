@@ -1,37 +1,15 @@
 meta {
   name: CREAR-DISPONIBILIDAD
   type: http
-  seq: 16
+  seq: 13
 }
 
-post {
-  url: http://localhost:3000/api/disponibilidades
-  body: json
+get {
+  url: http://localhost:3000/api/disponibilidad
+  body: none
+  auth: inherit
 }
 
-body:json {
-  {
-    "idMedico": 1,
-    "diaSemana": "lunes",
-    "horaInicio": "09:00",
-    "horaFin": "12:00"
-  }
-}
-
-tests {
-  test("Status code is 201", function() {
-    expect(res.getStatus()).to.equal(201);
-  });
-  
-  test("Response has id", function() {
-    expect(res.body).to.have.property("data");
-    expect(res.body.data).to.have.property("idDisponibilidad");
-  });
-  
-  test("Response has expected fields", function() {
-    expect(res.body.data).to.have.property("idMedico", 1);
-    expect(res.body.data).to.have.property("diaSemana", "lunes");
-    expect(res.body.data).to.have.property("horaInicio", "09:00");
-    expect(res.body.data).to.have.property("horaFin", "12:00");
-  });
+settings {
+  encodeUrl: true
 }

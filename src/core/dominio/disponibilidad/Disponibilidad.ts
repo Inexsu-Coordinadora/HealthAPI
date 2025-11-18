@@ -52,16 +52,16 @@ export class Disponibilidad implements IDisponibilidad {
         });
     }
 
-        static validarDiaSemana(dia: string): boolean {
+    static validarDiaSemana(dia: string): boolean {
         const diasValidos = [
             "lunes",
             "martes",
             "miércoles",
-            "miercoles", 
+            "miercoles",
             "jueves",
             "viernes",
             "sábado",
-            "sabado", 
+            "sabado",
             "domingo",
         ];
         return diasValidos.includes(dia.toLowerCase());
@@ -75,19 +75,21 @@ export class Disponibilidad implements IDisponibilidad {
 
     //VALIDACION DE QUE HORA INICIO SEA MENOR A HORA FIN
     static validarRangoHorario(horaInicio: string, horaFin: string): boolean {
-    const partesInicio = horaInicio.split(":");
-    const partesFin = horaFin.split(":");
+        const partesInicio = horaInicio.split(":");
+        const partesFin = horaFin.split(":");
 
-    // Validar que tengamos al menos horas y minutos
+        // Validar que tengamos al menos horas y minutos
         if (partesInicio.length < 2 || partesFin.length < 2) {
-         return false;
-        };
+            return false;
+        }
 
-        const minutosInicio = parseInt(partesInicio[0]!) * 60 + parseInt(partesInicio[1]!);
-        const minutosFin = parseInt(partesFin[0]!) * 60 + parseInt(partesFin[1]!);
+        const minutosInicio =
+            parseInt(partesInicio[0]!) * 60 + parseInt(partesInicio[1]!);
+        const minutosFin =
+            parseInt(partesFin[0]!) * 60 + parseInt(partesFin[1]!);
 
         return minutosInicio < minutosFin;
-    };
+    }
 
     toObject(): IDisponibilidad {
         return {
@@ -98,5 +100,5 @@ export class Disponibilidad implements IDisponibilidad {
             horaInicio: this.horaInicio,
             horaFin: this.horaFin,
         };
-    };
-};
+    }
+}

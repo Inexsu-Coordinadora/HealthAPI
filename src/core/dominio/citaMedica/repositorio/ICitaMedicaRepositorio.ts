@@ -1,6 +1,5 @@
-// src/core/dominio/citaMedica/repositorio/ICitaMedicaRepositorio.ts
-
 import type { ICitaMedica } from "../ICitaMedica.js";
+import type { ICitaMedicaConDetalles } from "../ICitaMedicaConDetalles.js";
 
 export interface ICitaMedicaRepositorio {
   crear(cita: Omit<ICitaMedica, 'idCita'>): Promise<ICitaMedica>;
@@ -11,7 +10,11 @@ export interface ICitaMedicaRepositorio {
   obtenerPorPaciente(idPaciente: number): Promise<ICitaMedica[]>;
   obtenerPorMedico(idMedico: number): Promise<ICitaMedica[]>;
   obtenerPorEstado(estado: string): Promise<ICitaMedica[]>;
-  
+   obtenerCitasConDetallesPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]>;
+    verificarCitasSuperpuestasPaciente(idPaciente: number, fecha: Date): Promise<boolean>;
+    verificarCitasSuperpuestasMedico(idDisponibilidad: number, fecha: Date): Promise<boolean>;
+    verificarCitasSuperpuestasConsultorio(idDisponibilidad: number, fecha: Date): Promise<boolean>;
+
 
   verificarPacienteExiste(idPaciente: number): Promise<boolean>;
   verificarMedicoExiste(idMedico: number): Promise<boolean>;
@@ -20,22 +23,25 @@ export interface ICitaMedicaRepositorio {
   
   verificarTraslapePaciente(
     idPaciente: number,
-    fechaInicio: Date,
-    fechaFin: Date,
+    horaInicio: string,
+    horaFin: string,
+    fecha?: Date,
     excluirCitaId?: number
   ): Promise<ICitaMedica | null>;
   
   verificarTraslapeMedico(
-    idDisponibilidad: number,
-    fechaInicio: Date,
-    fechaFin: Date,
+    idMedico: number,
+    horaInicio: string,
+    horaFin: string,
+    fecha?: Date,
     excluirCitaId?: number
   ): Promise<ICitaMedica | null>;
   
   verificarTraslapeConsultorio(
     idConsultorio: number,
-    fechaInicio: Date,
-    fechaFin: Date,
+    horaInicio: string,
+    horaFin: string,
+    fecha?: Date,
     excluirCitaId?: number
   ): Promise<ICitaMedica | null>;
 }

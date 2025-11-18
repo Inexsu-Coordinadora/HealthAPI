@@ -1,17 +1,13 @@
 meta {
   name: LISTAR-MEDICOS
   type: http
-  seq: 2
+  seq: 4
 }
 
 get {
   url: http://localhost:3000/api/medicos
+  body: none
   auth: inherit
-}
-
-settings {
-  encodeUrl: true
-  timeout: 0
 }
 
 tests {
@@ -28,4 +24,9 @@ tests {
       expect(res.getBody()[0]).to.have.property("idMedico");
     }
   });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
 }

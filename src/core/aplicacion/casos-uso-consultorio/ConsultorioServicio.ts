@@ -1,7 +1,6 @@
 import type { IConsultorioRepositorio } from "../../dominio/consultorio/repositorio/IConsultorioRepositorio.js";
 import type { IConsultorio } from "../../dominio/consultorio/IConsultorio.js";
-import { Consultorio } from "../../dominio/consultorio/consultorio.js";
-
+import { Consultorio } from "../../dominio/consultorio/Consultorio.js";
 
 export class ConsultorioServicio {
     constructor(private readonly consultorioRepositorio: IConsultorioRepositorio) {}
@@ -12,6 +11,11 @@ export class ConsultorioServicio {
             throw new Error("El nombre del consultorio es obligatorio");
         }
 
+        const consultorioExistente = await this.consultorioRepositorio.obtenerPorNombre(datos.nombreConsultorio);
+            if (consultorioExistente) {
+        throw new Error(`Ya existe un consultorio con el nombre ${datos.nombreConsultorio}`);
+        }
+
         const nuevoConsultorio = Consultorio.crear(
             datos.nombreConsultorio,
             datos.ubicacionConsultorio,
@@ -20,6 +24,8 @@ export class ConsultorioServicio {
 
         return await this.consultorioRepositorio.crearConsultorio(nuevoConsultorio);
     }
+
+    
 
     // OBTENER CONSULTORIO POR ID
     async obtenerConsultorioPorId(id: number): Promise<IConsultorio> {

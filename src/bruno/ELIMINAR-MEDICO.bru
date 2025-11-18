@@ -1,17 +1,13 @@
 meta {
   name: ELIMINAR-MEDICO
   type: http
-  seq: 5
+  seq: 7
 }
 
 delete {
   url: http://localhost:3000/api/medicos/1
+  body: none
   auth: inherit
-}
-
-settings {
-  encodeUrl: true
-  timeout: 0
 }
 
 tests {
@@ -23,4 +19,9 @@ tests {
     const status = res.getStatus();
     expect([200, 204]).to.include(status);
   });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
 }

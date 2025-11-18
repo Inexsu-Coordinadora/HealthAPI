@@ -1,7 +1,9 @@
 import type { ICitaMedica } from "../../dominio/citaMedica/ICitaMedica.js";
-import { CitaMedica } from "../../dominio/citaMedica/CitaMedica.js";
+import type { ICitaMedicaConDetalles } from "../../dominio/citaMedica/ICitaMedicaConDetalles.js";
 import type { ICitaMedicaRepositorio } from "../../dominio/citaMedica/repositorio/ICitaMedicaRepositorio.js";
-
+import type { IDisponibilidadRepositorio } from "../../dominio/disponibilidad/repositorio/IDisponibilidadRepositorio.js";
+import type { IDisponibilidad } from "../../dominio/disponibilidad/IDisponibilidad.js";
+import type { IPacienteRepositorio } from "../../dominio/paciente/repositorio/IPacienteRepositorio.js"; 
 export class PacienteNoExisteError extends Error {
     constructor(idPaciente: number) {
         super(`El paciente con ID ${idPaciente} no existe`);
@@ -80,116 +82,176 @@ export class DisponibilidadNoExisteError extends Error {
     }
 }
 
-// ============================================================================
-// FUNCIÓN AUXILIAR
-// ============================================================================
-
 // Función auxiliar para validar estado
 function validarEstado(estado: string): boolean {
     const estadosValidos = ["programada", "cancelada", "realizada"];
     return estadosValidos.includes(estado.toLowerCase());
 }
 
-// ============================================================================
-// SERVICIO
-// ============================================================================
+
 
 export class CitaMedicaServicio {
-    constructor(private citaMedicaRepositorio: ICitaMedicaRepositorio) {}
+    constructor(
+        private citaMedicaRepositorio: ICitaMedicaRepositorio,
+        private disponibilidadRepositorio: IDisponibilidadRepositorio,
+        private pacienteRepositorio: IPacienteRepositorio  
+    ) {}
 
-    async CrearCitaMedica(datos: {
-        idPaciente: number;
-        idDisponibilidad: number;
-        fecha: Date;
-        estado: string;
-        motivo: string | null;
-        observaciones: string;
-    }): Promise<ICitaMedica> {
-        if (!validarEstado(datos.estado)) {
-            throw new Error("Estado de cita inválido");
+    async CrearCitaMedica(
+        datos: Omit<ICitaMedica, "idCita">
+    ): Promise<ICitaMedica> {
+        // Validar que la disponibilidad existe
+        const disponibilidad =
+            await this.disponibilidadRepositorio.obtenerDisponibilidadPorId(
+                datos.idDisponibilidad
+            );
+
+        if (!disponibilidad) {
+            throw new Error(
+                `No se encontró una disponibilidad con el ID ${datos.idDisponibilidad}`
+            );
         }
+
+        // Validar que la fecha de la cita coincida con la disponibilidad
+        this.validarFechaConDisponibilidad(datos.fecha, disponibilidad);
 
         const nuevaCita: Omit<ICitaMedica, "idCita"> = {
             idPaciente: datos.idPaciente,
             idDisponibilidad: datos.idDisponibilidad,
-            idConsultorio: 0,
             fecha: datos.fecha,
             estado: datos.estado,
             motivo: datos.motivo,
             observaciones: datos.observaciones,
         };
 
+        const medicoOcupado = await this.citaMedicaRepositorio.verificarCitasSuperpuestasMedico(
+            datos.idDisponibilidad,
+            datos.fecha
+            );
+    
+            if (medicoOcupado) {
+                throw new Error(`El médico ya tiene una cita programada en ese horario`);
+            }
+
+            const pacienteTieneCita = await this.citaMedicaRepositorio.verificarCitasSuperpuestasPaciente(
+                datos.idPaciente,
+                datos.fecha
+            );
+            
+            if (pacienteTieneCita) {
+                throw new Error("El paciente ya tiene una cita programada en ese horario");
+            }
+
+
+        const consultorioOcupado = await this.citaMedicaRepositorio.verificarCitasSuperpuestasConsultorio(
+            datos.idDisponibilidad,
+            datos.fecha
+        );
+    
+        if (consultorioOcupado) {
+            throw new Error(`El consultorio ya está ocupado en ese horario`);
+        }
+
         return await this.citaMedicaRepositorio.crear(nuevaCita);
     }
 
-    async obtenerCitaMedicaPorId(id: number): Promise<ICitaMedica> {
-        if (id <= 0) {
-            throw new Error("El ID de la cita médica debe ser un número positivo");
+    private validarFechaConDisponibilidad(
+        fecha: Date,
+        disponibilidad: {
+            diaSemana: string;
+            horaInicio: string;
+            horaFin: string;
+        }
+    ): void {
+        // Extraer día de semana de la fecha
+        const diasSemana = [
+            "domingo",
+            "lunes",
+            "martes",
+            "miércoles",
+            "jueves",
+            "viernes",
+            "sábado",
+        ];
+        const diaCita = diasSemana[fecha.getDay()];
+
+        // Validar día de semana
+        if (
+            diaCita?.toLowerCase() !==
+            disponibilidad.diaSemana
+                .toLowerCase()
+                .replace("á", "a")
+                .replace("é", "e")
+        ) {
+            throw new Error(
+                `La fecha de la cita (${diaCita}) no coincide con el día de disponibilidad (${disponibilidad.diaSemana})`
+            );
         }
 
-        const cita = await this.citaMedicaRepositorio.obtenerCitaPorId(id);
-
-        if (!cita) {
-            throw new Error("No se encontró una cita médica con el ID ${id}");
+        // Extraer hora de la fecha (formato HH:MM:SS)
+        const horaCita = fecha.toISOString().split("T")[1]?.substring(0, 8);
+        if (!horaCita) {
+            throw new Error("Formato de fecha inválido");
         }
 
-        return cita;
+        // Validar que la hora esté dentro del rango
+        if (
+            !this.estaEnRangoHorario(
+                horaCita,
+                disponibilidad.horaInicio,
+                disponibilidad.horaFin
+            )
+        ) {
+            throw new Error(
+                `La hora de la cita (${horaCita}) no está dentro del rango de disponibilidad (${disponibilidad.horaInicio} - ${disponibilidad.horaFin})`
+            );
+        }
+    }
+
+    private estaEnRangoHorario(
+        hora: string,
+        horaInicio: string,
+        horaFin: string
+    ): boolean {
+        const convertirAMinutos = (tiempo: string): number => {
+            const partes = tiempo.split(":");
+            const horas = partes[0] ?? "0";
+            const minutos = partes[1] ?? "0";
+            return parseInt(horas) * 60 + parseInt(minutos);
+        };
+
+        const minutosCita = convertirAMinutos(hora);
+        const minutosInicio = convertirAMinutos(horaInicio);
+        const minutosFin = convertirAMinutos(horaFin);
+
+        return minutosCita >= minutosInicio && minutosCita < minutosFin;
+    }
+
+    async obtenerCitaMedicaPorId(id: number): Promise<ICitaMedica | null> {
+        return await this.citaMedicaRepositorio.obtenerCitaPorId(id);
     }
 
     async listarCitas(): Promise<ICitaMedica[]> {
         return await this.citaMedicaRepositorio.listarCitas();
     }
 
-    async actualizarCita(id: number, datosActualizados: Partial<Omit<ICitaMedica, "id_cita">>): Promise<ICitaMedica> {
-        if (id <= 0) {
-            throw new Error("El ID de la cita médica debe ser un número positivo");
-        }
-
-        const citaExistente = await this.citaMedicaRepositorio.obtenerCitaPorId(id);
+    async actualizarCita(
+        id: number,
+        datosActualizados: Partial<Omit<ICitaMedica, "id_cita">>
+    ): Promise<ICitaMedica | null> {
+        const citaExistente =
+            await this.citaMedicaRepositorio.obtenerCitaPorId(id);
         if (!citaExistente) {
-            throw new Error("No se encontró una cita médica con el ID ${id}");
+            return null;
         }
 
-        if (datosActualizados.idDisponibilidad !== undefined) {
-            if (datosActualizados.idDisponibilidad <= 0) {
-                throw new Error("El ID de disponibilidad debe ser un número positivo");
-            }
-        }
-
-        if (datosActualizados.fecha !== undefined) {
-            if (!datosActualizados.fecha) {
-                throw new Error("La fecha no puede estar vacía");
-            }
-        }
-
-        if (datosActualizados.estado !== undefined) {
-            if (datosActualizados.estado.trim() === "") {
-                throw new Error("El estado no puede estar vacío");
-            }
-            if (!validarEstado(datosActualizados.estado)) {
-                throw new Error("El estado de la cita es inválido");
-            }
-        }
-
-        const citaActualizada = await this.citaMedicaRepositorio.actualizarCita(id, datosActualizados);
-
-        if (!citaActualizada) {
-            throw new Error("Error al actualizar la cita médica");
-        }
-
-        return citaActualizada;
+        return await this.citaMedicaRepositorio.actualizarCita(
+            id,
+            datosActualizados
+        );
     }
 
     async eliminarCitaMedica(id: number): Promise<boolean> {
-        if (id <= 0) {
-            throw new Error("El ID de la cita médica debe ser un número positivo");
-        }
-
-        const citaExistente = await this.citaMedicaRepositorio.obtenerCitaPorId(id);
-        if (!citaExistente) {
-            throw new Error("No se encontró una cita médica con el ID ${id}");
-        }
-
         return await this.citaMedicaRepositorio.eliminarCita(id);
     }
 
@@ -222,7 +284,7 @@ export class CitaMedicaServicio {
         }
         console.log("✓ Médico existe");
 
-        // VALIDACIÓN 3: Verificar que la Disponibilidad existe
+        // VALIDACIÓN 3: Verificar que la Disponibilidad existe Y obtener sus horarios
         console.log(`[3] Verificando existencia de la Disponibilidad ID: ${datos.idDisponibilidad}`);
         const disponibilidadExiste = await this.citaMedicaRepositorio.verificarDisponibilidadExiste(
             datos.idDisponibilidad
@@ -233,6 +295,25 @@ export class CitaMedicaServicio {
             );
         }
         console.log("✓ Disponibilidad existe");
+
+        // Obtener la disponibilidad para extraer horarios
+        let horaInicio = "09:00";
+        let horaFin = "17:00";
+        
+        if (this.disponibilidadRepositorio) {
+            try {
+                const disponibilidad = await this.disponibilidadRepositorio.obtenerDisponibilidadPorId(
+                    datos.idDisponibilidad
+                );
+                if (disponibilidad) {
+                    horaInicio = disponibilidad.horaInicio;
+                    horaFin = disponibilidad.horaFin;
+                    console.log(`✓ Horarios obtenidos: ${horaInicio} - ${horaFin}`);
+                }
+            } catch (error) {
+                console.warn("No se pudo obtener la disponibilidad, usando horarios por defecto");
+            }
+        }
 
         // VALIDACIÓN 4: Verificar que el Consultorio existe (si se proporciona)
         let idConsultorioFinal = datos.idConsultorio;
@@ -257,7 +338,8 @@ export class CitaMedicaServicio {
         );
         const traslapePaciente = await this.citaMedicaRepositorio.verificarTraslapePaciente(
             datos.idPaciente,
-            fecha,
+            horaInicio,
+            horaFin,
             fecha
         );
         if (traslapePaciente) {
@@ -272,8 +354,9 @@ export class CitaMedicaServicio {
             `[6] Validando traslape para Médico ID: ${datos.idMedico} en Disponibilidad ID: ${datos.idDisponibilidad}`
         );
         const traslapeMedico = await this.citaMedicaRepositorio.verificarTraslapeMedico(
-            datos.idDisponibilidad,
-            fecha,
+            datos.idMedico,
+            horaInicio,
+            horaFin,
             fecha
         );
         if (traslapeMedico) {
@@ -290,7 +373,8 @@ export class CitaMedicaServicio {
             );
             const traslapeConsultorio = await this.citaMedicaRepositorio.verificarTraslapeConsultorio(
                 idConsultorioFinal,
-                fecha,
+                horaInicio,
+                horaFin,
                 fecha
             );
             if (traslapeConsultorio) {
@@ -308,7 +392,6 @@ export class CitaMedicaServicio {
         const nuevaCita: Omit<ICitaMedica, "idCita"> = {
             idPaciente: datos.idPaciente,
             idDisponibilidad: datos.idDisponibilidad,
-            idConsultorio: idConsultorioFinal || 0,
             fecha: fecha,
             estado: "programada",
             motivo: datos.motivo || null,
@@ -320,4 +403,24 @@ export class CitaMedicaServicio {
 
         return citaRegistrada;
     }
-}
+
+    
+    async obtenerCitasPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]> {
+    
+        if (idPaciente <= 0) {
+            throw new Error("El ID del paciente debe ser un número positivo");
+        }
+
+    
+        const paciente = await this.pacienteRepositorio.obtenerPacientePorId(idPaciente);
+        if (!paciente) {
+            throw new Error(`No se encontró un paciente con el ID ${idPaciente}`);
+        }
+
+    
+        const citas = await this.citaMedicaRepositorio.obtenerCitasConDetallesPorPaciente(idPaciente);
+
+    
+        return citas;
+    };
+};
