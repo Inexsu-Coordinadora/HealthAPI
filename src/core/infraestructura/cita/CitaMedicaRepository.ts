@@ -177,13 +177,13 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         excluirCitaId?: number
     ): Promise<ICitaMedica | null> {
         let query = `
-            SELECT cm.* FROM cita_medica cm
+            SELECT cm.id_cita, cm.id_paciente, cm.id_disponibilidad, cm.fecha, cm.estado, cm.motivo, cm.observaciones FROM cita_medica cm
             INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
             WHERE cm.id_paciente = $1
             AND cm.estado != 'cancelada'
             AND (d.hora_fin > $2 AND d.hora_inicio < $3)
         `;
-        const params: any[] = [idPaciente, horaInicio, horaFin];
+       const params: (number | string | Date)[] = [idPaciente, horaInicio, horaFin];
 
         if (fecha) {
             query += ` AND DATE(cm.fecha) = DATE($${params.length + 1})`;
@@ -208,14 +208,13 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         excluirCitaId?: number
     ): Promise<ICitaMedica | null> {
         let query = `
-            SELECT cm.* FROM cita_medica cm
+            SELECT cm.id_cita, cm.id_paciente, cm.id_disponibilidad, cm.fecha, cm.estado, cm.motivo, cm.observaciones FROM cita_medica cm
             INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
             WHERE d.id_medico = $1
             AND cm.estado != 'cancelada'
             AND (d.hora_fin > $2 AND d.hora_inicio < $3)
         `;
-        const params: any[] = [idMedico, horaInicio, horaFin];
-
+      const params: (number | string | Date)[] = [idMedico, horaInicio, horaFin];
         if (fecha) {
             query += ` AND DATE(cm.fecha) = DATE($${params.length + 1})`;
             params.push(fecha);
@@ -239,13 +238,13 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         excluirCitaId?: number
     ): Promise<ICitaMedica | null> {
         let query = `
-            SELECT cm.* FROM cita_medica cm
+            SELECT cm.id_cita, cm.id_paciente, cm.id_disponibilidad, cm.fecha, cm.estado, cm.motivo, cm.observaciones FROM cita_medica cm
             INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
             WHERE cm.id_consultorio = $1
             AND cm.estado != 'cancelada'
             AND (d.hora_fin > $2 AND d.hora_inicio < $3)
         `;
-        const params: any[] = [idConsultorio, horaInicio, horaFin];
+        const params: (number | string | Date)[] = [idConsultorio, horaInicio, horaFin];
 
         if (fecha) {
             query += ` AND DATE(cm.fecha) = DATE($${params.length + 1})`;
