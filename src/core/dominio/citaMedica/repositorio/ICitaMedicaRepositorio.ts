@@ -1,6 +1,8 @@
 import type { ICitaMedica } from "../ICitaMedica.js";
 import type { ICitaMedicaConDetalles } from "../ICitaMedicaConDetalles.js";
 
+export type TipoEntidad = 'paciente' | 'medico' | 'consultorio';
+
 export interface ICitaMedicaRepositorio {
   crear(cita: Omit<ICitaMedica, 'idCita'>): Promise<ICitaMedica>;
   obtenerCitaPorId(id: number): Promise<ICitaMedica | null>;
@@ -14,32 +16,13 @@ export interface ICitaMedicaRepositorio {
   verificarMedicoExiste(idMedico: number): Promise<boolean>;
   verificarConsultorioExiste(idConsultorio: number): Promise<boolean>;
   verificarDisponibilidadExiste(idDisponibilidad: number): Promise<boolean>;
-  
-  verificarTraslapePaciente(
-    idPaciente: number,
+  obtenerCitasConDetallesPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]>;
+  verificarTraslape(
+    tipo: TipoEntidad,
+    idEntidad: number,
     horaInicio: string,
     horaFin: string,
-    fecha?: Date,
+    fecha: Date,
     excluirCitaId?: number
   ): Promise<ICitaMedica | null>;
-  
-  verificarTraslapeMedico(
-    idMedico: number,
-    horaInicio: string,
-    horaFin: string,
-    fecha?: Date,
-    excluirCitaId?: number
-  ): Promise<ICitaMedica | null>;
-  
-  verificarTraslapeConsultorio(
-    idConsultorio: number,
-    horaInicio: string,
-    horaFin: string,
-    fecha?: Date,
-    excluirCitaId?: number
-  ): Promise<ICitaMedica | null>;
-    obtenerCitasConDetallesPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]>;
-    verificarCitasSuperpuestasPaciente(idPaciente: number, fecha: Date): Promise<boolean>;
-    verificarCitasSuperpuestasMedico(idDisponibilidad: number, fecha: Date): Promise<boolean>;
-    verificarCitasSuperpuestasConsultorio(idDisponibilidad: number, fecha: Date): Promise<boolean>;
 }
