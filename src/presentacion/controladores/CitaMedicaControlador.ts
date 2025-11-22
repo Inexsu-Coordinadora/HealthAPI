@@ -2,6 +2,7 @@ import type { FastifyRequest, FastifyReply } from "fastify";
 import { ZodError } from "zod";
 import { CitaMedicaServicio } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
 import type { ICitaMedica } from "../../core/dominio/citaMedica/ICitaMedica.js";
+import { FechaUtil } from "../../common/utilidades/FormatoFecha.js"; 
 import {
     esquemaCitaPorId,
     esquemaActualizarCita,
@@ -14,6 +15,7 @@ import {
     DisponibilidadNoExisteError,
     TraslapeCitaError,
     FechaDisponibilidadInvalidaError,
+    FechaInvalidaError,
 } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
 
 // Enum para mensajes consistentes
@@ -32,51 +34,51 @@ export class CitaControlador {
     constructor(private readonly citaServicio: CitaMedicaServicio) {}
 
     /**
-     * Crear una nueva cita médica
+     * CREAR UNA NUEVA CITA MÉDICA
      */
-    async crearCita(
-        request: FastifyRequest,
-        reply: FastifyReply
-    ): Promise<void> {
+    async crearCita(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         try {
-            // ✅ Validar datos con Zod
-            const citaValidada = validadorEsquemas(
-                esquemaCrearCita,
-                request.body,
-                reply
-            );
+            // Validar datos con Zod
+            const citaValidada = validadorEsquemas(esquemaCrearCita, request.body, reply);
 
             const citaCreada = await this.citaServicio.CrearCitaMedica(
                 citaValidada as Omit<ICitaMedica, "idCita">
             );
 
+            // Serializar fecha en formato ISO para el cliente
             reply.status(201).send({
                 mensaje: Mensajes.CITA_CREADA,
-                data: citaCreada,
+                data: {
+                    ...citaCreada,
+                    fecha: FechaUtil.toISO(citaCreada.fecha),
+                    fechaLegible: FechaUtil.formatearParaMostrar(citaCreada.fecha),
+                },
             });
         } catch (error: unknown) {
             this.manejarErrorCreacion(error, reply);
         }
     }
 
-    /**
-     * Listar todas las citas médicas
+    /** LISTAR TODAS LAS CITAS MÉDICAS
      */
-    async listarCitas(
-        request: FastifyRequest,
-        reply: FastifyReply
-    ): Promise<void> {
+    async listarCitas(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         try {
             const citas = await this.citaServicio.listarCitas();
 
+            // Serializar fechas en todas las citas
+            const citasSerializadas = citas.map((cita) => ({
+                ...cita,
+                fecha: FechaUtil.toISO(cita.fecha),
+                fechaLegible: FechaUtil.formatearParaMostrar(cita.fecha),
+            }));
+
             reply.status(200).send({
                 mensaje: Mensajes.CITAS_LISTADAS,
-                data: citas,
+                data: citasSerializadas,
                 total: citas.length,
             });
         } catch (error: unknown) {
-            const mensaje =
-                error instanceof Error ? error.message : "Error desconocido";
+            const mensaje = error instanceof Error ? error.message : "Error desconocido";
             reply.status(500).send({
                 error: "Error al listar citas",
                 mensaje,
@@ -84,19 +86,11 @@ export class CitaControlador {
         }
     }
 
-    /**
-     * Obtener una cita médica por ID
+    /** OBTENER UNA CITA MÉDICA POR ID
      */
-    async obtenerCitaPorId(
-        request: FastifyRequest,
-        reply: FastifyReply
-    ): Promise<void> {
+    async obtenerCitaPorId(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         try {
-            const { id: idCita } = validadorEsquemas(
-                esquemaCitaPorId,
-                request.params,
-                reply
-            );
+            const { id: idCita } = validadorEsquemas(esquemaCitaPorId, request.params, reply);
 
             const cita = await this.citaServicio.obtenerCitaMedicaPorId(idCita);
 
@@ -108,13 +102,17 @@ export class CitaControlador {
                 return;
             }
 
+            // Serializar fecha
             reply.status(200).send({
                 mensaje: Mensajes.CITA_OBTENIDA,
-                data: cita,
+                data: {
+                    ...cita,
+                    fecha: FechaUtil.toISO(cita.fecha),
+                    fechaLegible: FechaUtil.formatearParaMostrar(cita.fecha),
+                },
             });
         } catch (error: unknown) {
-            const mensaje =
-                error instanceof Error ? error.message : "Error desconocido";
+            const mensaje = error instanceof Error ? error.message : "Error desconocido";
             reply.status(500).send({
                 error: "Error al obtener la cita",
                 mensaje,
@@ -123,23 +121,12 @@ export class CitaControlador {
     }
 
     /**
-     * Actualizar una cita médica
+     * ACTUALIZAR UNA CITA MÉDICA
      */
-    async actualizarCita(
-        request: FastifyRequest,
-        reply: FastifyReply
-    ): Promise<void> {
+    async actualizarCita(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         try {
-            const { id: idCita } = validadorEsquemas(
-                esquemaCitaPorId,
-                request.params,
-                reply
-            );
-            const datos = validadorEsquemas(
-                esquemaActualizarCita,
-                request.body,
-                reply
-            );
+            const { id: idCita } = validadorEsquemas(esquemaCitaPorId, request.params, reply);
+            const datos = validadorEsquemas(esquemaActualizarCita, request.body, reply);
 
             const citaActualizada = await this.citaServicio.actualizarCita(
                 idCita,
@@ -154,9 +141,14 @@ export class CitaControlador {
                 return;
             }
 
+            // Serializar fecha
             reply.status(200).send({
                 mensaje: Mensajes.CITA_ACTUALIZADA,
-                data: citaActualizada,
+                data: {
+                    ...citaActualizada,
+                    fecha: FechaUtil.toISO(citaActualizada.fecha),
+                    fechaLegible: FechaUtil.formatearParaMostrar(citaActualizada.fecha),
+                },
             });
         } catch (error: unknown) {
             this.manejarErrorActualizacion(error, reply);
@@ -164,18 +156,11 @@ export class CitaControlador {
     }
 
     /**
-     * Eliminar una cita médica
+     * ELIMINAR UNA CITA MÉDICA
      */
-    async eliminarCita(
-        request: FastifyRequest,
-        reply: FastifyReply
-    ): Promise<void> {
+    async eliminarCita(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         try {
-            const { id: idCita } = validadorEsquemas(
-                esquemaCitaPorId,
-                request.params,
-                reply
-            );
+            const { id: idCita } = validadorEsquemas(esquemaCitaPorId, request.params, reply);
 
             const eliminado = await this.citaServicio.eliminarCitaMedica(idCita);
 
@@ -191,8 +176,7 @@ export class CitaControlador {
                 mensaje: Mensajes.CITA_ELIMINADA,
             });
         } catch (error: unknown) {
-            const mensaje =
-                error instanceof Error ? error.message : "Error desconocido";
+            const mensaje = error instanceof Error ? error.message : "Error desconocido";
             reply.status(500).send({
                 error: "Error al eliminar la cita",
                 mensaje,
@@ -200,13 +184,10 @@ export class CitaControlador {
         }
     }
 
-    
-     //SERVICIO 2: Consultar citas de un paciente con detalles
-    
-    async consultarCitasPorPaciente(
-        request: FastifyRequest,
-        reply: FastifyReply
-    ): Promise<void> {
+    /**
+     * SERVICIO 2: CONSULTAR CITAS DE UN PACIENTE CON DETALLES
+     */
+    async consultarCitasPorPaciente(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         try {
             const { idPaciente } = request.params as { idPaciente: string };
             const id = parseInt(idPaciente, 10);
@@ -232,10 +213,17 @@ export class CitaControlador {
                 return;
             }
 
-            // Caso: paciente con citas
+            // Caso: paciente con citas - Serializar fechas
+            const citasSerializadas = citas.map((cita) => ({
+                ...cita,
+                fecha: FechaUtil.toISO(cita.fecha),
+                fechaLegible: FechaUtil.formatearParaMostrar(cita.fecha),
+                diaSemana: FechaUtil.obtenerDiaSemana(cita.fecha), // ✅ NUEVO: Agregar día en español
+            }));
+
             reply.status(200).send({
                 mensaje: Mensajes.CITAS_PACIENTE_OBTENIDAS,
-                data: citas,
+                data: citasSerializadas,
                 total: citas.length,
             });
         } catch (error: unknown) {
@@ -244,7 +232,7 @@ export class CitaControlador {
     }
 
     /**
-     * Manejo centralizado de errores para creación de citas
+     * MANEJO CENTRALIZADO DE ERRORES PARA CREACIÓN DE CITAS
      */
     private manejarErrorCreacion(error: unknown, reply: FastifyReply): void {
         // Error de validación Zod
@@ -259,7 +247,16 @@ export class CitaControlador {
             return;
         }
 
-        // Errores de negocio
+        // NUEVO: Error de fecha inválida (fecha pasada)
+        if (error instanceof FechaInvalidaError) {
+            reply.status(400).send({
+                error: "Fecha inválida",
+                mensaje: error.message,
+            });
+            return;
+        }
+
+        // Error: Disponibilidad no existe
         if (error instanceof DisponibilidadNoExisteError) {
             reply.status(404).send({
                 error: "Disponibilidad no encontrada",
@@ -268,14 +265,16 @@ export class CitaControlador {
             return;
         }
 
+        // Error: Fecha no coincide con disponibilidad
         if (error instanceof FechaDisponibilidadInvalidaError) {
             reply.status(400).send({
-                error: "Fecha inválida",
+                error: "Fecha incompatible con disponibilidad",
                 mensaje: error.message,
             });
             return;
         }
 
+        // Error: Traslape de horarios
         if (error instanceof TraslapeCitaError) {
             reply.status(409).send({
                 error: "Conflicto de horario",
@@ -284,9 +283,17 @@ export class CitaControlador {
             return;
         }
 
+        // Error: Paciente no existe
+        if (error instanceof PacienteNoExisteError) {
+            reply.status(404).send({
+                error: "Paciente no encontrado",
+                mensaje: error.message,
+            });
+            return;
+        }
+
         // Error genérico
-        const mensaje =
-            error instanceof Error ? error.message : "Error desconocido";
+        const mensaje = error instanceof Error ? error.message : "Error desconocido";
         reply.status(500).send({
             error: "Error al crear la cita médica",
             mensaje,
@@ -294,12 +301,10 @@ export class CitaControlador {
     }
 
     /**
-     * Manejo centralizado de errores para actualización de citas
+     * MANEJO CENTRALIZADO DE ERRORES PARA ACTUALIZACIÓN DE CITAS
      */
-    private manejarErrorActualizacion(
-        error: unknown,
-        reply: FastifyReply
-    ): void {
+    private manejarErrorActualizacion(error: unknown, reply: FastifyReply): void {
+        // Error de validación Zod
         if (error instanceof ZodError) {
             reply.status(400).send({
                 error: "Datos inválidos",
@@ -311,6 +316,16 @@ export class CitaControlador {
             return;
         }
 
+        // NUEVO: Error de fecha inválida
+        if (error instanceof FechaInvalidaError) {
+            reply.status(400).send({
+                error: "Fecha inválida",
+                mensaje: error.message,
+            });
+            return;
+        }
+
+        // Error: Disponibilidad no existe
         if (error instanceof DisponibilidadNoExisteError) {
             reply.status(404).send({
                 error: "Disponibilidad no encontrada",
@@ -319,16 +334,17 @@ export class CitaControlador {
             return;
         }
 
+        // Error: Fecha no coincide con disponibilidad
         if (error instanceof FechaDisponibilidadInvalidaError) {
             reply.status(400).send({
-                error: "Fecha inválida",
+                error: "Fecha incompatible con disponibilidad",
                 mensaje: error.message,
             });
             return;
         }
 
-        const mensaje =
-            error instanceof Error ? error.message : "Error desconocido";
+        // Error genérico
+        const mensaje = error instanceof Error ? error.message : "Error desconocido";
         reply.status(500).send({
             error: "Error al actualizar la cita",
             mensaje,
@@ -336,17 +352,11 @@ export class CitaControlador {
     }
 
     /**
-     * ✅ Manejo centralizado de errores para consulta de citas por paciente
+     * MANEJO CENTRALIZADO DE ERRORES PARA CONSULTA DE CITAS POR PACIENTE
      */
-    private manejarErrorConsultaCitas(
-        error: unknown,
-        reply: FastifyReply
-    ): void {
+    private manejarErrorConsultaCitas(error: unknown, reply: FastifyReply): void {
         // Error: ID inválido
-        if (
-            error instanceof Error &&
-            error.message.includes("debe ser un número positivo")
-        ) {
+        if (error instanceof Error && error.message.includes("debe ser un número positivo")) {
             reply.status(400).send({
                 error: "ID inválido",
                 mensaje: error.message,
@@ -364,8 +374,7 @@ export class CitaControlador {
         }
 
         // Error genérico
-        const mensaje =
-            error instanceof Error ? error.message : "Error desconocido";
+        const mensaje = error instanceof Error ? error.message : "Error desconocido";
         reply.status(500).send({
             error: "Error al obtener las citas del paciente",
             mensaje,
