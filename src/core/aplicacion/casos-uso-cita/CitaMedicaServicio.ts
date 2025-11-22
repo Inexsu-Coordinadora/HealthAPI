@@ -21,9 +21,7 @@ export class MedicoNoExisteError extends Error {
     }
 }
 
-/**
- * Excepción lanzada cuando un consultorio no existe
- */
+
 export class ConsultorioNoExisteError extends Error {
     constructor(idConsultorio: number) {
         super(`El consultorio con ID ${idConsultorio} no existe`);
@@ -32,9 +30,7 @@ export class ConsultorioNoExisteError extends Error {
     }
 }
 
-/**
- * Excepción lanzada cuando hay un traslape en las citas del paciente
- */
+
 export class TraslapePacienteError extends Error {
     constructor(idPaciente: number, fechaInicio: Date, fechaFin: Date) {
         super(
@@ -45,9 +41,7 @@ export class TraslapePacienteError extends Error {
     }
 }
 
-/**
- * Excepción lanzada cuando hay un traslape en las citas del médico
- */
+
 export class TraslapeMedicoError extends Error {
     constructor(idMedico: number, fechaInicio: Date, fechaFin: Date) {
         super(
@@ -58,9 +52,7 @@ export class TraslapeMedicoError extends Error {
     }
 }
 
-/**
- * Excepción lanzada cuando hay un traslape en las citas del consultorio
- */
+
 export class TraslapeConsultorioError extends Error {
     constructor(idConsultorio: number, fechaInicio: Date, fechaFin: Date) {
         super(
@@ -71,9 +63,7 @@ export class TraslapeConsultorioError extends Error {
     }
 }
 
-/**
- * Excepción lanzada cuando la disponibilidad no existe
- */
+
 export class DisponibilidadNoExisteError extends Error {
     constructor(idDisponibilidad: number) {
         super(`La disponibilidad con ID ${idDisponibilidad} no existe`);
@@ -274,7 +264,7 @@ export class CitaMedicaServicio {
         if (!pacienteExiste) {
             throw new Error(`Paciente inexistente: El paciente con ID ${datos.idPaciente} no existe en el sistema`);
         }
-        console.log("✓ Paciente existe");
+        console.log(" Paciente existe");
 
         // VALIDACIÓN 2: Verificar que el Médico existe
         console.log(`[2] Verificando existencia del Médico ID: ${datos.idMedico}`);
@@ -282,7 +272,7 @@ export class CitaMedicaServicio {
         if (!medicoExiste) {
             throw new Error(`Médico inexistente: El médico con ID ${datos.idMedico} no existe en el sistema`);
         }
-        console.log("✓ Médico existe");
+        console.log(" Médico existe");
 
         // VALIDACIÓN 3: Verificar que la Disponibilidad existe Y obtener sus horarios
         console.log(`[3] Verificando existencia de la Disponibilidad ID: ${datos.idDisponibilidad}`);
@@ -294,7 +284,7 @@ export class CitaMedicaServicio {
                 `Disponibilidad inexistente: La disponibilidad con ID ${datos.idDisponibilidad} no existe`
             );
         }
-        console.log("✓ Disponibilidad existe");
+        console.log(" Disponibilidad existe");
 
         // Obtener la disponibilidad para extraer horarios
         let horaInicio = "09:00";
