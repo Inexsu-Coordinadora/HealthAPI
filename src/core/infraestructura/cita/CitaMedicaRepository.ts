@@ -2,7 +2,7 @@ import type { ICitaMedicaRepositorio } from "../../dominio/citaMedica/repositori
 import type { ICitaMedica } from "../../dominio/citaMedica/ICitaMedica.js";
 import { ejecutarConsulta } from "../DBpostgres.js";
 import type { ICitaMedicaConDetalles } from "../../dominio/citaMedica/ICitaMedicaConDetalles.js";
-
+import { FechaUtil } from "../../../common/utilidades/FormatoFecha.js";
 
 interface CitaMedicaRow {
     id_cita: number;
@@ -367,50 +367,57 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
     }
 
     // 19. Obtener citas con detalles por paciente (para servicio 2)
-    async obtenerCitasConDetallesPorPaciente(
-        idPaciente: number
-    ): Promise<ICitaMedicaConDetalles[]> {
-        const query = `
-            SELECT 
-                cm.id_cita,
-                cm.fecha,
-                cm.estado,
-                cm.motivo,
-                cm.observaciones,
-                p.id_paciente,
-                p.nombre as nombre_paciente,
-                p.correo as correo_paciente,
-                m.id_medico,
-                m.nombre as nombre_medico,
-                m.especialidad as especialidad_medico
-            FROM cita_medica cm
-            INNER JOIN paciente p ON cm.id_paciente = p.id_paciente
-            INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
-            INNER JOIN medico m ON d.id_medico = m.id_medico
-            WHERE cm.id_paciente = $1
-            ORDER BY cm.fecha DESC
-        `;
+    async obtenerCitasConDetallesPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]> {
+    const query = `
+        SELECT 
+            cm.id_cita,
+            cm.fecha,
+            cm.estado,
+            cm.motivo,
+            cm.observaciones,
+            p.id_paciente,
+            p.nombre as nombre_paciente,
+            p.correo as correo_paciente,
+            m.id_medico,
+            m.nombre as nombre_medico,
+            m.especialidad as especialidad_medico,
+            d.dia_semana,
+            d.hora_inicio,
+            d.hora_fin
+        FROM cita_medica cm
+        INNER JOIN paciente p ON cm.id_paciente = p.id_paciente
+        INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
+        INNER JOIN medico m ON d.id_medico = m.id_medico
+        WHERE cm.id_paciente = $1
+        ORDER BY cm.fecha DESC
+    `;
 
-        const result = await ejecutarConsulta(query, [idPaciente]);
-        
-        return result.rows.map((row: CitaMedicaConDetallesRow) => ({
-            idCita: row.id_cita,
-            fecha: new Date(row.fecha),
-            estado: row.estado,
-            motivo: row.motivo ?? "",
-            observaciones: row.observaciones ?? "",
-            paciente: {
-                idPaciente: row.id_paciente,
-                nombrePaciente: row.nombre_paciente,
-                correoPaciente: row.correo_paciente,
-            },
-            medico: {
-                idMedico: row.id_medico,
-                nombreMedico: row.nombre_medico,
-                especialidadMedico: row.especialidad_medico,
-            },
-        }));
-    }
+    const result = await ejecutarConsulta(query, [idPaciente]);
+    
+    return result.rows.map((row) => ({
+        idCita: row.id_cita,
+        fecha: new Date(row.fecha), 
+        estado: row.estado,
+        motivo: row.motivo,
+        observaciones: row.observaciones,
+        paciente: {
+            idPaciente: row.id_paciente,
+            nombrePaciente: row.nombre_paciente,
+            correoPaciente: row.correo_paciente,
+        },
+        medico: {
+            idMedico: row.id_medico,
+            nombreMedico: row.nombre_medico,
+            especialidadMedico: row.especialidad_medico,
+        },
+    
+        disponibilidad: {
+            diaSemana: row.dia_semana,
+            horaInicio: row.hora_inicio,
+            horaFin: row.hora_fin,
+        },
+    }));
+}
 
     // Método auxiliar: Mapear nombres de campos TypeScript a columnas SQL
     private mapearCampoAColumna(campo: string): string {
@@ -427,15 +434,15 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
     }
 
     // Método auxiliar: Mapear fila de BD a objeto ICitaMedica
-    private mapearFilaACitaMedica(row: CitaMedicaRow): ICitaMedica {
-        return {
-            idCita: row.id_cita,
-            idPaciente: row.id_paciente,
-            idDisponibilidad: row.id_disponibilidad,
-            fecha: new Date(row.fecha),
-            estado: row.estado,
-            motivo: row.motivo,
-            observaciones: row.observaciones ?? "",
-        };
-    }
+private mapearFilaACitaMedica(row: any): ICitaMedica {
+    return {
+        idCita: row.id_cita,
+        idPaciente: row.id_paciente,
+        idDisponibilidad: row.id_disponibilidad,
+        fecha: new Date(row.fecha),
+        estado: row.estado,
+        motivo: row.motivo,
+        observaciones: row.observaciones,
+    };
+}
 }
