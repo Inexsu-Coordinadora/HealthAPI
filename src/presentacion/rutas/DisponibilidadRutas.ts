@@ -40,7 +40,7 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
 
     // Endpoints específicos por relaciones
     fastify.get(
-        "/medicos/:idMedico/disponibilidades",
+        "/disponibilidades/medico/:idMedico",
         async (request, reply) => {
             return disponibilidadControlador.obtenerDisponibilidadesPorMedico(
                 request,
@@ -50,7 +50,7 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
     );
 
     fastify.get(
-        "/consultorios/:idConsultorio/disponibilidades",
+        "/disponibilidades/consultorio/:idConsultorio",
         async (request, reply) => {
             return disponibilidadControlador.obtenerDisponibilidadesPorConsultorio(
                 request,
