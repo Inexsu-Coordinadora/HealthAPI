@@ -200,7 +200,6 @@ async consultarCitasPorPaciente(request: FastifyRequest, reply: FastifyReply) {
             });
         }
 
-        // ✨ Error: Paciente no encontrado
         if (error.message.includes("No se encontró")) {
             return reply.status(404).send({
                 error: "Paciente no encontrado",

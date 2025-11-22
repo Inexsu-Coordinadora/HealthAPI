@@ -10,8 +10,6 @@ export interface ICitaMedicaRepositorio {
   obtenerPorPaciente(idPaciente: number): Promise<ICitaMedica[]>;
   obtenerPorMedico(idMedico: number): Promise<ICitaMedica[]>;
   obtenerPorEstado(estado: string): Promise<ICitaMedica[]>;
-  
-
   verificarPacienteExiste(idPaciente: number): Promise<boolean>;
   verificarMedicoExiste(idMedico: number): Promise<boolean>;
   verificarConsultorioExiste(idConsultorio: number): Promise<boolean>;
