@@ -159,8 +159,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             ).rejects.toThrow(DisponibilidadOcupadaError);
         });
 
-        it.skip("debería verificar que el médico viene de la disponibilidad", async () => {
-            // Test deshabilitado: requiere ajustes en query SQL del repositorio
+        it("debería verificar que el médico viene de la disponibilidad", async () => {
             const datosCita = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
@@ -216,7 +215,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             const citaDatos = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: new Date("2025-12-01T10:00:00"),
+                fecha: new Date("2025-12-01T10:00:00.000Z"),
                 estado: "programada" as const,
                 motivo: "Test validación día",
                 observaciones: "",
@@ -229,42 +228,39 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             expect(resultado.idCita).toBeGreaterThan(0);
         });
 
-        // Test deshabilitado: dev's CrearCitaMedica no valida día de la semana
-        it.skip("debería rechazar cita en día incorrecto", async () => {
+        it("debería rechazar cita en día incorrecto", async () => {
             const citaDatos = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: new Date("2025-12-02T10:00:00"), // martes
+                fecha: new Date("2025-12-02T10:00:00.000Z"), // martes
                 estado: "programada" as const,
                 motivo: "Test día incorrecto",
                 observaciones: "",
             };
 
             await expect(servicio.CrearCitaMedica(citaDatos)).rejects.toThrow(
-                "no coincide con el día de disponibilidad"
+                /La cita no coincide con la disponibilidad.*martes/i
             );
         });
 
-        // Test deshabilitado: dev's CrearCitaMedica no valida rango de horarios
-        it.skip("debería rechazar cita fuera de horario", async () => {
+        it("debería rechazar cita fuera de horario", async () => {
             const citaDatos = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: new Date("2025-12-01T14:00:00"), // 14:00, fuera de 09:00-13:00
+                fecha: new Date("2025-12-01T14:00:00.000Z"), // 14:00, fuera de 09:00-13:00
                 estado: "programada" as const,
                 motivo: "Test hora incorrecta",
                 observaciones: "",
             };
 
             await expect(servicio.CrearCitaMedica(citaDatos)).rejects.toThrow(
-                "no está dentro del rango de disponibilidad"
+                /La cita no coincide con la disponibilidad/i
             );
         });
     });
 
     describe("obtenerCitasPorPaciente", () => {
-        // Test deshabilitado: obtenerCitasConDetallesPorPaciente tiene error SQL (columna c.nombre no existe)
-        it.skip("debería retornar todas las citas del paciente con detalles", async () => {
+        it("debería retornar todas las citas del paciente con detalles", async () => {
             const resultado =
                 await servicio.obtenerCitasPorPaciente(pacienteId);
 
