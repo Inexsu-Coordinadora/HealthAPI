@@ -15,9 +15,9 @@ export interface ICitaMedicaConDetalles {
         especialidadMedico: string;
     };
 
-    disponibilidad: {
+    disponibilidad?: {
         diaSemana: string;
         horaInicio: string;
         horaFin: string;
     };
-};
+}

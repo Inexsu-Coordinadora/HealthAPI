@@ -48,7 +48,7 @@ export async function citaRutas(fastify: FastifyInstance) {
             },
         },
         async (request: FastifyRequest, reply: FastifyReply) => {
-            return citaControlador.listarCitas(reply);
+            return citaControlador.listarCitas(request, reply);
         }
     );
 
