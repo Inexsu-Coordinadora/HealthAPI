@@ -13,57 +13,6 @@ export class PacienteNoExisteError extends Error {
 }
 
 
-export class MedicoNoExisteError extends Error {
-    constructor(idMedico: number) {
-        super(`El médico con ID ${idMedico} no existe`);
-        this.name = "MedicoNoExisteError";
-        Object.setPrototypeOf(this, MedicoNoExisteError.prototype);
-    }
-}
-
-
-export class ConsultorioNoExisteError extends Error {
-    constructor(idConsultorio: number) {
-        super(`El consultorio con ID ${idConsultorio} no existe`);
-        this.name = "ConsultorioNoExisteError";
-        Object.setPrototypeOf(this, ConsultorioNoExisteError.prototype);
-    }
-}
-
-
-export class TraslapePacienteError extends Error {
-    constructor(idPaciente: number, fechaInicio: Date, fechaFin: Date) {
-        super(
-            `El paciente ${idPaciente} ya tiene una cita entre ${fechaInicio.toISOString()} y ${fechaFin.toISOString()}`
-        );
-        this.name = "TraslapePacienteError";
-        Object.setPrototypeOf(this, TraslapePacienteError.prototype);
-    }
-}
-
-
-export class TraslapeMedicoError extends Error {
-    constructor(idMedico: number, fechaInicio: Date, fechaFin: Date) {
-        super(
-            `El médico ${idMedico} ya tiene una cita entre ${fechaInicio.toISOString()} y ${fechaFin.toISOString()}`
-        );
-        this.name = "TraslapeMedicoError";
-        Object.setPrototypeOf(this, TraslapeMedicoError.prototype);
-    }
-}
-
-
-export class TraslapeConsultorioError extends Error {
-    constructor(idConsultorio: number, fechaInicio: Date, fechaFin: Date) {
-        super(
-            `El consultorio ${idConsultorio} ya tiene citas entre ${fechaInicio.toISOString()} y ${fechaFin.toISOString()}`
-        );
-        this.name = "TraslapeConsultorioError";
-        Object.setPrototypeOf(this, TraslapeConsultorioError.prototype);
-    }
-}
-
-
 export class DisponibilidadNoExisteError extends Error {
     constructor(idDisponibilidad: number) {
         super(`La disponibilidad con ID ${idDisponibilidad} no existe`);
@@ -71,12 +20,32 @@ export class DisponibilidadNoExisteError extends Error {
         Object.setPrototypeOf(this, DisponibilidadNoExisteError.prototype);
     }
 }
-
-// Función auxiliar para validar estado
-function validarEstado(estado: string): boolean {
-    const estadosValidos = ["programada", "cancelada", "realizada"];
-    return estadosValidos.includes(estado.toLowerCase());
+/**
+ * Excepción lanzada cuando una disponibilidad ya está ocupada
+ */
+export class DisponibilidadOcupadaError extends Error {
+    constructor(idDisponibilidad: number, fecha: Date) {
+        super(
+            `La disponibilidad ${idDisponibilidad} ya está ocupada en la fecha ${fecha.toISOString()}`
+        );
+        this.name = "DisponibilidadOcupadaError";
+        Object.setPrototypeOf(this, DisponibilidadOcupadaError.prototype);
+    }
 }
+
+/**
+ * Excepción lanzada cuando hay un traslape en las citas del paciente
+ */
+export class TraslapePacienteError extends Error {
+    constructor(idPaciente: number, fecha: Date) {
+        super(
+           ` El paciente ${idPaciente} ya tiene una cita programada en ${fecha.toISOString()}`
+        );
+        this.name = "TraslapePacienteError";
+        Object.setPrototypeOf(this, TraslapePacienteError.prototype);
+    }
+}
+
 
 
 
@@ -97,9 +66,7 @@ export class CitaMedicaServicio {
             );
 
         if (!disponibilidad) {
-            throw new Error(
-                `No se encontró una disponibilidad con el ID ${datos.idDisponibilidad}`
-            );
+            throw new DisponibilidadNoExisteError(datos.idDisponibilidad);
         }
 
         // Validar que la fecha de la cita coincida con la disponibilidad
@@ -113,35 +80,6 @@ export class CitaMedicaServicio {
             motivo: datos.motivo,
             observaciones: datos.observaciones,
         };
-
-        const medicoOcupado = await this.citaMedicaRepositorio.verificarCitasSuperpuestasMedico(
-            datos.idDisponibilidad,
-            datos.fecha
-            );
-    
-            if (medicoOcupado) {
-                throw new Error(`El médico ya tiene una cita programada en ese horario`);
-            }
-
-            const pacienteTieneCita = await this.citaMedicaRepositorio.verificarCitasSuperpuestasPaciente(
-                datos.idPaciente,
-                datos.fecha
-            );
-            
-            if (pacienteTieneCita) {
-                throw new Error("El paciente ya tiene una cita programada en ese horario");
-            }
-
-
-        const consultorioOcupado = await this.citaMedicaRepositorio.verificarCitasSuperpuestasConsultorio(
-            datos.idDisponibilidad,
-            datos.fecha
-        );
-    
-        if (consultorioOcupado) {
-            throw new Error(`El consultorio ya está ocupado en ese horario`);
-        }
-
         return await this.citaMedicaRepositorio.crear(nuevaCita);
     }
 
@@ -248,10 +186,8 @@ export class CitaMedicaServicio {
  
     async agendarCitaConValidacion(datos: {
         idPaciente: number;
-        idMedico: number;
         fecha: Date | string;
         idDisponibilidad: number;
-        idConsultorio?: number | null;
         motivo?: string | null;
         observaciones?: string;
     }): Promise<ICitaMedica> {
@@ -262,17 +198,10 @@ export class CitaMedicaServicio {
         console.log(`[1] Verificando existencia del Paciente ID: ${datos.idPaciente}`);
         const pacienteExiste = await this.citaMedicaRepositorio.verificarPacienteExiste(datos.idPaciente);
         if (!pacienteExiste) {
-            throw new Error(`Paciente inexistente: El paciente con ID ${datos.idPaciente} no existe en el sistema`);
+            throw new PacienteNoExisteError(datos.idPaciente);
         }
         console.log(" Paciente existe");
 
-        // VALIDACIÓN 2: Verificar que el Médico existe
-        console.log(`[2] Verificando existencia del Médico ID: ${datos.idMedico}`);
-        const medicoExiste = await this.citaMedicaRepositorio.verificarMedicoExiste(datos.idMedico);
-        if (!medicoExiste) {
-            throw new Error(`Médico inexistente: El médico con ID ${datos.idMedico} no existe en el sistema`);
-        }
-        console.log(" Médico existe");
 
         // VALIDACIÓN 3: Verificar que la Disponibilidad existe Y obtener sus horarios
         console.log(`[3] Verificando existencia de la Disponibilidad ID: ${datos.idDisponibilidad}`);
@@ -280,9 +209,7 @@ export class CitaMedicaServicio {
             datos.idDisponibilidad
         );
         if (!disponibilidadExiste) {
-            throw new Error(
-                `Disponibilidad inexistente: La disponibilidad con ID ${datos.idDisponibilidad} no existe`
-            );
+            throw new DisponibilidadNoExisteError(datos.idDisponibilidad);
         }
         console.log(" Disponibilidad existe");
 
@@ -305,77 +232,33 @@ export class CitaMedicaServicio {
             }
         }
 
-        // VALIDACIÓN 4: Verificar que el Consultorio existe (si se proporciona)
-        let idConsultorioFinal = datos.idConsultorio;
-        if (idConsultorioFinal) {
-            console.log(`[4] Verificando existencia del Consultorio ID: ${idConsultorioFinal}`);
-            const consultorioExiste = await this.citaMedicaRepositorio.verificarConsultorioExiste(
-                idConsultorioFinal
-            );
-            if (!consultorioExiste) {
-                throw new Error(
-                    `Consultorio inexistente: El consultorio con ID ${idConsultorioFinal} no existe`
-                );
-            }
-            console.log("✓ Consultorio existe");
-        } else {
-            console.log("[4] Consultorio no especificado (se asignará automáticamente)");
-        }
 
-        // VALIDACIÓN 5: Verificar traslape de citas del PACIENTE
-        console.log(
-            `[5] Validando traslape para Paciente ID: ${datos.idPaciente} en fecha ${fecha.toISOString()}`
-        );
-        const traslapePaciente = await this.citaMedicaRepositorio.verificarTraslapePaciente(
-            datos.idPaciente,
-            horaInicio,
-            horaFin,
-            fecha
-        );
-        if (traslapePaciente) {
-            throw new Error(
-                `Solicitud de hora con traslape para el Paciente: El paciente ${datos.idPaciente} ya tiene una cita en ${fecha.toISOString()}`
-            );
-        }
-        console.log("✓ Sin traslape para el Paciente");
+// VALIDACIÓN 5: Verificar que la disponibilidad no esté ocupada
+    console.log('[5] Verificando disponibilidad ocupada');
+    const disponibilidadOcupada = await this.citaMedicaRepositorio.verificarDisponibilidadOcupada(
+    datos.idDisponibilidad,
+    fecha
+    );
 
-        // VALIDACIÓN 6: Verificar traslape de citas del MÉDICO
-        console.log(
-            `[6] Validando traslape para Médico ID: ${datos.idMedico} en Disponibilidad ID: ${datos.idDisponibilidad}`
-        );
-        const traslapeMedico = await this.citaMedicaRepositorio.verificarTraslapeMedico(
-            datos.idMedico,
-            horaInicio,
-            horaFin,
-            fecha
-        );
-        if (traslapeMedico) {
-            throw new Error(
-                `Solicitud de hora con traslape para el Médico: El médico ${datos.idMedico} ya tiene una cita en ${fecha.toISOString()}`
-            );
-        }
-        console.log("✓ Sin traslape para el Médico");
+    if (disponibilidadOcupada) {
+    throw new DisponibilidadOcupadaError(datos.idDisponibilidad, fecha);
+    }
+    console.log('✓ Disponibilidad disponible');
 
-        // VALIDACIÓN 7: Verificar traslape de citas del CONSULTORIO (si se proporciona)
-        if (idConsultorioFinal) {
-            console.log(
-                `[7] Validando traslape para Consultorio ID: ${idConsultorioFinal} en fecha ${fecha.toISOString()}`
-            );
-            const traslapeConsultorio = await this.citaMedicaRepositorio.verificarTraslapeConsultorio(
-                idConsultorioFinal,
-                horaInicio,
-                horaFin,
-                fecha
-            );
-            if (traslapeConsultorio) {
-                throw new Error(
-                    `Solicitud de hora con traslape para el Consultorio: El consultorio ${idConsultorioFinal} ya tiene una cita en ${fecha.toISOString()}`
-                );
-            }
-            console.log("✓ Sin traslape para el Consultorio");
-        } else {
-            console.log("[7] Validación de traslape del Consultorio omitida (no especificado)");
-        }
+    // VALIDACIÓN 6: Verificar que el paciente no tenga otra cita
+    console.log('[6] Verificando traslape de paciente');
+    const pacienteTieneCita = await this.citaMedicaRepositorio.verificarTraslapePaciente(
+    datos.idPaciente,
+    horaInicio,
+    horaFin,
+    fecha
+    );
+
+    if (pacienteTieneCita) {
+    throw new TraslapePacienteError(datos.idPaciente, fecha);
+    }
+    console.log('✓ Paciente sin traslapes');
+
 
         // VALIDACIÓN 8: Crear la cita con estado "programada"
         console.log("[8] Registrando cita con estado 'programada'");
