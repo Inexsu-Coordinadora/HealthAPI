@@ -95,9 +95,6 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
             mockCitaMedicaRepositorio.verificarPacienteExiste.mockResolvedValue(
                 true
             );
-            mockCitaMedicaRepositorio.verificarDisponibilidadExiste.mockResolvedValue(
-                true
-            );
             mockDisponibilidadRepositorio.obtenerDisponibilidadPorId.mockResolvedValue(
                 disponibilidadMock
             );
@@ -117,7 +114,7 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
                 mockCitaMedicaRepositorio.verificarPacienteExiste
             ).toHaveBeenCalledWith(1);
             expect(
-                mockCitaMedicaRepositorio.verificarDisponibilidadExiste
+                mockDisponibilidadRepositorio.obtenerDisponibilidadPorId
             ).toHaveBeenCalledWith(1);
             expect(
                 mockCitaMedicaRepositorio.verificarDisponibilidadOcupada
@@ -141,8 +138,8 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
             mockCitaMedicaRepositorio.verificarPacienteExiste.mockResolvedValue(
                 true
             );
-            mockCitaMedicaRepositorio.verificarDisponibilidadExiste.mockResolvedValue(
-                false
+            mockDisponibilidadRepositorio.obtenerDisponibilidadPorId.mockResolvedValue(
+                null
             );
 
             await expect(
@@ -152,9 +149,6 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
 
         it("debería lanzar DisponibilidadOcupadaError si la disponibilidad ya está ocupada", async () => {
             mockCitaMedicaRepositorio.verificarPacienteExiste.mockResolvedValue(
-                true
-            );
-            mockCitaMedicaRepositorio.verificarDisponibilidadExiste.mockResolvedValue(
                 true
             );
             mockDisponibilidadRepositorio.obtenerDisponibilidadPorId.mockResolvedValue(
@@ -278,7 +272,7 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
             const citaMock: Omit<ICitaMedica, "idCita"> = {
                 idPaciente: 1,
                 idDisponibilidad: 1,
-                fecha: new Date("2025-11-24T10:00:00"),
+                fecha: new Date("2025-11-24T10:00:00.000Z"),
                 estado: "programada",
                 motivo: "Consulta",
                 observaciones: "",
@@ -286,6 +280,12 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
 
             const citaCreada: ICitaMedica = { ...citaMock, idCita: 1 };
 
+            mockPacienteRepositorio.obtenerPacientePorId.mockResolvedValue({
+                idPaciente: 1,
+                nombrePaciente: "Test",
+                correoPaciente: "test@test.com",
+                telefonoPaciente: "123456",
+            });
             mockDisponibilidadRepositorio.obtenerDisponibilidadPorId.mockResolvedValue(
                 disponibilidadMock
             );
@@ -306,6 +306,12 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
                 observaciones: "",
             };
 
+            mockPacienteRepositorio.obtenerPacientePorId.mockResolvedValue({
+                idPaciente: 1,
+                nombrePaciente: "Test",
+                correoPaciente: "test@test.com",
+                telefonoPaciente: "123456",
+            });
             mockDisponibilidadRepositorio.obtenerDisponibilidadPorId.mockResolvedValue(
                 null
             );
@@ -416,6 +422,18 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
 
     describe("eliminarCitaMedica", () => {
         it("debería eliminar una cita exitosamente", async () => {
+            const citaMock = {
+                idCita: 1,
+                idPaciente: 1,
+                idDisponibilidad: 1,
+                fecha: new Date(),
+                estado: "programada" as const,
+                motivo: "Test",
+                observaciones: "",
+            };
+            mockCitaMedicaRepositorio.obtenerCitaPorId.mockResolvedValue(
+                citaMock
+            );
             mockCitaMedicaRepositorio.eliminarCita.mockResolvedValue(true);
 
             const resultado = await servicio.eliminarCitaMedica(1);
@@ -423,12 +441,12 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
             expect(resultado).toBe(true);
         });
 
-        it("debería retornar false si la cita no existe", async () => {
-            mockCitaMedicaRepositorio.eliminarCita.mockResolvedValue(false);
+        it("debería lanzar error si la cita no existe", async () => {
+            mockCitaMedicaRepositorio.obtenerCitaPorId.mockResolvedValue(null);
 
-            const resultado = await servicio.eliminarCitaMedica(999);
-
-            expect(resultado).toBe(false);
+            await expect(servicio.eliminarCitaMedica(999)).rejects.toThrow(
+                "No se encontró una cita con el ID 999"
+            );
         });
     });
 
@@ -488,7 +506,7 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
             );
 
             await expect(servicio.obtenerCitasPorPaciente(999)).rejects.toThrow(
-                "No se encontró un paciente con el ID"
+                /paciente con ID 999 no existe/i
             );
         });
     });
