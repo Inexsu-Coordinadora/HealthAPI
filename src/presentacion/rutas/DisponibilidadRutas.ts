@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { DisponibilidadControlador } from "../controladores/DisponibilidadControlador.js";
 import { DisponibilidadServicio } from "../../core/aplicacion/casos-uso-disponibilidad/DisponibilidadServicio.js";
 import { DisponibilidadRepositorioPostgres } from "../../core/infraestructura/disponibilidad/DisponibilidadRepository.js";
@@ -12,36 +12,87 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
         disponibilidadServicio
     );
 
-    fastify.post("/disponibilidades", async (request, reply) => {
-        return disponibilidadControlador.crearDisponibilidad(request, reply);
-    });
+    fastify.post(
+        "/disponibilidades",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return disponibilidadControlador.crearDisponibilidad(
+                request,
+                reply
+            );
+        }
+    );
 
-    fastify.get("/disponibilidades/:id", async (request, reply) => {
-        return disponibilidadControlador.obtenerDisponibilidadPorId(
-            request,
-            reply
-        );
-    });
+    fastify.get(
+        "/disponibilidades/:id",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return disponibilidadControlador.obtenerDisponibilidadPorId(
+                request,
+                reply
+            );
+        }
+    );
 
-    fastify.get("/disponibilidades", async (request, reply) => {
-        return disponibilidadControlador.listarDisponibilidades(reply);
-    });
+    fastify.get(
+        "/disponibilidades",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return disponibilidadControlador.listarDisponibilidades(reply);
+        }
+    );
 
-    fastify.put("/disponibilidades/:id", async (request, reply) => {
-        return disponibilidadControlador.actualizarDisponibilidad(
-            request,
-            reply
-        );
-    });
+    fastify.put(
+        "/disponibilidades/:id",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return disponibilidadControlador.actualizarDisponibilidad(
+                request,
+                reply
+            );
+        }
+    );
 
-    fastify.delete("/disponibilidades/:id", async (request, reply) => {
-        return disponibilidadControlador.eliminarDisponibilidad(request, reply);
-    });
+    fastify.delete(
+        "/disponibilidades/:id",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return disponibilidadControlador.eliminarDisponibilidad(
+                request,
+                reply
+            );
+        }
+    );
 
     // Endpoints específicos por relaciones
     fastify.get(
-        "/medicos/:idMedico/disponibilidades",
-        async (request, reply) => {
+        "/disponibilidades/medico/:idMedico",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
             return disponibilidadControlador.obtenerDisponibilidadesPorMedico(
                 request,
                 reply
@@ -50,8 +101,13 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
     );
 
     fastify.get(
-        "/consultorios/:idConsultorio/disponibilidades",
-        async (request, reply) => {
+        "/disponibilidades/consultorio/:idConsultorio",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
             return disponibilidadControlador.obtenerDisponibilidadesPorConsultorio(
                 request,
                 reply

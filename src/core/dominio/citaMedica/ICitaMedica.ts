@@ -1,5 +1,3 @@
-// src/core/dominio/citaMedica/ICitaMedica.ts
-
 export interface ICitaMedica {
   idCita: number | null; 
   idPaciente: number; 

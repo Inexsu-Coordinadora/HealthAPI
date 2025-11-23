@@ -118,11 +118,14 @@ export class ConsultorioRepositorioPostgres implements IConsultorioRepositorio {
     }
 
     async obtenerPorNombre(nombre: string): Promise<IConsultorio | null> {
-        const query = "SELECT * FROM consultorio WHERE nombre_consultorio = $1";
+        const query =
+            "SELECT id_consultorio, nombre_consultorio, ubicacion_consultorio, capacidad_consultorio FROM consultorio WHERE nombre_consultorio = $1";
         const result = await ejecutarConsulta(query, [nombre]);
-    
-        if (result.rows.length === 0) return null;
-    
-    return this.mapearFilaAConsultorio(result.rows[0]);
-}
+
+        if (result.rows.length === 0) {
+            return null;
+        }
+
+        return this.mapearFilaAConsultorio(result.rows[0]);
+    }
 }

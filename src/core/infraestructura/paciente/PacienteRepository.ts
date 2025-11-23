@@ -93,13 +93,16 @@ export class PacienteRepositorioPostgres implements IPacienteRepositorio {
     }
 
     async obtenerPorCorreo(correo: string): Promise<IPaciente | null> {
-    const query = "SELECT * FROM paciente WHERE correo = $1";
-    const result = await ejecutarConsulta(query, [correo]);
-    
-    if (result.rows.length === 0) return null;
-    
-    return this.mapearFilaAPaciente(result.rows[0]);
-    }   
+        const query =
+            "SELECT id_paciente, nombre, correo, telefono FROM paciente WHERE correo = $1";
+        const result = await ejecutarConsulta(query, [correo]);
+
+        if (result.rows.length === 0) {
+            return null;
+        }
+
+        return this.mapearFilaAPaciente(result.rows[0]);
+    }
 
     // Método auxiliar: Mapear nombres de campos TypeScript a columnas SQL
     private mapearCampoAColumna(campo: string): string {
