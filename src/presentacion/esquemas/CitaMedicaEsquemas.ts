@@ -1,6 +1,4 @@
 import * as z from "zod";
-import type { IPacienteRepositorio } from "../../core/dominio/paciente/repositorio/IPacienteRepositorio.js";
-import type { IDisponibilidadRepositorio } from "../../core/dominio/disponibilidad/repositorio/IDisponibilidadRepositorio.js";
 import { CitaMedica } from "../../core/dominio/citaMedica/CitaMedica.js";
 import { esquemaIdParam, esquemaIdPositivo } from "./ValidacionesComunes.js";
 
@@ -27,9 +25,8 @@ export interface ActualizarCitaDTO {
 
 export interface AgendarCitaDTO {
     idPaciente: number;
+    fecha: Date ;
     idDisponibilidad: number;
-    idConsultorio?: number | null; 
-    fecha: Date;
     motivo?: string | null;
     observaciones?: string;
 }
@@ -104,32 +101,6 @@ export const esquemaCitaPorId = z.object({
     id: esquemaIdParam,
 });
 
-export const crearCitaConValidacionRepositorios = (
-    pacienteRepo: IPacienteRepositorio,
-    disponibilidadRepo: IDisponibilidadRepositorio
-) => {
-    return esquemaCrearCita
-        .refine(
-            async (data) => {
-                const paciente = await pacienteRepo.obtenerPacientePorId(data.idPaciente);
-                return paciente !== null;
-            },
-            {
-                message: "No se encontró el paciente con el ID especificado",
-                path: ["idPaciente"],
-            }
-        )
-        .refine(
-            async (data) => {
-                const disponibilidad = await disponibilidadRepo.obtenerDisponibilidadPorId(
-                    data.idDisponibilidad
-                );
-                return disponibilidad !== null;
-            },
-            {
-                message: "No se encontró la disponibilidad con el ID especificado",
-                path: ["idDisponibilidad"],
-            }
-        );
-        
-};
+
+
+

@@ -195,176 +195,53 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         const result = await ejecutarConsulta(query, [idDisponibilidad]);
         return result.rows.length > 0;
     }
+    async verificarDisponibilidadOcupada(
+    idDisponibilidad: number,
+    fecha: Date,
+    excluirCitaId?: number
+): Promise<boolean> {
+    let query = `
+        SELECT 1 FROM cita_medica
+        WHERE id_disponibilidad = $1
+        AND DATE(fecha) = DATE($2)
+        AND estado != 'cancelada'
+    `;
+    const params: any[] = [idDisponibilidad, fecha];
 
-    // Verificar traslape de citas para un paciente
+    if (excluirCitaId) {
+        query += ` AND id_cita != $${params.length + 1}`;
+        params.push(excluirCitaId);
+    }
+
+    const result = await ejecutarConsulta(query, params);
+    return result.rows.length > 0;
+}
+
     async verificarTraslapePaciente(
-        idPaciente: number,
-        horaInicio: string,
-        horaFin: string,
-        fecha?: Date,
-        excluirCitaId?: number
-    ): Promise<ICitaMedica | null> {
-        let query = `
-            SELECT ${this.columnasBase.map(col => `cm.${col}`).join(', ')}
-            FROM cita_medica cm
-            INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
-            WHERE cm.id_paciente = $1
-            AND cm.estado != 'cancelada'
-            AND (d.hora_fin > $2 AND d.hora_inicio < $3)
-        `;
-        const params: (number | string | Date)[] = [idPaciente, horaInicio, horaFin];
+    idPaciente: number,
+    horaInicio: string,
+    horaFin: string,
+    fecha: Date,
+    excluirCitaId?: number
+): Promise<boolean> {
+    let query = `
+        SELECT 1 FROM cita_medica cm
+        INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
+        WHERE cm.id_paciente = $1
+        AND DATE(cm.fecha) = DATE($2)
+        AND cm.estado != 'cancelada'
+        AND (d.hora_fin > $3 AND d.hora_inicio < $4)
+    `;
+    const params: any[] = [idPaciente, fecha, horaInicio, horaFin];
 
-        if (fecha) {
-            query += ` AND DATE(cm.fecha) = DATE($${params.length + 1})`;
-            params.push(fecha);
-        }
-
-        if (excluirCitaId) {
-            query += ` AND cm.id_cita != $${params.length + 1}`;
-            params.push(excluirCitaId);
-        }
-
-        query += ` LIMIT 1`;
-
-        const result = await ejecutarConsulta(query, params);
-        return result.rows.length > 0
-            ? this.mapearFilaACitaMedica(result.rows[0])
-            : null;
+    if (excluirCitaId) {
+        query += ` AND cm.id_cita != $${params.length + 1}`;
+        params.push(excluirCitaId);
     }
 
-    // Verificar traslape de citas para un médico
-    async verificarTraslapeMedico(
-        idMedico: number,
-        horaInicio: string,
-        horaFin: string,
-        fecha?: Date,
-        excluirCitaId?: number
-    ): Promise<ICitaMedica | null> {
-        let query = `
-            SELECT ${this.columnasBase.map(col => `cm.${col}`).join(', ')}
-            FROM cita_medica cm
-            INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
-            WHERE d.id_medico = $1
-            AND cm.estado != 'cancelada'
-            AND (d.hora_fin > $2 AND d.hora_inicio < $3)
-        `;
-        const params: (number | string | Date)[] = [idMedico, horaInicio, horaFin];
-
-        if (fecha) {
-            query += ` AND DATE(cm.fecha) = DATE($${params.length + 1})`;
-            params.push(fecha);
-        }
-
-        if (excluirCitaId) {
-            query += ` AND cm.id_cita != $${params.length + 1}`;
-            params.push(excluirCitaId);
-        }
-
-        query += ` LIMIT 1`;
-
-        const result = await ejecutarConsulta(query, params);
-        return result.rows.length > 0
-            ? this.mapearFilaACitaMedica(result.rows[0])
-            : null;
-    }
-
-    // Verificar traslape de citas para un consultorio
-    async verificarTraslapeConsultorio(
-        idConsultorio: number,
-        horaInicio: string,
-        horaFin: string,
-        fecha?: Date,
-        excluirCitaId?: number
-    ): Promise<ICitaMedica | null> {
-        let query = `
-            SELECT ${this.columnasBase.map(col => `cm.${col}`).join(', ')}
-            FROM cita_medica cm
-            INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
-            WHERE d.id_consultorio = $1
-            AND cm.estado != 'cancelada'
-            AND (d.hora_fin > $2 AND d.hora_inicio < $3)
-        `;
-        const params: (number | string | Date)[] = [idConsultorio, horaInicio, horaFin];
-
-        if (fecha) {
-            query += ` AND DATE(cm.fecha) = DATE($${params.length + 1})`;
-            params.push(fecha);
-        }
-
-        if (excluirCitaId) {
-            query += ` AND cm.id_cita != $${params.length + 1}`;
-            params.push(excluirCitaId);
-        }
-
-        query += ` LIMIT 1`;
-
-        const result = await ejecutarConsulta(query, params);
-        return result.rows.length > 0
-            ? this.mapearFilaACitaMedica(result.rows[0])
-            : null;
-    }
-
-    // Verificar citas superpuestas para médico
-    async verificarCitasSuperpuestasMedico(
-        idDisponibilidad: number, 
-        fecha: Date
-    ): Promise<boolean> {
-        const query = `
-            SELECT 1
-            FROM cita_medica cm
-            INNER JOIN disponibilidad d1 ON cm.id_disponibilidad = d1.id_disponibilidad
-            INNER JOIN disponibilidad d2 ON d1.id_medico = d2.id_medico
-            WHERE d2.id_disponibilidad = $1
-            AND cm.fecha BETWEEN $2::timestamp - interval '1 hour' 
-                            AND $2::timestamp + interval '1 hour'
-            AND cm.estado != 'cancelada'
-            LIMIT 1
-        `;
-
-        const result = await ejecutarConsulta(query, [idDisponibilidad, fecha]);
-        return result.rows.length > 0;
-    }
-
-    // Verificar citas superpuestas para consultorio
-    async verificarCitasSuperpuestasConsultorio(
-        idDisponibilidad: number, 
-        fecha: Date
-    ): Promise<boolean> {
-        const query = `
-            SELECT 1
-            FROM cita_medica cm
-            INNER JOIN disponibilidad d1 ON cm.id_disponibilidad = d1.id_disponibilidad
-            INNER JOIN disponibilidad d2 ON d1.id_consultorio = d2.id_consultorio
-            WHERE d2.id_disponibilidad = $1
-            AND d2.id_consultorio IS NOT NULL
-            AND cm.fecha BETWEEN $2::timestamp - interval '1 hour' 
-                            AND $2::timestamp + interval '1 hour'
-            AND cm.estado != 'cancelada'
-            LIMIT 1
-        `;
-
-        const result = await ejecutarConsulta(query, [idDisponibilidad, fecha]);
-        return result.rows.length > 0;
-    }
-
-    // Verificar citas superpuestas para paciente
-    async verificarCitasSuperpuestasPaciente(
-        idPaciente: number, 
-        fecha: Date
-    ): Promise<boolean> {
-        const query = `
-            SELECT 1
-            FROM cita_medica
-            WHERE id_paciente = $1
-            AND fecha BETWEEN $2::timestamp - interval '1 hour' 
-                        AND $2::timestamp + interval '1 hour'
-            AND estado != 'cancelada'
-            LIMIT 1
-        `;
-        
-        const result = await ejecutarConsulta(query, [idPaciente, fecha]);
-        return result.rows.length > 0;
-    }
+    const result = await ejecutarConsulta(query, params);
+    return result.rows.length > 0;
+}
 
     // 19. Obtener citas con detalles por paciente (para servicio 2)
     async obtenerCitasConDetallesPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]> {
@@ -375,6 +252,8 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
             cm.estado,
             cm.motivo,
             cm.observaciones,
+            c.id_consultorio,
+            c.nombre as nombre_consultorio,
             p.id_paciente,
             p.nombre as nombre_paciente,
             p.correo as correo_paciente,
@@ -387,6 +266,7 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         FROM cita_medica cm
         INNER JOIN paciente p ON cm.id_paciente = p.id_paciente
         INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
+        INNER JOIN consultorio c ON d.id_consultorio = c.id_consultorio
         INNER JOIN medico m ON d.id_medico = m.id_medico
         WHERE cm.id_paciente = $1
         ORDER BY cm.fecha DESC

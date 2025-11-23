@@ -11,9 +11,8 @@ import {
 import { validadorEsquemas } from "../esquemas/ValidadorZod.js";
 import {
     PacienteNoExisteError,
-    MedicoNoExisteError,
     DisponibilidadNoExisteError,
-    TraslapeCitaError,
+    TraslapePacienteError,
     FechaDisponibilidadInvalidaError,
     FechaInvalidaError,
 } from "../../core/aplicacion/casos-uso-cita/CitaMedicaServicio.js";
@@ -275,10 +274,10 @@ export class CitaControlador {
         }
 
         // Error: Traslape de horarios
-        if (error instanceof TraslapeCitaError) {
+        if (error instanceof TraslapePacienteError) {
             reply.status(409).send({
                 error: "Conflicto de horario",
-                mensaje: error.message,
+                mensaje:error.message,
             });
             return;
         }

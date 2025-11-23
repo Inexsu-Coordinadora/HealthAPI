@@ -17,27 +17,30 @@ importers:
       '@fastify/env':
         specifier: ^5.0.3
         version: 5.0.3
-      '@fastify/swagger':
-        specifier: ^9.6.1
-        version: 9.6.1
-      '@fastify/swagger-ui':
-        specifier: ^5.2.3
-        version: 5.2.3
+      '@types/jest':
+        specifier: ^30.0.0
+        version: 30.0.0
+      '@types/supertest':
+        specifier: ^6.0.3
+        version: 6.0.3
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
       fastify:
         specifier: ^5.6.2
         version: 5.6.2
+      jest:
+        specifier: ^30.2.0
+        version: 30.2.0(@types/node@24.10.1)
       pg:
         specifier: ^8.16.3
         version: 8.16.3
-      pino:
-        specifier: ^10.1.0
-        version: 10.1.0
-      pino-pretty:
-        specifier: ^13.1.2
-        version: 13.1.2
+      supertest:
+        specifier: ^7.1.4
+        version: 7.1.4
+      ts-jest:
+        specifier: ^29.4.5
+        version: 29.4.5(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(jest-util@30.2.0)(jest@30.2.0(@types/node@24.10.1))(typescript@5.9.3)
       uuid:
         specifier: ^13.0.0
         version: 13.0.0
@@ -72,21 +75,12 @@ importers:
       eslint:
         specifier: ^9.38.0
         version: 9.39.1
-      jest:
-        specifier: ^30.2.0
-        version: 30.2.0(@types/node@24.10.1)
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
       rimraf:
         specifier: ^6.1.0
         version: 6.1.2
-      supertest:
-        specifier: ^7.1.4
-        version: 7.1.4
-      ts-jest:
-        specifier: ^29.4.5
-        version: 29.4.5(@babel/core@7.28.5)(@jest/transform@30.2.0)(@jest/types@30.2.0)(babel-jest@30.2.0(@babel/core@7.28.5))(jest-util@30.2.0)(jest@30.2.0(@types/node@24.10.1))(typescript@5.9.3)
       tsc-watch:
         specifier: ^7.2.0
         version: 7.2.0(typescript@5.9.3)
@@ -484,10 +478,13 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
+<<<<<<< HEAD
   '@lukeed/ms@2.0.2':
     resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
     engines: {node: '>=8'}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
 
@@ -937,9 +934,12 @@ packages:
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
 
+<<<<<<< HEAD
   colorette@2.0.20:
     resolution: {integrity: sha512-IfEDxwoWIjkeXL1eXcDiow4UbKjhLdq6/EuSVR9GMN7KVH3r9gQ83e73hsz1Nd1T3ijd5xv1wcWRYO+D6kCI2w==}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
@@ -950,10 +950,13 @@ packages:
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
+<<<<<<< HEAD
   content-disposition@0.5.4:
     resolution: {integrity: sha512-FveZTNuGw04cxlAiWbzi6zTAL/lhehaWbTtgluJh4/E95DqMwTmha3KZN1aAWA8cFIhHzMZUvLevkw5Rqk+tSQ==}
     engines: {node: '>= 0.6'}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
@@ -999,10 +1002,13 @@ packages:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
 
+<<<<<<< HEAD
   depd@2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
@@ -1074,9 +1080,12 @@ packages:
     resolution: {integrity: sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==}
     engines: {node: '>=6'}
 
+<<<<<<< HEAD
   escape-html@1.0.3:
     resolution: {integrity: sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   escape-string-regexp@2.0.0:
     resolution: {integrity: sha512-UpzcLCXolUWcNu5HtVMHYdXJjArjsF9C0aNnquZYY4uW/Vu0miy5YoWvbV345HauVvcAUnpRuhMMcqTcGOY2+w==}
     engines: {node: '>=8'}
@@ -1147,9 +1156,12 @@ packages:
     resolution: {integrity: sha512-u/feCi0GPsI+988gU2FLcsHyAHTU0MX1Wg68NhAnN7z/+C5wqG+CY8J53N9ioe8RXgaoz0nBR/TYMf3AycUuPw==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
 
+<<<<<<< HEAD
   fast-copy@3.0.2:
     resolution: {integrity: sha512-dl0O9Vhju8IrcLndv2eU4ldt1ftXMqqfgN4H1cpmGV7P6jeB9FwpN9a2c8DPGE1Ys88rNUJVYDHq73CGAGOPfQ==}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   fast-decode-uri-component@1.0.1:
     resolution: {integrity: sha512-WKgKWg5eUxvRZGwW8FvfbaH7AXSh2cL+3j5fMGzUMCxWBJ3dV3a7Wz8y2f/uQ0e3B6WmodD3oS54jTQ9HVTIIg==}
 
@@ -1277,11 +1289,14 @@ packages:
 
   glob@10.5.0:
     resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
+<<<<<<< HEAD
     hasBin: true
 
   glob@11.1.0:
     resolution: {integrity: sha512-vuNwKSaKiqm7g0THUBu2x7ckSs3XJLXE+2ssL7/MfTGPLLcrJQ/4Uq1CjPTtO5cCIiRxqvN6Twy1qOwhL0Xjcw==}
     engines: {node: 20 || >=22}
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
     hasBin: true
 
   glob@13.0.0:
@@ -1327,6 +1342,7 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
+<<<<<<< HEAD
   help-me@5.0.0:
     resolution: {integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==}
 
@@ -1337,6 +1353,11 @@ packages:
     resolution: {integrity: sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ==}
     engines: {node: '>= 0.8'}
 
+=======
+  html-escaper@2.0.2:
+    resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
+
+>>>>>>> feature/3-mejoras-agendamiento-citas
   human-signals@2.1.0:
     resolution: {integrity: sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==}
     engines: {node: '>=10.17.0'}
@@ -1406,6 +1427,7 @@ packages:
   istanbul-lib-coverage@3.2.2:
     resolution: {integrity: sha512-O8dpsF+r0WV/8MNRKfnmrtCWhuKjxrq2w+jpzBL5UZKTi2LeVWnWOmWRxFlesJONmc+wLAGvKQZEOanko0LFTg==}
     engines: {node: '>=8'}
+<<<<<<< HEAD
 
   istanbul-lib-instrument@6.0.3:
     resolution: {integrity: sha512-Vtgk7L/R2JHyyGW07spoFlB8/lpjiOLTjMdms6AFMraYt3BaJauod/NGrfnVG/y4Ix1JEuMRPDPEj2ua+zz1/Q==}
@@ -1430,6 +1452,28 @@ packages:
     resolution: {integrity: sha512-zptv57P3GpL+O0I7VdMJNBZCu+BPHVQUk55Ft8/QCJjTVxrnJHuVuX/0Bl2A6/+2oyR/ZMEuFKwmzqqZ/U5nPQ==}
     engines: {node: 20 || >=22}
 
+=======
+
+  istanbul-lib-instrument@6.0.3:
+    resolution: {integrity: sha512-Vtgk7L/R2JHyyGW07spoFlB8/lpjiOLTjMdms6AFMraYt3BaJauod/NGrfnVG/y4Ix1JEuMRPDPEj2ua+zz1/Q==}
+    engines: {node: '>=10'}
+
+  istanbul-lib-report@3.0.1:
+    resolution: {integrity: sha512-GCfE1mtsHGOELCU8e/Z7YWzpmybrx/+dSTfLrvY8qRmaY6zXTKWn6WQIjaAFw069icm6GVMNkgu0NzI4iPZUNw==}
+    engines: {node: '>=10'}
+
+  istanbul-lib-source-maps@5.0.6:
+    resolution: {integrity: sha512-yg2d+Em4KizZC5niWhQaIomgf5WlL4vOOjZ5xGCmF8SnPE/mDWWXgvRExdcpCgh9lLRRa1/fSYp2ymmbJ1pI+A==}
+    engines: {node: '>=10'}
+
+  istanbul-reports@3.2.0:
+    resolution: {integrity: sha512-HGYWWS/ehqTV3xN10i23tkPkpH46MLCIMFNCaaKNavAXTF1RkqxawEPtnjnGZ6XKSInBKkiOA5BKS+aZiY3AvA==}
+    engines: {node: '>=8'}
+
+  jackspeak@3.4.3:
+    resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
+
+>>>>>>> feature/3-mejoras-agendamiento-citas
   jest-changed-files@30.2.0:
     resolution: {integrity: sha512-L8lR1ChrRnSdfeOvTrwZMlnWV8G/LLjQ0nG9MBclwWZidA2N5FviRki0Bvh20WRMOX31/JYvzdqTJrk5oBdydQ==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
@@ -1558,10 +1602,13 @@ packages:
       node-notifier:
         optional: true
 
+<<<<<<< HEAD
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -1691,11 +1738,14 @@ packages:
     engines: {node: '>=4.0.0'}
     hasBin: true
 
+<<<<<<< HEAD
   mime@3.0.0:
     resolution: {integrity: sha512-jSCU7/VB1loIWBZe14aEYHU/+1UMEHoaO7qxCOVJOw9GgH72VAWppxNcjU+x9a2k3GSIBXNKxXQFqRvvZ7vr3A==}
     engines: {node: '>=10.0.0'}
     hasBin: true
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   mimic-fn@2.1.0:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}
     engines: {node: '>=6'}
@@ -1764,9 +1814,12 @@ packages:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
     engines: {node: '>=6'}
 
+<<<<<<< HEAD
   openapi-types@12.1.3:
     resolution: {integrity: sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw==}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
@@ -1932,9 +1985,12 @@ packages:
     engines: {node: '>= 0.10'}
     hasBin: true
 
+<<<<<<< HEAD
   pump@3.0.3:
     resolution: {integrity: sha512-todwxLMY7/heScKmntwQG8CXVkWUOdYxIvY2s0VWAAMh/nd8SoYiRaKjlr7+iCs984f2P8zvrfWcDDYVb73NfA==}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
@@ -2085,10 +2141,13 @@ packages:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
     engines: {node: '>=10'}
 
+<<<<<<< HEAD
   statuses@2.0.2:
     resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
     engines: {node: '>= 0.8'}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   stream-combiner@0.0.4:
     resolution: {integrity: sha512-rT00SPnTVyRsaSz5zgSPma/aHSOic5U1prhYdRy5HS2kTZviFpmDgzilbtsJsxiroqACmayynDN/9VzIbX5DOw==}
 
@@ -2128,10 +2187,13 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
+<<<<<<< HEAD
   strip-json-comments@5.0.3:
     resolution: {integrity: sha512-1tB5mhVo7U+ETBKNf92xT4hrQa3pm0MZ0PQvuDnWgAAGHDsfp4lPSpiS6psrSiet87wyGPh9ft6wmhOMQ0hDiw==}
     engines: {node: '>=14.16'}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   superagent@10.2.3:
     resolution: {integrity: sha512-y/hkYGeXAj7wUMjxRbB21g/l6aAEituGXM9Rwl4o20+SX3e8YOSV6BxFXl+dL3Uk0mjSL3kCbNkwURm8/gEDig==}
     engines: {node: '>=14.18.0'}
@@ -2173,10 +2235,13 @@ packages:
     resolution: {integrity: sha512-/m8M+2BJUpoJdgAHoG+baCwBT+tf2VraSfkBgl0Y00qIWt41DJ8R5B8nsEw0I58YwF5IZH6z24/2TobDKnqSWw==}
     engines: {node: '>=12'}
 
+<<<<<<< HEAD
   toidentifier@1.0.1:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
     engines: {node: '>=0.6'}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   ts-api-utils@2.1.0:
     resolution: {integrity: sha512-CUgTZL1irw8u29bzrOD/nH85jqyc74D6SshFgujOIA7osm2Rz7dYH77agkx7H4FBNxDq7Cjf+IjaX/8zwFW+ZQ==}
     engines: {node: '>=18.12'}
@@ -2310,11 +2375,14 @@ packages:
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
 
+<<<<<<< HEAD
   yaml@2.8.1:
     resolution: {integrity: sha512-lcYcMxX2PO9XMGvAJkJ3OsNMw+/7FKes7/hgerGUYWIoWu5j/+YQqcZr5JnPZWzOsEBgMbSbiSTn/dv/69Mkpw==}
     engines: {node: '>= 14.6'}
     hasBin: true
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   yargs-parser@21.1.1:
     resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}
     engines: {node: '>=12'}
@@ -2889,8 +2957,11 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+<<<<<<< HEAD
   '@lukeed/ms@2.0.2': {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   '@napi-rs/wasm-runtime@0.2.12':
     dependencies:
       '@emnapi/core': 1.7.1
@@ -3364,8 +3435,11 @@ snapshots:
 
   color-name@1.1.4: {}
 
+<<<<<<< HEAD
   colorette@2.0.20: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   combined-stream@1.0.8:
     dependencies:
       delayed-stream: 1.0.0
@@ -3374,10 +3448,13 @@ snapshots:
 
   concat-map@0.0.1: {}
 
+<<<<<<< HEAD
   content-disposition@0.5.4:
     dependencies:
       safe-buffer: 5.2.1
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   convert-source-map@2.0.0: {}
 
   cookie@1.0.2: {}
@@ -3390,8 +3467,11 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
+<<<<<<< HEAD
   dateformat@4.6.3: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   debug@4.4.3:
     dependencies:
       ms: 2.1.3
@@ -3404,8 +3484,11 @@ snapshots:
 
   delayed-stream@1.0.0: {}
 
+<<<<<<< HEAD
   depd@2.0.0: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   dequal@2.0.3: {}
 
   detect-newline@3.1.0: {}
@@ -3468,8 +3551,11 @@ snapshots:
 
   escalade@3.2.0: {}
 
+<<<<<<< HEAD
   escape-html@1.0.3: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   escape-string-regexp@2.0.0: {}
 
   escape-string-regexp@4.0.0: {}
@@ -3575,8 +3661,11 @@ snapshots:
       jest-mock: 30.2.0
       jest-util: 30.2.0
 
+<<<<<<< HEAD
   fast-copy@3.0.2: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   fast-decode-uri-component@1.0.1: {}
 
   fast-deep-equal@3.1.3: {}
@@ -3732,6 +3821,7 @@ snapshots:
       is-glob: 4.0.3
 
   glob@10.5.0:
+<<<<<<< HEAD
     dependencies:
       foreground-child: 3.3.1
       jackspeak: 3.4.3
@@ -3741,13 +3831,19 @@ snapshots:
       path-scurry: 1.11.1
 
   glob@11.1.0:
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
     dependencies:
       foreground-child: 3.3.1
-      jackspeak: 4.1.1
-      minimatch: 10.1.1
+      jackspeak: 3.4.3
+      minimatch: 9.0.5
       minipass: 7.1.2
       package-json-from-dist: 1.0.1
+<<<<<<< HEAD
       path-scurry: 2.0.1
+=======
+      path-scurry: 1.11.1
+>>>>>>> feature/3-mejoras-agendamiento-citas
 
   glob@13.0.0:
     dependencies:
@@ -3793,6 +3889,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
+<<<<<<< HEAD
   help-me@5.0.0: {}
 
   html-escaper@2.0.2: {}
@@ -3805,6 +3902,10 @@ snapshots:
       statuses: 2.0.2
       toidentifier: 1.0.1
 
+=======
+  html-escaper@2.0.2: {}
+
+>>>>>>> feature/3-mejoras-agendamiento-citas
   human-signals@2.1.0: {}
 
   ignore@5.3.2: {}
@@ -3882,14 +3983,19 @@ snapshots:
       istanbul-lib-report: 3.0.1
 
   jackspeak@3.4.3:
+<<<<<<< HEAD
     dependencies:
       '@isaacs/cliui': 8.0.2
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
 
   jackspeak@4.1.1:
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
     dependencies:
       '@isaacs/cliui': 8.0.2
+    optionalDependencies:
+      '@pkgjs/parseargs': 0.11.0
 
   jest-changed-files@30.2.0:
     dependencies:
@@ -4202,8 +4308,11 @@ snapshots:
       - supports-color
       - ts-node
 
+<<<<<<< HEAD
   joycon@3.1.1: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   js-tokens@4.0.0: {}
 
   js-yaml@3.14.2:
@@ -4313,8 +4422,11 @@ snapshots:
 
   mime@2.6.0: {}
 
+<<<<<<< HEAD
   mime@3.0.0: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   mimic-fn@2.1.0: {}
 
   minimatch@10.1.1:
@@ -4365,8 +4477,11 @@ snapshots:
     dependencies:
       mimic-fn: 2.1.0
 
+<<<<<<< HEAD
   openapi-types@12.1.3: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   optionator@0.9.4:
     dependencies:
       deep-is: 0.1.4
@@ -4538,11 +4653,14 @@ snapshots:
     dependencies:
       event-stream: 3.3.4
 
+<<<<<<< HEAD
   pump@3.0.3:
     dependencies:
       end-of-stream: 1.4.5
       once: 1.4.0
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   punycode@2.3.1: {}
 
   pure-rand@7.0.1: {}
@@ -4667,8 +4785,11 @@ snapshots:
     dependencies:
       escape-string-regexp: 2.0.0
 
+<<<<<<< HEAD
   statuses@2.0.2: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   stream-combiner@0.0.4:
     dependencies:
       duplexer: 0.1.2
@@ -4706,8 +4827,11 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
+<<<<<<< HEAD
   strip-json-comments@5.0.3: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   superagent@10.2.3:
     dependencies:
       component-emitter: 1.3.1
@@ -4761,8 +4885,11 @@ snapshots:
 
   toad-cache@3.7.0: {}
 
+<<<<<<< HEAD
   toidentifier@1.0.1: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   ts-api-utils@2.1.0(typescript@5.9.3):
     dependencies:
       typescript: 5.9.3
@@ -4894,8 +5021,11 @@ snapshots:
 
   yallist@3.1.1: {}
 
+<<<<<<< HEAD
   yaml@2.8.1: {}
 
+=======
+>>>>>>> feature/3-mejoras-agendamiento-citas
   yargs-parser@21.1.1: {}
 
   yargs@17.7.2:
