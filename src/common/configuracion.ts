@@ -1,18 +1,17 @@
+import { config } from "dotenv";
 
-import * as dotenv from "dotenv";
-
-dotenv.config();
+config();
 
 export const configuracion = {
     baseDatos: {
         host: process.env.DB_HOST,
-        puerto: Number(process.env.DB_PORT) ,
-        nombreDB: process.env.DB_NAME ,
-        usuario: process.env.DB_USER ,
-        contrasena: process.env.DB_PASSWORD ,
+        puerto: Number(process.env.DB_PORT),
+        nombreDB: process.env.DB_NAME,
+        usuario: process.env.DB_USER,
+        contrasena: process.env.DB_PASSWORD,
     },
     servidor: {
-        puerto: Number(process.env.PUERTO) ,
-        entorno: process.env.NODE_ENV 
+        puerto: Number(process.env.PUERTO),
+        entorno: process.env.NODE_ENV,
     },
 };
