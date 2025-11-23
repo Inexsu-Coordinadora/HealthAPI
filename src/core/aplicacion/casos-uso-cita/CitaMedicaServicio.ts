@@ -3,7 +3,7 @@ import type { ICitaMedicaConDetalles } from "../../dominio/citaMedica/ICitaMedic
 import type { ICitaMedicaRepositorio } from "../../dominio/citaMedica/repositorio/ICitaMedicaRepositorio.js";
 import type { IDisponibilidadRepositorio } from "../../dominio/disponibilidad/repositorio/IDisponibilidadRepositorio.js";
 import type { IPacienteRepositorio } from "../../dominio/paciente/repositorio/IPacienteRepositorio.js";
-import { FechaUtil } from "../../../common/utilidades/FormatoFecha.js"; // ✅ Corregido import
+import { FechaUtil } from "../../../common/utilidades/FormatoFecha.js";
 
 // ERRORES TIPADOS
 
