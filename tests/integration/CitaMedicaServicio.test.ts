@@ -12,6 +12,7 @@ import type { IPaciente } from "../../src/core/dominio/paciente/IPaciente.js";
 import type { IMedico } from "../../src/core/dominio/medico/IMedico.js";
 import type { IConsultorio } from "../../src/core/dominio/consultorio/IConsultorio.js";
 import { IDisponibilidad } from "../../src/core/dominio/disponibilidad/IDisponibilidad.js";
+import { pool } from "../../src/core/infraestructura/DBpostgres.js";
 
 describe("CitaMedicaServicio - Tests de Integración", () => {
     let citaRepo: CitaMedicaRepositorioPostgres;
@@ -28,6 +29,11 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
     const citasCreadas: number[] = [];
 
     beforeAll(async () => {
+        await pool.query('DELETE FROM cita_medica');
+        await pool.query('DELETE FROM disponibilidad');
+        await pool.query('DELETE FROM consultorio');
+        await pool.query('DELETE FROM medico');
+        await pool.query('DELETE FROM paciente');
         citaRepo = new CitaMedicaRepositorioPostgres();
         disponibilidadRepo = new DisponibilidadRepositorioPostgres();
         pacienteRepo = new PacienteRepositorioPostgres();
