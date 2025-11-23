@@ -6,6 +6,7 @@ import Fastify, {
 import swagger from "@fastify/swagger";
 import swaggerUi from "@fastify/swagger-ui";
 import { configuracion } from "../common/configuracion.js";
+import { AppError } from "../common/errores/AppError.js";
 import { pacienteRutas } from "./rutas/PacienteRutas.js";
 import { medicoRutas } from "./rutas/MedicoRutas.js";
 import { citaRutas } from "./rutas/CitaMedicaRutas.js";
@@ -84,26 +85,48 @@ await app.register(swaggerUi, {
 });
 
 // Middleware de manejo de errores global
-app.setErrorHandler<FastifyError>(
-    (error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
-        const statusCode = error.statusCode || 500;
+app.setErrorHandler(
+    (error: Error | AppError, request: FastifyRequest, reply: FastifyReply) => {
+        // Determinar si es un error operacional o del servidor
+        const isAppError = error instanceof AppError;
+        const statusCode = isAppError ? error.statusCode : 500;
 
-        app.log.error({
-            error: {
-                message: error.message,
-                stack: error.stack,
-                statusCode,
-            },
-            request: {
-                method: request.method,
-                url: request.url,
-                params: request.params,
-                query: request.query,
-            },
-        });
+        // Log diferenciado por tipo de error
+        if (isAppError && error.isOperational) {
+            // Errores operacionales (400, 404, 409) - nivel warn
+            app.log.warn({
+                error: {
+                    message: error.message,
+                    statusCode,
+                    type: error.constructor.name,
+                },
+                request: {
+                    method: request.method,
+                    url: request.url,
+                    params: request.params,
+                    query: request.query,
+                },
+            });
+        } else {
+            // Errores del servidor (500) - nivel error con stack
+            app.log.error({
+                error: {
+                    message: error.message,
+                    stack: error.stack,
+                    statusCode,
+                },
+                request: {
+                    method: request.method,
+                    url: request.url,
+                    params: request.params,
+                    query: request.query,
+                    body: request.body,
+                },
+            });
+        }
 
         reply.status(statusCode).send({
-            error: error.name || "Error",
+            error: isAppError ? error.constructor.name : "InternalServerError",
             message: error.message || "Error interno del servidor",
             statusCode,
             timestamp: new Date().toISOString(),
