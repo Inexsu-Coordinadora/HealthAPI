@@ -1,6 +1,10 @@
 import type { IMedicoRepositorio } from "../../dominio/medico/repositorio/IMedicoRepositorio.js";
 import type { IMedico } from "../../dominio/medico/IMedico.js";
 import { Medico } from "../../dominio/medico/Medico.js";
+import {
+    BadRequestError,
+    ConflictError,
+} from "../../../common/errores/AppError.js";
 
 export class MedicoServicio {
     constructor(private readonly medicoRepositorio: IMedicoRepositorio) {}
@@ -13,21 +17,32 @@ export class MedicoServicio {
         );
 
         if (!datos.correoMedico || datos.correoMedico.trim() === "") {
-            throw new Error("El correo del médico es obligatorio");
+            throw new BadRequestError("El correo del médico es obligatorio");
         }
 
-        if (!datos.especialidadMedico || datos.especialidadMedico.trim() === "") {
-            throw new Error("La especialidad del médico es obligatoria");
+        if (
+            !datos.especialidadMedico ||
+            datos.especialidadMedico.trim() === ""
+        ) {
+            throw new BadRequestError(
+                "La especialidad del médico es obligatoria"
+            );
         }
 
-        const medicoExistente = await this.medicoRepositorio.obtenerPorCorreo(datos.correoMedico);
-            if (medicoExistente) {
-        throw new Error(`Ya existe un médico con el correo ${datos.correoMedico}`);
+        const medicoExistente = await this.medicoRepositorio.obtenerPorCorreo(
+            datos.correoMedico
+        );
+        if (medicoExistente) {
+            throw new ConflictError(
+                `Ya existe un médico con el correo ${datos.correoMedico}`
+            );
         }
 
         // VALIDACIÓN DEL FORMATO DEL CORREO
         if (!Medico.validarCorreo(nuevoMedico.correoMedico)) {
-            throw new Error("El formato del correo electrónico es inválido");
+            throw new BadRequestError(
+                "El formato del correo electrónico es inválido"
+            );
         }
 
         // GUARDAR EN EL REPOSITORIO
@@ -48,7 +63,9 @@ export class MedicoServicio {
     ): Promise<IMedico | null> {
         const medicoExistente =
             await this.medicoRepositorio.obtenerMedicoPorId(id);
-        if (!medicoExistente) {return null;}
+        if (!medicoExistente) {
+            return null;
+        }
 
         return await this.medicoRepositorio.actualizarMedico(
             id,
