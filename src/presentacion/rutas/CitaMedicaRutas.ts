@@ -15,32 +15,87 @@ export async function citaRutas(fastify: FastifyInstance) {
         pacienteRepositorio
     );
     const citaControlador = new CitaControlador(citaServicio);
-    
 
-    fastify.post("/citas", async (request: FastifyRequest, reply: FastifyReply) => {
-        return citaControlador.crearCita(request, reply);
-    });
+    fastify.post(
+        "/citas",
+        {
+            schema: {
+                tags: ["Citas"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return citaControlador.crearCita(request, reply);
+        }
+    );
 
-    fastify.get("/citas/:id", async (request: FastifyRequest, reply: FastifyReply) => {
-        return citaControlador.obtenerCitaPorId(request, reply);
-    });
+    fastify.get(
+        "/citas/:id",
+        {
+            schema: {
+                tags: ["Citas"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return citaControlador.obtenerCitaPorId(request, reply);
+        }
+    );
 
-    fastify.get("/citas", async (request: FastifyRequest, reply: FastifyReply) => {
-        return citaControlador.listarCitas(reply);
-    });
+    fastify.get(
+        "/citas",
+        {
+            schema: {
+                tags: ["Citas"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return citaControlador.listarCitas(reply);
+        }
+    );
 
-    fastify.put("/citas/:id", async (request: FastifyRequest, reply: FastifyReply) => {
-        return citaControlador.actualizarCita(request, reply);
-    });
+    fastify.put(
+        "/citas/:id",
+        {
+            schema: {
+                tags: ["Citas"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return citaControlador.actualizarCita(request, reply);
+        }
+    );
 
-    fastify.delete("/citas/:id", async (request: FastifyRequest, reply: FastifyReply) => {
-        return citaControlador.eliminarCita(request, reply);
-    });
+    fastify.delete(
+        "/citas/:id",
+        {
+            schema: {
+                tags: ["Citas"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return citaControlador.eliminarCita(request, reply);
+        }
+    );
 
-    fastify.post("/citas/agendar", async (request: FastifyRequest, reply: FastifyReply) => {
-        return citaControlador.crearCita(request, reply);
-    });
-    fastify.get("/pacientes/:idPaciente/citas", async (request: FastifyRequest, reply: FastifyReply) => {
-        return citaControlador.consultarCitasPorPaciente(request, reply);
-    });
+    fastify.post(
+        "/citas/agendar",
+        {
+            schema: {
+                tags: ["Citas"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return citaControlador.crearCita(request, reply);
+        }
+    );
+    fastify.get(
+        "/pacientes/:idPaciente/citas",
+        {
+            schema: {
+                tags: ["Citas"],
+            },
+        },
+        async (request: FastifyRequest, reply: FastifyReply) => {
+            return citaControlador.consultarCitasPorPaciente(request, reply);
+        }
+    );
 }

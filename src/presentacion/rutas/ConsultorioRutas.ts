@@ -12,6 +12,11 @@ export async function consultorioRutas(fastify: FastifyInstance) {
 
     fastify.post(
         "/consultorios",
+        {
+            schema: {
+                tags: ["Consultorios"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return consultorioControlador.crearConsultorio(request, reply);
         }
@@ -19,6 +24,11 @@ export async function consultorioRutas(fastify: FastifyInstance) {
 
     fastify.get(
         "/consultorios/:id",
+        {
+            schema: {
+                tags: ["Consultorios"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return consultorioControlador.obtenerConsultorioPorId(
                 request,
@@ -29,6 +39,11 @@ export async function consultorioRutas(fastify: FastifyInstance) {
 
     fastify.get(
         "/consultorios",
+        {
+            schema: {
+                tags: ["Consultorios"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return consultorioControlador.listarConsultorios(reply);
         }
@@ -36,6 +51,11 @@ export async function consultorioRutas(fastify: FastifyInstance) {
 
     fastify.put(
         "/consultorios/:id",
+        {
+            schema: {
+                tags: ["Consultorios"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return consultorioControlador.actualizarConsultorio(request, reply);
         }
@@ -43,6 +63,11 @@ export async function consultorioRutas(fastify: FastifyInstance) {
 
     fastify.delete(
         "/consultorios/:id",
+        {
+            schema: {
+                tags: ["Consultorios"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return consultorioControlador.eliminarConsultorio(request, reply);
         }

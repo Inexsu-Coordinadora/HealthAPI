@@ -10,6 +10,11 @@ export async function medicoRutas(fastify: FastifyInstance) {
 
     fastify.post(
         "/medicos",
+        {
+            schema: {
+                tags: ["Médicos"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return medicoControlador.crearMedico(request, reply);
         }
@@ -17,6 +22,11 @@ export async function medicoRutas(fastify: FastifyInstance) {
 
     fastify.get(
         "/medicos/:id",
+        {
+            schema: {
+                tags: ["Médicos"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return medicoControlador.obtenerMedicoPorId(request, reply);
         }
@@ -24,6 +34,11 @@ export async function medicoRutas(fastify: FastifyInstance) {
 
     fastify.get(
         "/medicos",
+        {
+            schema: {
+                tags: ["Médicos"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return medicoControlador.listarMedicos(reply);
         }
@@ -31,6 +46,11 @@ export async function medicoRutas(fastify: FastifyInstance) {
 
     fastify.put(
         "/medicos/:id",
+        {
+            schema: {
+                tags: ["Médicos"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return medicoControlador.actualizarMedico(request, reply);
         }
@@ -38,6 +58,11 @@ export async function medicoRutas(fastify: FastifyInstance) {
 
     fastify.delete(
         "/medicos/:id",
+        {
+            schema: {
+                tags: ["Médicos"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return medicoControlador.eliminarMedico(request, reply);
         }

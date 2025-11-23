@@ -14,6 +14,11 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
 
     fastify.post(
         "/disponibilidades",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return disponibilidadControlador.crearDisponibilidad(
                 request,
@@ -24,6 +29,11 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
 
     fastify.get(
         "/disponibilidades/:id",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return disponibilidadControlador.obtenerDisponibilidadPorId(
                 request,
@@ -34,6 +44,11 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
 
     fastify.get(
         "/disponibilidades",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return disponibilidadControlador.listarDisponibilidades(reply);
         }
@@ -41,6 +56,11 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
 
     fastify.put(
         "/disponibilidades/:id",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return disponibilidadControlador.actualizarDisponibilidad(
                 request,
@@ -51,6 +71,11 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
 
     fastify.delete(
         "/disponibilidades/:id",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return disponibilidadControlador.eliminarDisponibilidad(
                 request,
@@ -62,6 +87,11 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
     // Endpoints específicos por relaciones
     fastify.get(
         "/disponibilidades/medico/:idMedico",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return disponibilidadControlador.obtenerDisponibilidadesPorMedico(
                 request,
@@ -72,6 +102,11 @@ export async function disponibilidadRutas(fastify: FastifyInstance) {
 
     fastify.get(
         "/disponibilidades/consultorio/:idConsultorio",
+        {
+            schema: {
+                tags: ["Disponibilidad"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return disponibilidadControlador.obtenerDisponibilidadesPorConsultorio(
                 request,

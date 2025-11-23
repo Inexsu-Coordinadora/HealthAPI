@@ -10,6 +10,11 @@ export async function pacienteRutas(fastify: FastifyInstance) {
 
     fastify.post(
         "/pacientes",
+        {
+            schema: {
+                tags: ["Pacientes"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return pacienteControlador.crearPaciente(request, reply);
         }
@@ -17,6 +22,11 @@ export async function pacienteRutas(fastify: FastifyInstance) {
 
     fastify.get(
         "/pacientes/:id",
+        {
+            schema: {
+                tags: ["Pacientes"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return pacienteControlador.obtenerPacientePorId(request, reply);
         }
@@ -24,6 +34,11 @@ export async function pacienteRutas(fastify: FastifyInstance) {
 
     fastify.get(
         "/pacientes",
+        {
+            schema: {
+                tags: ["Pacientes"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return pacienteControlador.listarPacientes(reply);
         }
@@ -31,6 +46,11 @@ export async function pacienteRutas(fastify: FastifyInstance) {
 
     fastify.put(
         "/pacientes/:id",
+        {
+            schema: {
+                tags: ["Pacientes"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return pacienteControlador.actualizarPaciente(request, reply);
         }
@@ -38,6 +58,11 @@ export async function pacienteRutas(fastify: FastifyInstance) {
 
     fastify.delete(
         "/pacientes/:id",
+        {
+            schema: {
+                tags: ["Pacientes"],
+            },
+        },
         async (request: FastifyRequest, reply: FastifyReply) => {
             return pacienteControlador.eliminarPaciente(request, reply);
         }
