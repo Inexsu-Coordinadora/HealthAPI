@@ -1,17 +1,18 @@
-import dotenv from "dotenv";
+
+import * as dotenv from "dotenv";
 
 dotenv.config();
 
 export const configuracion = {
     baseDatos: {
-        host: process.env.DB_HOST || "localhost",
-        puerto: Number(process.env.DB_PORT) || 5432,
-        nombreDB: process.env.DB_NAME || "healthapi",
-        usuario: process.env.DB_USER || "postgres",
-        contrasena: process.env.DB_PASSWORD || "pokemon3",
+        host: process.env.DB_HOST,
+        puerto: Number(process.env.DB_PORT) ,
+        nombreDB: process.env.DB_NAME ,
+        usuario: process.env.DB_USER ,
+        contrasena: process.env.DB_PASSWORD ,
     },
     servidor: {
-        puerto: Number(process.env.PUERTO) || 3000,
-        entorno: process.env.NODE_ENV || "development",
+        puerto: Number(process.env.PUERTO) ,
+        entorno: process.env.NODE_ENV 
     },
 };

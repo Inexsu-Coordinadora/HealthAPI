@@ -5,11 +5,9 @@ import type { ICitaMedica } from "../../core/dominio/citaMedica/ICitaMedica.js";
 import {
     esquemaCitaPorId,
     esquemaActualizarCita,
-    crearCitaConValidacionRepositorios,
+    esquemaCrearCita, // ⬅️ CAMBIAR: importar esquemaCrearCita en lugar de crearCitaConValidacionRepositorios
 } from "../esquemas/CitaMedicaEsquemas.js";
 import { validadorEsquemas } from "../esquemas/ValidadorZod.js";
-import { PacienteRepositorioPostgres } from "../../core/infraestructura/paciente/PacienteRepository.js";
-import { DisponibilidadRepositorioPostgres } from "../../core/infraestructura/disponibilidad/DisponibilidadRepository.js";
 
 enum Mensajes {
     "200_POST_OK" = "Cita médica creada exitosamente",
@@ -25,16 +23,7 @@ export class CitaControlador {
 
     async crearCita(request: FastifyRequest, reply: FastifyReply) {
         try {
-            const pacienteRepo = new PacienteRepositorioPostgres();
-            const disponibilidadRepo = new DisponibilidadRepositorioPostgres();
-            const esquemaConValidaciones = crearCitaConValidacionRepositorios(
-                pacienteRepo,
-                disponibilidadRepo
-            );
-
-            const citaValidada = await esquemaConValidaciones.parseAsync(
-                request.body
-            );
+            const citaValidada = await esquemaCrearCita.parseAsync(request.body);
 
             const citaCreada = await this.citaServicio.CrearCitaMedica(
                 citaValidada as Omit<ICitaMedica, "idCita">
@@ -52,7 +41,6 @@ export class CitaControlador {
                 });
             }
 
-            // Error de disponibilidad no encontrada
             if (
                 error instanceof Error &&
                 error.message.includes("No se encontró una disponibilidad")
@@ -63,7 +51,6 @@ export class CitaControlador {
                 });
             }
 
-            // Error de validación de fecha con disponibilidad
             if (
                 error instanceof Error &&
                 (error.message.includes("no coincide") ||
@@ -75,7 +62,6 @@ export class CitaControlador {
                 });
             }
 
-            // Error de duplicado desde el servicio
             if (error instanceof Error && error.message.includes("Ya existe")) {
                 return reply.status(409).send({
                     error: "Conflicto",
@@ -164,54 +150,52 @@ export class CitaControlador {
         return reply.status(statusCode).send({ mensaje });
     }
 
-    
-async consultarCitasPorPaciente(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const { idPaciente } = request.params as { idPaciente: string };
-        const id = parseInt(idPaciente, 10);
+    async consultarCitasPorPaciente(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const { idPaciente } = request.params as { idPaciente: string };
+            const id = parseInt(idPaciente, 10);
 
-        if (isNaN(id)) {
-            return reply.status(400).send({
-                error: "ID inválido",
-                mensaje: "El ID del paciente debe ser un número válido",
-            });
-        }
+            if (isNaN(id)) {
+                return reply.status(400).send({
+                    error: "ID inválido",
+                    mensaje: "El ID del paciente debe ser un número válido",
+                });
+            }
 
-        const citas = await this.citaServicio.obtenerCitasPorPaciente(id);
+            const citas = await this.citaServicio.obtenerCitasPorPaciente(id);
 
-        if (citas.length === 0) {
+            if (citas.length === 0) {
+                return reply.status(200).send({
+                    mensaje: "El paciente no tiene citas registradas",
+                    data: [],
+                    total: 0,
+                });
+            }
+
             return reply.status(200).send({
-                mensaje: "El paciente no tiene citas registradas",
-                data: [],
-                total: 0,
+                mensaje: "Citas del paciente obtenidas exitosamente",
+                data: citas,
+                total: citas.length,
             });
-        }
+        } catch (error: any) {
+            if (error.message.includes("debe ser un número positivo")) {
+                return reply.status(400).send({
+                    error: "ID inválido",
+                    mensaje: error.message,
+                });
+            }
 
-        return reply.status(200).send({
-            mensaje: "Citas del paciente obtenidas exitosamente",
-            data: citas,
-            total: citas.length,
-        });
-    } catch (error: any) {
-        if (error.message.includes("debe ser un número positivo")) {
-            return reply.status(400).send({
-                error: "ID inválido",
+            if (error.message.includes("No se encontró")) {
+                return reply.status(404).send({
+                    error: "Paciente no encontrado",
+                    mensaje: error.message,
+                });
+            }
+
+            return reply.status(500).send({
+                error: "Error al obtener las citas del paciente",
                 mensaje: error.message,
             });
         }
-
-        // ✨ Error: Paciente no encontrado
-        if (error.message.includes("No se encontró")) {
-            return reply.status(404).send({
-                error: "Paciente no encontrado",
-                mensaje: error.message,
-            });
-        }
-
-        return reply.status(500).send({
-            error: "Error al obtener las citas del paciente",
-            mensaje: error.message,
-        });
     }
-}
 }

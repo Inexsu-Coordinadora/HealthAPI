@@ -50,7 +50,7 @@ export class DisponibilidadServicio {
                     datos.diaSemana,
                     datos.horaInicio,
                     datos.horaFin
-                );
+                ); 
 
             if (consultorioOcupado) {
                 throw new Error(

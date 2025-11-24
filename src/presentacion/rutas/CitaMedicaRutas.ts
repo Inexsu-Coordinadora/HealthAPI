@@ -38,9 +38,6 @@ export async function citaRutas(fastify: FastifyInstance) {
         return citaControlador.eliminarCita(request, reply);
     });
 
-    fastify.post("/citas/agendar", async (request, reply) => {
-        return citaControlador.crearCita(request, reply);
-    });
     fastify.get("/pacientes/:idPaciente/citas", async (request, reply) => {
         return citaControlador.consultarCitasPorPaciente(request, reply);
     });
