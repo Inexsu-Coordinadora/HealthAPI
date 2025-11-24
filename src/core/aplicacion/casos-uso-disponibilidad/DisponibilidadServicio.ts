@@ -1,6 +1,7 @@
 import type { IDisponibilidadRepositorio } from "../../dominio/disponibilidad/repositorio/IDisponibilidadRepositorio.js";
 import type { IDisponibilidad } from "../../dominio/disponibilidad/IDisponibilidad.js";
 import { Disponibilidad } from "../../dominio/disponibilidad/Disponibilidad.js";
+import { ConflictError } from "../../../common/errores/AppError.js";
 
 export class DisponibilidadServicio {
     constructor(
@@ -21,7 +22,7 @@ export class DisponibilidadServicio {
             );
 
         if (existeDuplicado) {
-            throw new Error(
+            throw new ConflictError(
                 "Ya existe una disponibilidad idéntica para este médico en el mismo horario"
             );
         }
@@ -37,7 +38,7 @@ export class DisponibilidadServicio {
             );
 
         if (medicoEnOtroConsultorio) {
-            throw new Error(
+            throw new ConflictError(
                 "El médico ya tiene disponibilidad en otro consultorio en este horario"
             );
         }
@@ -53,7 +54,7 @@ export class DisponibilidadServicio {
                 );
 
             if (consultorioOcupado) {
-                throw new Error(
+                throw new ConflictError(
                     "El consultorio ya está ocupado por otro médico en este horario"
                 );
             }
@@ -136,7 +137,7 @@ export class DisponibilidadServicio {
                 );
 
             if (medicoEnOtroConsultorio) {
-                throw new Error(
+                throw new ConflictError(
                     "El médico ya tiene disponibilidad en otro consultorio en este horario"
                 );
             }
@@ -156,7 +157,7 @@ export class DisponibilidadServicio {
                     );
 
                 if (consultorioOcupado) {
-                    throw new Error(
+                    throw new ConflictError(
                         "El consultorio ya está ocupado por otro médico en este horario"
                     );
                 }

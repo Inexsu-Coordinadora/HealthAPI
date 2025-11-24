@@ -162,8 +162,11 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
     }
 
     // 12. Verificar si una disponibilidad existe
-    async verificarDisponibilidadExiste(idDisponibilidad: number): Promise<boolean> {
-        const query = "SELECT 1 FROM disponibilidad WHERE id_disponibilidad = $1";
+    async verificarDisponibilidadExiste(
+        idDisponibilidad: number
+    ): Promise<boolean> {
+        const query =
+            "SELECT 1 FROM disponibilidad WHERE id_disponibilidad = $1";
         const result = await ejecutarConsulta(query, [idDisponibilidad]);
         return result.rows.length > 0;
     }
@@ -196,7 +199,9 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         }
 
         const result = await ejecutarConsulta(query, params);
-        return result.rows.length > 0 ? this.mapearFilaACitaMedica(result.rows[0]) : null;
+        return result.rows.length > 0
+            ? this.mapearFilaACitaMedica(result.rows[0])
+            : null;
     }
 
     // 14. Verificar traslape de citas para un médico
@@ -227,7 +232,9 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         }
 
         const result = await ejecutarConsulta(query, params);
-        return result.rows.length > 0 ? this.mapearFilaACitaMedica(result.rows[0]) : null;
+        return result.rows.length > 0
+            ? this.mapearFilaACitaMedica(result.rows[0])
+            : null;
     }
 
     // 15. Verificar traslape de citas para un consultorio
@@ -258,9 +265,14 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         }
 
         const result = await ejecutarConsulta(query, params);
-        return result.rows.length > 0 ? this.mapearFilaACitaMedica(result.rows[0]) : null;
+        return result.rows.length > 0
+            ? this.mapearFilaACitaMedica(result.rows[0])
+            : null;
     }
-    async verificarCitasSuperpuestasMedico(idDisponibilidad: number, fecha: Date): Promise<boolean> {
+    async verificarCitasSuperpuestasMedico(
+        idDisponibilidad: number,
+        fecha: Date
+    ): Promise<boolean> {
         const query = `
             SELECT COUNT(*) as count
             FROM cita_medica cm
@@ -271,13 +283,15 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
                             AND $2::timestamp + interval '1 hour'
             AND cm.estado != 'cancelada'
         `;
-    
+
         const result = await ejecutarConsulta(query, [idDisponibilidad, fecha]);
         return parseInt(result.rows[0].count) > 0;
     }
 
-
-    async verificarCitasSuperpuestasConsultorio(idDisponibilidad: number, fecha: Date): Promise<boolean> {
+    async verificarCitasSuperpuestasConsultorio(
+        idDisponibilidad: number,
+        fecha: Date
+    ): Promise<boolean> {
         const query = `
             SELECT COUNT(*) as count
             FROM cita_medica cm
@@ -289,7 +303,7 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
                             AND $2::timestamp + interval '1 hour'
             AND cm.estado != 'cancelada'
         `;
-    
+
         const result = await ejecutarConsulta(query, [idDisponibilidad, fecha]);
         return parseInt(result.rows[0].count) > 0;
     }
@@ -308,7 +322,10 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         return mapeo[campo] || campo.toLowerCase();
     }
 
-    async verificarCitasSuperpuestasPaciente(idPaciente: number, fecha: Date): Promise<boolean> {
+    async verificarCitasSuperpuestasPaciente(
+        idPaciente: number,
+        fecha: Date
+    ): Promise<boolean> {
         const query = `
             SELECT COUNT(*) as count
             FROM cita_medica
@@ -317,7 +334,7 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
                         AND $2::timestamp + interval '1 hour'
             AND estado != 'cancelada'
         `;
-        
+
         const result = await ejecutarConsulta(query, [idPaciente, fecha]);
         return parseInt(result.rows[0].count) > 0;
     }
@@ -335,8 +352,10 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         };
     }
 
-    async obtenerCitasConDetallesPorPaciente(idPaciente: number): Promise<ICitaMedicaConDetalles[]> {
-    const query = `
+    async obtenerCitasConDetallesPorPaciente(
+        idPaciente: number
+    ): Promise<ICitaMedicaConDetalles[]> {
+        const query = `
         SELECT 
             cm.id_cita,
             cm.fecha,
@@ -357,24 +376,24 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         ORDER BY cm.fecha DESC
     `;
 
-    const result = await ejecutarConsulta(query, [idPaciente]);
-    
-    return result.rows.map((row) => ({
-        idCita: row.id_cita,
-        fecha: new Date(row.fecha),
-        estado: row.estado,
-        motivo: row.motivo,
-        observaciones: row.observaciones,
-        paciente: {
-            idPaciente: row.id_paciente,
-            nombrePaciente: row.nombre_paciente,
-            correoPaciente: row.correo_paciente,
-        },
-        medico: {
-            idMedico: row.id_medico,
-            nombreMedico: row.nombre_medico,
-            especialidadMedico: row.especialidad_medico,
-        },
-    }));
-}
+        const result = await ejecutarConsulta(query, [idPaciente]);
+
+        return result.rows.map((row) => ({
+            idCita: row.id_cita,
+            fecha: new Date(row.fecha),
+            estado: row.estado,
+            motivo: row.motivo,
+            observaciones: row.observaciones,
+            paciente: {
+                idPaciente: row.id_paciente,
+                nombrePaciente: row.nombre_paciente,
+                correoPaciente: row.correo_paciente,
+            },
+            medico: {
+                idMedico: row.id_medico,
+                nombreMedico: row.nombre_medico,
+                especialidadMedico: row.especialidad_medico,
+            },
+        }));
+    }
 }

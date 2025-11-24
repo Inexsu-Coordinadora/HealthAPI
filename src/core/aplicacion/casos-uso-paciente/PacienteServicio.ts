@@ -4,6 +4,7 @@ import type {
     IPacienteActualizar,
 } from "../../dominio/paciente/IPaciente.js";
 import { Paciente } from "../../dominio/paciente/Paciente.js";
+import { ConflictError } from "../../../common/errores/AppError.js";
 
 export class PacienteServicio {
     constructor(private readonly pacienteRepositorio: IPacienteRepositorio) {}
@@ -18,10 +19,15 @@ export class PacienteServicio {
             datos.telefonoPaciente || ""
         );
 
-        const pacienteExistente = await this.pacienteRepositorio.obtenerPorCorreo(datos.correoPaciente);
-            if (pacienteExistente) {
-        throw new Error(`Ya existe un paciente con el correo ${datos.correoPaciente}`);
-    }
+        const pacienteExistente =
+            await this.pacienteRepositorio.obtenerPorCorreo(
+                datos.correoPaciente
+            );
+        if (pacienteExistente) {
+            throw new ConflictError(
+                `Ya existe un paciente con el correo ${datos.correoPaciente}`
+            );
+        }
 
         return await this.pacienteRepositorio.crearPaciente(nuevoPaciente);
     }
