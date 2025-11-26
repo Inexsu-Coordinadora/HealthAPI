@@ -334,13 +334,18 @@ export class CitaMedicaServicio {
         }
         console.log("✓ Disponibilidad disponible");
 
-        // VALIDACIÓN 6: Verificar que el paciente no tenga otra cita
-        console.log("[6] Verificando traslape de paciente");
+        // VALIDACIÓN 6: Verificar que el paciente no tenga otra cita en ese horario exacto
+        // La cita tiene una hora específica (ej: 09:30), debemos verificar si existe otra cita a esa hora
+        const horaCita = FechaUtil.extraerHora(fecha);
+        console.log(
+            `[6] Verificando traslape de paciente en horario ${horaCita}`
+        );
+
         const pacienteTieneCita =
             await this.citaMedicaRepositorio.verificarTraslapePaciente(
                 datos.idPaciente,
-                horaInicio,
-                horaFin,
+                horaCita,
+                horaCita,
                 fecha
             );
 

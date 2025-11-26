@@ -232,15 +232,16 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         fecha: Date,
         excluirCitaId?: number
     ): Promise<boolean> {
+        // Verifica si el paciente ya tiene una cita en el mismo horario
+        // Compara la HORA DE LA CITA (extraída de cm.fecha), no el rango de disponibilidad
         let query = `
         SELECT 1 FROM cita_medica cm
-        INNER JOIN disponibilidad d ON cm.id_disponibilidad = d.id_disponibilidad
         WHERE cm.id_paciente = $1
         AND DATE(cm.fecha) = DATE($2)
         AND cm.estado != 'cancelada'
-        AND (d.hora_fin > $3 AND d.hora_inicio < $4)
+        AND TO_CHAR(cm.fecha AT TIME ZONE 'UTC', 'HH24:MI:SS') = $3
     `;
-        const params: any[] = [idPaciente, fecha, horaInicio, horaFin];
+        const params: any[] = [idPaciente, fecha, horaInicio];
 
         if (excluirCitaId) {
             query += ` AND cm.id_cita != $${params.length + 1}`;
