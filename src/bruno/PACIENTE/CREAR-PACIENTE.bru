@@ -1,17 +1,21 @@
 meta {
   name: CREAR-PACIENTE
   type: http
-<<<<<<< HEAD:src/bruno/PACIENTE/CREAR-PACIENTE.bru
   seq: 2
-=======
-  seq: 12
->>>>>>> feature/cita-agendamiento:src/bruno/CREAR-PACIENTE.bru
 }
 
 post {
-  url: http://192.168.80.14:3000
+  url: http://localhost:3000/api/pacientes
   body: json
   auth: inherit
+}
+
+body:json {
+  {
+      "nombrePaciente": "Karla Pérez",
+      "correoPaciente": "karla.perez@example.com",
+      "telefonoPaciente": "3002548974"
+  }
 }
 
 settings {
