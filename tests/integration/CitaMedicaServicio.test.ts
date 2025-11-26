@@ -29,11 +29,11 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
     const citasCreadas: number[] = [];
 
     beforeAll(async () => {
-        await pool.query('DELETE FROM cita_medica');
-        await pool.query('DELETE FROM disponibilidad');
-        await pool.query('DELETE FROM consultorio');
-        await pool.query('DELETE FROM medico');
-        await pool.query('DELETE FROM paciente');
+        await pool.query("DELETE FROM cita_medica");
+        await pool.query("DELETE FROM disponibilidad");
+        await pool.query("DELETE FROM consultorio");
+        await pool.query("DELETE FROM medico");
+        await pool.query("DELETE FROM paciente");
         citaRepo = new CitaMedicaRepositorioPostgres();
         disponibilidadRepo = new DisponibilidadRepositorioPostgres();
         pacienteRepo = new PacienteRepositorioPostgres();
@@ -110,7 +110,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             const datosCita = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: "2025-12-01T10:00:00",
+                fecha: "2099-01-01T10:00:00",
                 motivo: "Test estrategia simplificada",
                 observaciones: "Test de integración",
             };
@@ -131,7 +131,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             const datosCita = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: "2025-12-08T10:30:00",
+                fecha: "2099-01-08T10:30:00",
                 motivo: null,
                 observaciones: "Test disponibilidad ocupada",
             };
@@ -150,7 +150,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             const datosCita = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: "2025-12-15T09:30:00",
+                fecha: "2099-01-15T09:30:00",
                 motivo: null,
                 observaciones: "Test traslape paciente",
             };
@@ -169,7 +169,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             const datosCita = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: "2025-12-22T11:00:00",
+                fecha: "2099-01-22T11:00:00",
                 motivo: "Verificar médico implícito",
                 observaciones: "",
             };
@@ -192,7 +192,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             const cita1 = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: "2026-01-05T09:00:00",
+                fecha: "2099-02-05T09:00:00",
                 motivo: "Primera cita",
                 observaciones: "",
             };
@@ -200,7 +200,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             const cita2 = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: "2026-01-12T09:00:00",
+                fecha: "2099-02-12T09:00:00",
                 motivo: "Segunda cita",
                 observaciones: "",
             };
@@ -221,7 +221,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             const citaDatos = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: new Date("2025-12-01T10:00:00.000Z"),
+                fecha: new Date("2099-01-01T10:00:00.000Z"),
                 estado: "programada" as const,
                 motivo: "Test validación día",
                 observaciones: "",
@@ -238,7 +238,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             const citaDatos = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: new Date("2025-12-02T10:00:00.000Z"), // martes
+                fecha: new Date("2099-01-04T10:00:00.000Z"), // lunes: 2099-01-01, jueves; 2099-01-04, domingo
                 estado: "programada" as const,
                 motivo: "Test día incorrecto",
                 observaciones: "",
@@ -253,7 +253,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             const citaDatos = {
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: new Date("2025-12-01T14:00:00.000Z"), // 14:00, fuera de 09:00-13:00
+                fecha: new Date("2099-01-01T14:00:00.000Z"), // 14:00, fuera de 09:00-13:00
                 estado: "programada" as const,
                 motivo: "Test hora incorrecta",
                 observaciones: "",
@@ -299,7 +299,7 @@ describe("CitaMedicaServicio - Tests de Integración", () => {
             const cita = await servicio.agendarCitaConValidacion({
                 idPaciente: pacienteId,
                 idDisponibilidad: disponibilidadId,
-                fecha: "2026-02-02T10:00:00",
+                fecha: "2099-03-01T10:00:00",
                 motivo: "Test CRUD",
                 observaciones: "",
             });

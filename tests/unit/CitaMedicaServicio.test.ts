@@ -73,10 +73,11 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
             horaFin: "13:00:00",
         };
 
+        const fechaFutura = "2099-01-01T10:00:00";
         const datosCitaMock = {
             idPaciente: 1,
             idDisponibilidad: 1,
-            fecha: "2025-11-24T10:00:00",
+            fecha: fechaFutura,
             motivo: "Consulta general",
             observaciones: "Primera cita",
         };
@@ -264,7 +265,7 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
                 idDisponibilidad: 1,
                 idMedico: 1,
                 idConsultorio: 1,
-                diaSemana: "lunes",
+                diaSemana: "jueves", // 2099-01-01 es jueves
                 horaInicio: "09:00:00",
                 horaFin: "13:00:00",
             };
@@ -272,7 +273,7 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
             const citaMock: Omit<ICitaMedica, "idCita"> = {
                 idPaciente: 1,
                 idDisponibilidad: 1,
-                fecha: new Date("2025-11-24T10:00:00.000Z"),
+                fecha: new Date("2099-01-01T10:00:00.000Z"),
                 estado: "programada",
                 motivo: "Consulta",
                 observaciones: "",
@@ -300,7 +301,7 @@ describe("CitaMedicaServicio - Tests Unitarios", () => {
             const citaMock: Omit<ICitaMedica, "idCita"> = {
                 idPaciente: 1,
                 idDisponibilidad: 999,
-                fecha: new Date("2025-11-24T10:00:00"),
+                fecha: new Date("2099-01-01T10:00:00"),
                 estado: "programada",
                 motivo: "Consulta",
                 observaciones: "",
