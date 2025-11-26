@@ -32,12 +32,18 @@ export interface AgendarCitaDTO {
 }
 
 const esquemaFecha = z
-    .string()
-    .min(1, { message: "La fecha es obligatoria" })
-    .datetime({ message: "La fecha debe estar en formato ISO 8601 con zona horaria (ej: 2025-11-15T10:00:00Z)" })
-    .transform((val) => new Date(val))
+    .union([
+        z.string().min(1, "La fecha es obligatoria"),
+        z.date()
+    ])
+    .transform((val) => {
+        if (typeof val === "string") {
+            return new Date(val);
+        }
+        return val;
+    })
     .refine((date) => !isNaN(date.getTime()), {
-        message: "La fecha debe ser válida",
+        message: "La fecha debe ser válida en formato ISO 8601",
     })
     .refine((date) => date > new Date(), {
         message: "La fecha debe ser futura",

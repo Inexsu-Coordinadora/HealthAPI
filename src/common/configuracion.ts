@@ -1,6 +1,6 @@
-import { config } from "dotenv";
+import dotenv from 'dotenv';
 
-config();
+dotenv.config();
 
 export const configuracion = {
     baseDatos: {
@@ -11,7 +11,7 @@ export const configuracion = {
         contrasena: process.env.DB_PASSWORD,
     },
     servidor: {
-        puerto: Number(process.env.PUERTO),
+        puerto: Number(process.env.PUERTO)|| 3000,
         entorno: process.env.NODE_ENV,
     },
 };
