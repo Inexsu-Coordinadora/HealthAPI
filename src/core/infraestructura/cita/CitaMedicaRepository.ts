@@ -209,11 +209,12 @@ export class CitaMedicaRepositorioPostgres implements ICitaMedicaRepositorio {
         excluirCitaId?: number
     ): Promise<boolean> {
         let query = `
-        SELECT 1 FROM cita_medica
-        WHERE id_disponibilidad = $1
-        AND DATE(fecha) = DATE($2)
-        AND estado != 'cancelada'
-    `;
+            SELECT 1 FROM cita_medica
+            WHERE id_disponibilidad = $1
+            AND DATE(fecha) = DATE($2)
+            AND estado != 'cancelada'
+            AND TO_CHAR(fecha AT TIME ZONE 'UTC', 'HH24:MI:SS') = TO_CHAR($2 AT TIME ZONE 'UTC', 'HH24:MI:SS')
+        `;
         const params: any[] = [idDisponibilidad, fecha];
 
         if (excluirCitaId) {
